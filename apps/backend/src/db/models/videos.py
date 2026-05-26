@@ -1,6 +1,9 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base
+from db.models.scenes_videos import scenes_videos
+from models.scene import Scene
 
 
 class Video(Base):
@@ -10,11 +13,11 @@ class Video(Base):
     """
     __tablename__ = "videos"
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     """Primary key for Video Model."""
-    description = Column(String(4096), nullable=False)
+    description: Mapped[str] = mapped_column(String(4096), nullable=False)
     """User defined description of the video."""
-    label=Column(String(512), nullable=False)
+    label: Mapped[str] = mapped_column(String(512), nullable=False)
     """User defined name of the video."""
-    filename=Column(String(36), nullable=False)
+    filename: Mapped[str] = mapped_column(String(36), nullable=False)
     """Backend UUID of the video."""
