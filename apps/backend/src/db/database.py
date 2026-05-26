@@ -11,7 +11,6 @@ from loguru import logger
 def load_database(settings: Settings) -> tuple[Engine, sessionmaker]:
     """
     Connects to the database configured in settings.
-    todo: do we need to use alembic?
     :return: SQLAlchemy engine object.
     """
 
