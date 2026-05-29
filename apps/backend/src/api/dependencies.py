@@ -5,8 +5,10 @@ from sqlalchemy.orm import Session
 
 from repositories.project_repository import ProjectRepository
 from repositories.video_repository import VideoRepository
+from repositories.agent_repository import AgentRepository
 from services.project_service import ProjectService
 from services.video_service import VideoService
+from services.agent_service import AgentService
 
 
 def database(request: Request) -> Generator[Session, None, None]:
@@ -38,3 +40,9 @@ def get_project_service(db: DBSession) -> ProjectService:
     project_repository = ProjectRepository(db)
     video_repository = VideoRepository(db)
     return ProjectService(project_repository, video_repository)
+
+
+def get_agent_service(db: DBSession) -> AgentService:
+    """Provides access to the AgentService."""
+    agent_repository = AgentRepository(db)
+    return AgentService(agent_repository)

@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy import Engine
 from sqlalchemy.orm import sessionmaker
 
-from api.routes import video_router
+from api.routes import video_router, project_router, agent_router
 from settings import Settings
 
 API_PREFIX = "/api"
@@ -17,6 +17,8 @@ app.state.engine = None
 router = APIRouter(prefix=API_PREFIX)
 
 router.include_router(video_router)
+router.include_router(project_router)
+router.include_router(agent_router)
 # router.include_router(example_router)
 # router.include_router(example_router)
 # add more routers here...
