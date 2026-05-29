@@ -3,9 +3,9 @@ from typing import Generator, Annotated
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
-from repositories.scene_repository import SceneRepository
+from repositories.project_repository import ProjectRepository
 from repositories.video_repository import VideoRepository
-from services.scene_service import SceneService
+from services.project_service import ProjectService
 from services.video_service import VideoService
 
 
@@ -33,8 +33,8 @@ def get_video_service(db: DBSession) -> VideoService:
     return VideoService(video_repository)
 
 
-def get_scene_service(db: DBSession) -> SceneService:
-    """Provides access to the SceneService."""
-    scene_repository = SceneRepository(db)
+def get_project_service(db: DBSession) -> ProjectService:
+    """Provides access to the ProjectService."""
+    project_repository = ProjectRepository(db)
     video_repository = VideoRepository(db)
-    return SceneService(scene_repository, video_repository)
+    return ProjectService(project_repository, video_repository)

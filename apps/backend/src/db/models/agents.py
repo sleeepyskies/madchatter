@@ -8,5 +8,6 @@ class Agent(Base):
 
     id = Column(Integer, primary_key=True)
     label = Column(String(256), nullable=False)
-    # todo: what other fields do we need? prompt, voice_model, llm_model ...
+    system_prompt = Column(String, nullable=False)
+    # todo: what other fields do we need? voice_model, llm_model ...
 

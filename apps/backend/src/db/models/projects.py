@@ -3,16 +3,16 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base
 from db.models.agents import Agent
-from db.models.scenes_videos import scenes_videos
+from db.models.projects_videos import projects_videos
 from db.models.videos import Video
 
 
-class Scene(Base):
+class Project(Base):
     """
-    A Scene represents an agent and a collection of videos together. This allows for agents to be
-    reused throughout various scenes without having to redefined their personality.
+    A Project represents an agent and a collection of videos together. This allows for agents to be
+    reused throughout various projects without having to redefined their personality.
     """
-    __tablename__ = "scenes"
+    __tablename__ = "projects"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     label: Mapped[str] = mapped_column(String(256), nullable=False)
@@ -23,6 +23,6 @@ class Scene(Base):
     agent: Mapped["Agent | None"] = relationship("Agent")
     videos: Mapped[list["Video"]] = relationship(
         "Video",
-        secondary=scenes_videos,
+        secondary=projects_videos,
     )
 

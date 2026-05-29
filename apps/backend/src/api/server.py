@@ -4,8 +4,8 @@ from loguru import logger
 from sqlalchemy import Engine
 from sqlalchemy.orm import sessionmaker
 
-from settings import Settings, Env
 from api.routes import video_router
+from settings import Settings
 
 API_PREFIX = "/api"
 

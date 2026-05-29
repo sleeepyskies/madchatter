@@ -1,18 +1,18 @@
 from models.base import BaseSchema
 
 
-class SceneResponse(BaseSchema):
+class ProjectResponse(BaseSchema):
     id: int
     label: str
     agent_id: int | None
     video_ids: list[int]
 
-class CreateSceneRequest(BaseSchema):
+class CreateProjectRequest(BaseSchema):
     label: str
     agent_id: int
     video_ids: list[int]
 
-class UpdateSceneRequest(BaseSchema):
+class UpdateProjectRequest(BaseSchema):
     label: str | None
     agent_id: int | None
     video_ids: list[int] | None

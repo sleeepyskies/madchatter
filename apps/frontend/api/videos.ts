@@ -1,6 +1,6 @@
 import ky from "ky";
 
-const api = ky.create({prefix: "/api/videos"});
+const api = ky.create({prefix: "/api/videos/"});
 
 export interface CreateVideoRequest {
     label: string,
@@ -18,7 +18,7 @@ export interface SimpleVideoResponse {
     description: string,
 }
 
-export const videoApi = {
+export const videosApi = {
     uploadVideo: async (file: File, request: CreateVideoRequest): Promise<SimpleVideoResponse> => {
         const form = new FormData();
 
