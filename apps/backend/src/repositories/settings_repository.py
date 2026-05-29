@@ -1,14 +1,16 @@
 from dataclasses import dataclass
+from typing import Literal
 
 from sqlalchemy.orm import Session
 
 from db.models.user_preferences import UserPreferences
 
+Language = Literal["en", "de"]
 
 @dataclass
 class UpdateSettings:
     theme: str | None
-    language: str | None
+    language: Language | None
     notifications_enabled: bool | None
 
 

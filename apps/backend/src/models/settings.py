@@ -1,12 +1,14 @@
 from models.base import BaseSchema
 from typing import Literal
 
+Language = Literal["en", "de"]
+
 class SettingsResponse(BaseSchema):
     theme: Literal["light", "dark", "system"]
-    language: str
+    language: Language
     notifications_enabled: bool
 
 class UpdateSettingsRequest(BaseSchema):
     theme: Literal["light", "dark", "system"] | None
-    language: str | None
+    language: Language | None
     notifications_enabled: bool | None
