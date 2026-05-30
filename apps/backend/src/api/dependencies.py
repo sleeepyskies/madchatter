@@ -9,6 +9,8 @@ from repositories.agent_repository import AgentRepository
 from services.project_service import ProjectService
 from services.video_service import VideoService
 from services.agent_service import AgentService
+from repositories.settings_repository import SettingsRepository
+from services.settings_service import SettingsService
 
 
 def database(request: Request) -> Generator[Session, None, None]:
@@ -46,3 +48,9 @@ def get_agent_service(db: DBSession) -> AgentService:
     """Provides access to the AgentService."""
     agent_repository = AgentRepository(db)
     return AgentService(agent_repository)
+
+
+def get_settings_service(db: DBSession) -> SettingsService:
+    """Provides access to the SettingsService."""
+    settings_repository = SettingsRepository(db)
+    return SettingsService(settings_repository)
