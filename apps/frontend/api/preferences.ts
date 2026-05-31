@@ -11,7 +11,7 @@ export interface Preferences {
     notificationsEnabled: boolean;
 }
 
-export interface UpdatePreferencesRequets {
+export interface UpdatePreferencesRequest {
     theme?: Theme | null;
     language?: Language | null;
     notificationsEnabled?: boolean | null;
@@ -22,7 +22,7 @@ export const preferences = {
         return await api.get("").json();
     },
 
-    updatePreferences: async (request: UpdatePreferencesRequets): Promise<Preferences> => {
+    updatePreferences: async (request: UpdatePreferencesRequest): Promise<Preferences> => {
         return await api.patch("", {json: request}).json();
     },
 };
