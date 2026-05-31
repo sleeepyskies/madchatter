@@ -16,8 +16,10 @@ LogLevel = Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 class Settings(BaseSettings):
     """Application configuration loaded from the environment."""
-    model_config = SettingsConfigDict(env_prefix="MC_",
-                                      env_file="./../../.env", )  # at monorepo root
+    model_config = SettingsConfigDict(
+        env_prefix="MC_",
+        env_file="./../../.env",  # at monorepo root
+    )
 
     env: Env = Env.DEV
     """Application runtime environment."""
@@ -38,3 +40,6 @@ class Settings(BaseSettings):
 def load_settings() -> Settings:
     """Load application settings from environment and .env file."""
     return Settings()
+
+settings = load_settings()
+"""Globally accessible application settings."""

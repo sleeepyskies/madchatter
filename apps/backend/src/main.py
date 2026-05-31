@@ -6,7 +6,6 @@ from db.database import load_database
 from loguru import logger
 
 from log import configure_logging
-from settings import Settings, load_settings
 
 
 @unique
@@ -19,10 +18,9 @@ class ExitCode(IntEnum):
 def main():
     """Entry point of the application."""
     try:
-        settings = load_settings()
-        configure_logging(settings)
-        engine, SessionLocal = load_database(settings)
-        start_server(settings, engine, SessionLocal)
+        configure_logging()
+        engine, SessionLocal = load_database()
+        start_server(engine, SessionLocal)
 
         return ExitCode.SUCCESS
 

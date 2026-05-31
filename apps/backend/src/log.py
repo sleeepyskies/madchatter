@@ -2,7 +2,7 @@ import sys
 import logging
 
 from loguru import logger
-from settings import Settings
+from settings import Settings, settings
 
 
 class LogInterceptHandler(logging.Handler):
@@ -22,7 +22,7 @@ class LogInterceptHandler(logging.Handler):
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
-def configure_logging(settings: Settings):
+def configure_logging():
     """
     Configures logging for the application.
     Intercepts all stdlib logging, routes uvicorn logging
