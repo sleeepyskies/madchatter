@@ -2,6 +2,8 @@ from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base
+from db.models.scenes_videos import scenes_videos
+from models.scene import Scene
 
 
 class Video(Base):
