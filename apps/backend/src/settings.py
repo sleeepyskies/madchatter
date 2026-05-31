@@ -1,5 +1,6 @@
 from enum import StrEnum
 from typing import Literal
+
 from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
@@ -9,11 +10,16 @@ class Env(StrEnum):
     PROD = "PROD"
     TEST = "TEST"
 
+
 LogLevel = Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+
 
 class Settings(BaseSettings):
     """Application configuration loaded from the environment."""
-    model_config = SettingsConfigDict(env_prefix="MC_", env_file=".env")
+    model_config = SettingsConfigDict(
+        env_prefix="MC_",
+        env_file="./../../.env",  # at monorepo root
+    )
 
     env: Env = Env.DEV
     """Application runtime environment."""
@@ -21,16 +27,19 @@ class Settings(BaseSettings):
     log_level: LogLevel = "INFO"
     """Logging verbosity level."""
 
-    server_address: str = "127.0.0.1"
+    server_address: str
     """Host address for the server."""
 
-    server_port: int = 8080
+    server_port: int
     """Server port."""
 
-    database_url: str = "sqlite:///db.sqlite"
+    database_url: str
     """Database connection string."""
 
 
 def load_settings() -> Settings:
     """Load application settings from environment and .env file."""
     return Settings()
+
+settings = load_settings()
+"""Globally accessible application settings."""

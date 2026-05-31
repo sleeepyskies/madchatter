@@ -26,9 +26,7 @@ class VideoRepository:
         return video
 
     def get(self, video_id: int) -> Video | None:
-        return self.database.scalars(
-            select(Video).where(Video.id == video_id)
-        ).first()
+        return self.database.get(Video, video_id)
 
     def list(self) -> list[Video]:
         return list(self.database.scalars(select(Video)).all())

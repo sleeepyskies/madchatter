@@ -4,11 +4,11 @@ from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker
 
 from db.base import Base
-from settings import Settings
+from settings import Settings, settings
 from loguru import logger
 
 
-def load_database(settings: Settings) -> tuple[Engine, sessionmaker]:
+def load_database() -> tuple[Engine, sessionmaker]:
     """
     Connects to the database configured in settings.
     :return: SQLAlchemy engine object.

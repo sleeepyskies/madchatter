@@ -3,7 +3,13 @@ from typing import Generator, Annotated
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
+from repositories.agent_repository import AgentRepository
+from repositories.preferences_repository import PreferencesRepository
+from repositories.project_repository import ProjectRepository
 from repositories.video_repository import VideoRepository
+from services.agent_service import AgentService
+from services.preferences_service import PreferencesService
+from services.project_service import ProjectService
 from services.video_service import VideoService
 
 
@@ -29,3 +35,22 @@ def get_video_service(db: DBSession) -> VideoService:
     """Provides access to the VideoService."""
     video_repository = VideoRepository(db)
     return VideoService(video_repository)
+
+
+def get_project_service(db: DBSession) -> ProjectService:
+    """Provides access to the ProjectService."""
+    project_repository = ProjectRepository(db)
+    video_repository = VideoRepository(db)
+    return ProjectService(project_repository, video_repository)
+
+
+def get_agent_service(db: DBSession) -> AgentService:
+    """Provides access to the AgentService."""
+    agent_repository = AgentRepository(db)
+    return AgentService(agent_repository)
+
+
+def get_preferences_service(db: DBSession) -> PreferencesService:
+    """Provides access to the PreferencesService."""
+    preferences_repository = PreferencesRepository(db)
+    return PreferencesService(preferences_repository)

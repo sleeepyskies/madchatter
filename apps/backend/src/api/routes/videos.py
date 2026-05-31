@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, File
 from fastapi import UploadFile
 from fastapi.params import Depends, Form
+from starlette import status
 
 from api.dependencies import get_video_service
 from models.videos import SimpleVideoResponse, UpdateVideoRequest, CreateVideoRequest
@@ -45,7 +46,8 @@ def update_video(
 ):
     video = video_service.update_video(video_id, request)
     if not video:
-        raise HTTPException(status_code=404, detail="Video not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Video with id: {} not found".format(video_id))
     return video
 
 

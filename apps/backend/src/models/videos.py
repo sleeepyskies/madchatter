@@ -1,24 +1,21 @@
-from pydantic import BaseModel
+from models.base import BaseSchema
 
 
-class SimpleVideoResponse(BaseModel):
+class SimpleVideoResponse(BaseSchema):
     id: int
     label: str
     description: str
-
-    class Config:
-        from_attributes = True
 
 
 class VideoResponse(SimpleVideoResponse):
     file_url: str
 
 
-class CreateVideoRequest(BaseModel):
+class CreateVideoRequest(BaseSchema):
     label: str
     description: str
 
 
-class UpdateVideoRequest(BaseModel):
+class UpdateVideoRequest(BaseSchema):
     label: str | None
     description: str | None
