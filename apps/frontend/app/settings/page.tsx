@@ -1,27 +1,21 @@
 "use client";
 
 import * as React from "react";
-import { AppSidebar } from "@/components/app-sidebar";
+import {AppSidebar} from "@/components/app-sidebar";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
-import { settingsApi } from "@/api/settings";
-import { applyTheme } from "@/components/theme-provider";
-
-import type { Language } from "@/api/settings";
+import {Separator} from "@/components/ui/separator";
+import {SidebarInset, SidebarProvider, SidebarTrigger,} from "@/components/ui/sidebar";
+import {TooltipProvider} from "@/components/ui/tooltip";
+import {Button} from "@/components/ui/button";
+import {Language, preferencesApi} from "@/api/preferences";
+import {applyTheme} from "@/components/theme-provider";
 
 type Settings = {
   theme: "light" | "dark" | "system";
@@ -40,7 +34,7 @@ const languageOptions: { value: Language; label: string }[] = [
 ];
 
 export default function Page() {
-  const [settings, setSettings] = React.useState<Settings | null>(null);
+  const [preferences, setPreferences] = React.useState<Settings | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
@@ -50,9 +44,9 @@ export default function Page() {
 
     async function loadSettings() {
       try {
-        const response = await settingsApi.getSettings();
+        const response = await preferencesApi.getPreferences();
         if (!isMounted) return;
-        setSettings(response);
+        setPreferences(response);
         applyTheme(response.theme);
       } catch (err) {
         if (!isMounted) return;
@@ -68,25 +62,25 @@ export default function Page() {
   }, []);
 
   const handleChange = (field: keyof Settings, value: string | boolean) => {
-    setSettings((current) =>
+    setPreferences((current) =>
       current ? { ...current, [field]: value } : null
     );
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!settings) return;
+    if (!preferences) return;
 
     setIsSaving(true);
     setError(null);
     setSuccess(null);
     try {
-      const updated = await settingsApi.updateSettings({
-        theme: settings.theme,
-        language: settings.language,
-        notificationsEnabled: settings.notificationsEnabled,
+      const updated = await preferencesApi.updatePreferences({
+        theme: preferences.theme,
+        language: preferences.language,
+        notificationsEnabled: preferences.notificationsEnabled,
       });
-      setSettings(updated);
+      setPreferences(updated);
         applyTheme(updated.theme);
       setSuccess("Settings saved.");
     } catch (err) {
@@ -143,14 +137,14 @@ export default function Page() {
                   ) : null}
                 </div>
               </div>
-              {settings ? (
+              {preferences ? (
                 <form className="grid gap-4" onSubmit={handleSubmit}>
                 <div className="space-y-2 rounded-xl border border-border bg-background/70 p-4">
                   <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
                     Theme
                     <select
                       className="h-10 w-full rounded-none border border-input bg-transparent px-3 text-base outline-none transition-colors focus:border-primary"
-                        value={settings.theme}
+                        value={preferences.theme}
                       onChange={(event) => handleChange("theme", event.target.value as Settings["theme"])}
                         disabled={false}
                     >
@@ -165,7 +159,7 @@ export default function Page() {
                     Language
                     <select
                       className="h-10 w-full rounded-none border border-input bg-transparent px-3 text-base outline-none transition-colors focus:border-primary"
-                      value={settings.language}
+                      value={preferences.language}
                       onChange={(event) => handleChange("language", event.target.value as Language)}
                     >
                       {languageOptions.map((option) => (
@@ -179,7 +173,7 @@ export default function Page() {
                     <input
                       type="checkbox"
                       className="h-5 w-5 rounded border border-input bg-background text-primary focus-visible:ring-ring"
-                        checked={settings.notificationsEnabled}
+                        checked={preferences.notificationsEnabled}
                       onChange={(event) => handleChange("notificationsEnabled", event.target.checked)}
                         disabled={false}
                     />
@@ -187,7 +181,7 @@ export default function Page() {
                   </label>
                 </div>
                 <div className="md:col-span-2 flex items-center justify-end gap-2">
-                  <Button type="submit" disabled={!settings || isSaving}>
+                  <Button type="submit" disabled={!preferences || isSaving}>
                     {isSaving ? "Saving..." : "Save settings"}
                   </Button>
                 </div>

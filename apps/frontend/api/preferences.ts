@@ -17,7 +17,7 @@ export interface UpdatePreferencesRequest {
     notificationsEnabled?: boolean | null;
 }
 
-export const preferences = {
+export const preferencesApi = {
     getPreferences: async (): Promise<Preferences> => {
         return await api.get("").json();
     },
