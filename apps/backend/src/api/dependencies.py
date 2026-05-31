@@ -3,14 +3,14 @@ from typing import Generator, Annotated
 from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
+from repositories.agent_repository import AgentRepository
+from repositories.preferences_repository import PreferencesRepository
 from repositories.project_repository import ProjectRepository
 from repositories.video_repository import VideoRepository
-from repositories.agent_repository import AgentRepository
+from services.agent_service import AgentService
+from services.preferences_service import PreferencesService
 from services.project_service import ProjectService
 from services.video_service import VideoService
-from services.agent_service import AgentService
-from repositories.settings_repository import SettingsRepository
-from services.settings_service import SettingsService
 
 
 def database(request: Request) -> Generator[Session, None, None]:
@@ -50,7 +50,7 @@ def get_agent_service(db: DBSession) -> AgentService:
     return AgentService(agent_repository)
 
 
-def get_settings_service(db: DBSession) -> SettingsService:
-    """Provides access to the SettingsService."""
-    settings_repository = SettingsRepository(db)
-    return SettingsService(settings_repository)
+def get_preferences_service(db: DBSession) -> PreferencesService:
+    """Provides access to the PreferencesService."""
+    preferences_repository = PreferencesRepository(db)
+    return PreferencesService(preferences_repository)

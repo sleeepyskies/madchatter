@@ -12,6 +12,7 @@ class CreateAgentRequest(BaseSchema):
     system_prompt: str
 
 
+
 class UpdateAgentRequest(BaseSchema):
     label: str | None
     system_prompt: str | None

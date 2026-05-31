@@ -8,13 +8,13 @@ from db.models.user_preferences import UserPreferences
 Language = Literal["en", "de"]
 
 @dataclass
-class UpdateSettings:
+class UpdatePreferences:
     theme: str | None
     language: Language | None
     notifications_enabled: bool | None
 
 
-class SettingsRepository:
+class PreferencesRepository:
     """Provides access to the database for settings and user preferences."""
 
     def __init__(self, database: Session) -> None:
@@ -35,7 +35,7 @@ class SettingsRepository:
         self.database.refresh(preferences)
         return preferences
 
-    def update(self, settings: UpdateSettings) -> UserPreferences:
+    def update(self, settings: UpdatePreferences) -> UserPreferences:
         preferences = self.get()
         if preferences is None:
             preferences = self.create_default()

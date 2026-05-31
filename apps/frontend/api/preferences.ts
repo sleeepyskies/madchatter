@@ -1,28 +1,28 @@
 import ky from "ky";
 
-const api = ky.create({prefix: "/api/settings"});
+const api = ky.create({prefix: "/api/preferences"});
 
 export type Theme = "light" | "dark" | "system";
 export type Language = "en" | "de";
 
-export interface SettingsResponse {
+export interface Preferences {
     theme: Theme;
     language: Language;
     notificationsEnabled: boolean;
 }
 
-export interface UpdateSettingsRequest {
+export interface UpdatePreferencesRequets {
     theme?: Theme | null;
     language?: Language | null;
     notificationsEnabled?: boolean | null;
 }
 
-export const settingsApi = {
-    getSettings: async (): Promise<SettingsResponse> => {
+export const preferences = {
+    getPreferences: async (): Promise<Preferences> => {
         return await api.get("").json();
     },
 
-    updateSettings: async (request: UpdateSettingsRequest): Promise<SettingsResponse> => {
+    updatePreferences: async (request: UpdatePreferencesRequets): Promise<Preferences> => {
         return await api.patch("", {json: request}).json();
     },
 };

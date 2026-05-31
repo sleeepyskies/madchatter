@@ -4,35 +4,35 @@ from loguru import logger
 from sqlalchemy import Engine
 from sqlalchemy.orm import sessionmaker
 
-from api.routes import video_router, project_router, agent_router, settings_router
-from settings import Settings
+from api.routes import video_router, project_router, agent_router, preference_router
+from settings import Settings, settings
 
 API_PREFIX = "/api"
 
 # configure app and state
-app = FastAPI()
+app = FastAPI(
+    title="MadChatter",
+    summary="Backend server for the MadChatter application."
+)
 app.state.SessionLocal = None
 app.state.engine = None
 
 router = APIRouter(prefix=API_PREFIX)
 
+# link all sub routers
 router.include_router(video_router)
 router.include_router(project_router)
 router.include_router(agent_router)
-router.include_router(settings_router)
-# router.include_router(example_router)
-# router.include_router(example_router)
-# add more routers here...
+router.include_router(preference_router)
 
 # connect main router containing all nested routers to app
 app.include_router(router)
 
 
-def start_server(settings: Settings, engine: Engine, SessionLocal: sessionmaker):
+def start_server(engine: Engine, SessionLocal: sessionmaker):
     """
     Starts the server and injects any dependencies into the application context.
 
-    :param settings: app configuration.
     :param engine: database engine.
     :param SessionLocal: DB session factory.
     :return: None
