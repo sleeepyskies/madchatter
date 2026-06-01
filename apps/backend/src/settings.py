@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     database_url: str
     """Database connection string."""
 
+    vector_db_url: str
+    """Vector database connection string."""
+
+
+
 
 def load_settings() -> Settings:
     """Load application settings from environment and .env file."""

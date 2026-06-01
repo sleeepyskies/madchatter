@@ -3,9 +3,10 @@ from fastapi import FastAPI, APIRouter
 from loguru import logger
 from sqlalchemy import Engine
 from sqlalchemy.orm import sessionmaker
-
-from api.routes import video_router, project_router, agent_router, preference_router
+from fastapi.staticfiles import StaticFiles
+from api.routes import video_router, project_router, agent_router, preference_router, chat_router
 from settings import Settings, settings
+from fastapi.middleware.cors import CORSMiddleware
 
 API_PREFIX = "/api"
 
@@ -14,8 +15,19 @@ app = FastAPI(
     title="MadChatter",
     summary="Backend server for the MadChatter application."
 )
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 app.state.SessionLocal = None
 app.state.engine = None
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["X-User-Text"] # Show user input text
+)
 
 router = APIRouter(prefix=API_PREFIX)
 
@@ -24,6 +36,8 @@ router.include_router(video_router)
 router.include_router(project_router)
 router.include_router(agent_router)
 router.include_router(preference_router)
+router.include_router(chat_router)
+
 
 # connect main router containing all nested routers to app
 app.include_router(router)
