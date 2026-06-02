@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { KnowledgeBaseStep } from "@/components/knowledge-base";
 
-export function Personality() {
+export function AgentConfiguration() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl w-full mx-auto">
       <div className="flex flex-col gap-6 w-full">
@@ -16,7 +16,7 @@ export function Personality() {
           </FieldLabel>
           <Input
             id="input-name"
-            placeholder="Give your AI chatbot a name..."
+            placeholder="Give your agent a name..."
             className="flex h-10 w-full rounded-lg border border-slate-200 bg-background px-3 py-2 text-sm shadow-sm transition-all placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </Field>
@@ -30,7 +30,7 @@ export function Personality() {
           </FieldLabel>
           <Textarea
             id="input-prompt"
-            placeholder="Set his/her personality, such as: you are a humorous assistant..."
+            placeholder="e.g. You are a friendly and knowledgeable travel assistant..."
             className="flex min-h-[235px] w-full rounded-lg border border-slate-200 bg-background px-3 py-2 text-sm shadow-sm transition-all placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
           />
         </Field>
