@@ -3,25 +3,74 @@ import { useState, useRef, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Check } from "lucide-react";
+import { Check, ArrowLeft } from "lucide-react";
 import { VideoUpload } from "@/components/video-upload";
-import { Personality } from "@/components/personality";
+import { AgentConfiguration } from "@/components/agent-configuration";
+import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 const STEPS = [
   { id: 1, name: "Videos Upload", description: "" },
   { id: 2, name: "Voice Configuration", description: "" },
-  { id: 3, name: "Agent Personality", description: "" },
+  { id: 3, name: "Agent Configuration", description: "" },
 ];
 
+type ProjectDraft = {
+  id: string;
+  label: string;
+  // videos
+  // voice
+  // agent
+  agent: {
+    label: string;
+    systemPrompt: string;
+  };
+};
 export default function Page() {
   const [currentStep, setCurrentStep] = useState(1);
   const [videos, setVideos] = useState<string[]>([]);
-
+  const router = useRouter();
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex min-h-screen flex-col bg-background">
         <header className="flex h-16 shrink-0 items-center border-b px-6 justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-lg">New Project</span>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  // onClick={handleBackButton}
+                  className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-muted-foreground hover:text-black transition cursor-pointer"
+                >
+                  <ArrowLeft />
+                  Back to Dashboard
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You have not save your project yet. Leaving this page will
+                    discard your current setup.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => router.push("/dashboard")}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
 
           <div className="text-sm text-muted-foreground">
@@ -80,14 +129,10 @@ export default function Page() {
               </p>
             </div>
 
-            {/* <div className="min-h-[300px] flex-1 rounded-xl bg-muted/50 border p-4">
-              <p className="text-sm text-muted-foreground">Test</p>
-            </div> */}
-
             {currentStep === 1 && (
               <VideoUpload videos={videos} setVideos={setVideos} />
             )}
-            {currentStep === 3 && <Personality />}
+            {currentStep === 3 && <AgentConfiguration />}
           </div>
 
           <div className="flex justify-between items-center pt-4 mt-auto border-t">
