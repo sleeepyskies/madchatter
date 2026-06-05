@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, FastAPI, UploadFile, File
-from services.chat_service.rag_module import RAG
-from services.chat_service.stt_module import SpeechToText
-from services.chat_service.tts_module import TextToSpeech
+from loguru import logger
+
+from services.chat.rag_module import RAG
+from services.chat.stt_module import SpeechToText
+from services.chat.tts_module import TextToSpeech
 import os
 import shutil
 import time
@@ -36,7 +38,7 @@ def chat(file: UploadFile = File(...)):
         t_stt = time.perf_counter() - t_stt_start
         os.remove(temp_input_path)
 
-        print(f"\n[STT]: {t_stt:.3f}s | Text: '{user_text}'")
+        logger.debug(f"\n[STT]: {t_stt:.3f}s | Text: '{user_text}'")
 
         chat_memory.append({"role": "user", "content": user_text})
         if len(chat_memory) > 20:
@@ -52,7 +54,7 @@ def chat(file: UploadFile = File(...)):
                     full_reply += text_chunk
                     yield text_chunk
 
-                print(f"[LLM]: {full_reply}")
+                logger.debug(f"[LLM]: {full_reply}")
                 latest_reply = full_reply
                 chat_memory.append({"role": "assistant", "content": full_reply})
 
@@ -95,7 +97,7 @@ def chat(file: UploadFile = File(...)):
         )
 
     except Exception as e:
-        print("Error：", e)
+        logger.error("Error：", e)
         if os.path.exists(temp_input_path):
             os.remove(temp_input_path)
         return JSONResponse(status_code=500, content={"error": str(e)})
