@@ -1,7 +1,8 @@
-from langchain_ollama import ChatOllama
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_ollama import ChatOllama
+
 from repositories.knowledge_base_repository import KnowledgeRepository
 
 
@@ -9,6 +10,7 @@ class RAG:
     """RAG (Retrieval-Augmented Generation) class that integrates a knowledge repository with a ChatOllama language model
     to answer user questions based on retrieved context and chat history.
     """
+
     def __init__(self):
         self.llm = ChatOllama(model="llama3.2")
         self.repo = KnowledgeRepository()
@@ -24,6 +26,7 @@ class RAG:
 
         def format_docs(docs):
             return "\n\n".join(doc.page_content for doc in docs)
+
         return (
                 {
                     "context": (lambda x: x["question"]) | self.repo.get_retriever() | format_docs,
