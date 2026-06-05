@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
+from api.api_exception import ResourceNotFoundException
 from db.models.videos import Video
 
 
@@ -25,17 +26,17 @@ class VideoRepository:
         self.database.refresh(video)
         return video
 
-    def get(self, video_id: int) -> Video | None:
-        return self.database.get(Video, video_id)
+    def get(self, video_id: int) -> Video:
+        video = self.database.get(Video, video_id)
+        if not video:
+            raise ResourceNotFoundException("Videos", video_id)
+        return video
 
     def list(self) -> list[Video]:
         return list(self.database.scalars(select(Video)).all())
 
     def update(self, video_id: int, new: UpdateVideo) -> Video | None:
         video = self.get(video_id)
-
-        if not video:
-            return None
 
         if new.description is not None:
             video.description = new.description
@@ -46,9 +47,7 @@ class VideoRepository:
         self.database.refresh(video)
         return video
 
-    def delete(self, video_id: int) -> bool:
-        result = self.database.execute(
-            delete(Video).where(Video.id == video_id)
-        )
+    def delete(self, video_id: int) -> None:
+        video = self.get(video_id)
+        self.database.delete(video)
         self.database.commit()
-        return result.rowcount > 0

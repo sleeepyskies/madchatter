@@ -4,9 +4,10 @@ import uuid
 
 from fastapi import UploadFile
 
+from api.api_exception import InvalidFileException
 from db.models.videos import Video
-from repositories.video_repository import VideoRepository, UpdateVideo
 from models.videos import SimpleVideoResponse, UpdateVideoRequest, CreateVideoRequest
+from repositories.video_repository import VideoRepository, UpdateVideo
 
 
 class VideoService:
@@ -36,42 +37,31 @@ class VideoService:
         videos = self.repository.list()
         return [SimpleVideoResponse.model_validate(video) for video in videos]
 
-    def get_video(self, video_id: int) -> SimpleVideoResponse | None:
+    def get_video(self, video_id: int) -> SimpleVideoResponse:
         video = self.repository.get(video_id)
-        if not video:
-            return None
         return SimpleVideoResponse.model_validate(video)
 
     def update_video(
             self,
             video_id: int,
             request: UpdateVideoRequest
-    ) -> SimpleVideoResponse | None:
-        video = self.repository.update(video_id, UpdateVideo(description=request.description, label=request.label))
-
-        if not video:
-            return None
+    ) -> SimpleVideoResponse:
+        video = self.repository.update(video_id, UpdateVideo(description=request.description,
+                                                             label=request.label))
         return SimpleVideoResponse.model_validate(video)
 
-    def delete_video(self, video_id: int) -> bool:
+    def delete_video(self, video_id: int) -> None:
         video = self.repository.get(video_id)
-        if not video:
-            return False
-
-        deleted = self.repository.delete(video_id)
-
-        if deleted:
-            self._delete_file(video.filename)
-
-        return deleted
+        self.repository.delete(video_id)
+        self._delete_file(video.filename)
 
     def _save_file(self, file: UploadFile) -> str:
         os.makedirs(self.VIDEO_DIRECTORY, exist_ok=True)
 
         if not file.filename:
-            raise ValueError("Missing filename")
+            raise InvalidFileException("Missing filename")
         if not file.content_type or not file.content_type.startswith("video/"):
-            raise ValueError("Invalid file type")
+            raise InvalidFileException("Invalid file type")
 
         ext = os.path.splitext(file.filename)[1]
         filename = f"{uuid.uuid4().hex}{ext}"

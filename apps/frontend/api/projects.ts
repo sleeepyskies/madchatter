@@ -37,4 +37,8 @@ export const projectsApi = {
     updateProject: async (projectId: number, request: UpdateProjectRequest): Promise<ProjectResponse> => {
         return await api.put(`${projectId}`, {json: request}).json();
     },
+
+    deleteProject: async(projectId: number): Promise<void> => {
+        await api.delete(`${projectId}`);
+    }
 };
