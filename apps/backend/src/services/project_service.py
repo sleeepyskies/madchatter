@@ -36,10 +36,8 @@ class ProjectService:
             video_ids=[v.id for v in project.videos],
         )
 
-    def get_project(self, project_id: int) -> ProjectResponse | None:
+    def get_project(self, project_id: int) -> ProjectResponse:
         project = self.project_repository.get(project_id)
-        if not project:
-            return None
         return ProjectResponse(
             id=project.id,
             label=project.label,
@@ -56,15 +54,13 @@ class ProjectService:
             video_ids=[video.id for video in s.videos],
         ) for s in projects]
 
-    def update_project(self, project_id: int, request: UpdateProjectRequest) -> ProjectResponse | None:
+    def update_project(self, project_id: int, request: UpdateProjectRequest) -> ProjectResponse:
         project = self.project_repository.update(project_id, UpdateProject(
             label=request.label,
             agent_id=request.agent_id,
             video_ids=request.video_ids,
         ))
 
-        if not project:
-            return None
         return ProjectResponse(
             id=project.id,
             label=project.label,
@@ -72,8 +68,5 @@ class ProjectService:
             video_ids=[video.id for video in project.videos],
         )
 
-    def delete_project(self, project_id: int) -> bool:
-        video = self.project_repository.get(project_id)
-        if not video:
-            return False
-        return self.project_repository.delete(project_id)
+    def delete_project(self, project_id: int) -> None:
+        self.project_repository.delete(project_id)

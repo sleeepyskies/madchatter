@@ -24,10 +24,8 @@ class AgentService:
             system_prompt=agent.system_prompt,
         )
 
-    def get_agent(self, agent_id: int) -> AgentResponse | None:
+    def get_agent(self, agent_id: int) -> AgentResponse:
         agent = self.agent_repository.get(agent_id)
-        if not agent:
-            return None
         return AgentResponse(
             id=agent.id,
             label=agent.label,
@@ -41,20 +39,16 @@ class AgentService:
             system_prompt=agent.system_prompt,
         ) for agent in self.agent_repository.list()]
 
-    def update_agent(self, agent_id: int, request: UpdateAgentRequest) -> AgentResponse | None:
+    def update_agent(self, agent_id: int, request: UpdateAgentRequest) -> AgentResponse:
         agent = self.agent_repository.update(agent_id, UpdateAgent(
             label=request.label,
             system_prompt=request.system_prompt,
         ))
-        if not agent:
-            return None
         return AgentResponse(
             id=agent.id,
             label=agent.label,
             system_prompt=agent.system_prompt,
         )
 
-    def delete_agent(self, agent_id: int) -> bool:
-        if not self.agent_repository.get(agent_id):
-            return False
-        return self.agent_repository.delete(agent_id)
+    def delete_agent(self, agent_id: int) -> None:
+        self.agent_repository.delete(agent_id)

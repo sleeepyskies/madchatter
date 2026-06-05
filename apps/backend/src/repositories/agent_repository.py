@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
+from api.api_exception import ResourceNotFoundException
 from db.models.agents import Agent
 
 
@@ -24,13 +25,16 @@ class AgentRepository:
         self.database.refresh(agent)
         return agent
 
-    def get(self, agent_id: int) -> Agent | None:
-        return self.database.get(Agent, agent_id)
+    def get(self, agent_id: int) -> Agent:
+        agent = self.database.get(Agent, agent_id)
+        if not agent:
+            raise ResourceNotFoundException("Agents", agent_id)
+        return agent
 
     def list(self) -> list[Agent]:
         return list(self.database.scalars(select(Agent)).all())
 
-    def update(self, agent_id: int, update: UpdateAgent) -> Agent | None:
+    def update(self, agent_id: int, update: UpdateAgent) -> Agent:
         agent = self.get(agent_id)
         if not agent:
             return None
@@ -44,7 +48,7 @@ class AgentRepository:
         self.database.refresh(agent)
         return agent
 
-    def delete(self, agent_id: int) -> bool:
-        result = self.database.execute(delete(Agent).where(Agent.id == agent_id))
+    def delete(self, agent_id: int) -> None:
+        agent = self.get(agent_id)
+        self.database.delete(agent)
         self.database.commit()
-        return result.rowcount > 0

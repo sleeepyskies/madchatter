@@ -39,10 +39,11 @@ def update_scene(
         request: UpdateProjectRequest,
         scene_service: ProjectService = Depends(get_project_service),
 ):
-    project = scene_service.update_project(project_id, request)
-    if not project:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Project with id: {} not found".format(project_id)
-        )
-    return project
+    return scene_service.update_project(project_id, request)
+
+@router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_project(
+        project_id: int,
+        project_service: ProjectService = Depends(get_project_service),
+):
+    project_service.delete_project(project_id)

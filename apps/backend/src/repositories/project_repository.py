@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
+from api.api_exception import ResourceNotFoundException
 from db.models.projects import Project
 
 
@@ -25,17 +26,17 @@ class ProjectRepository:
         self.database.refresh(project)
         return project
 
-    def get(self, project_id: int) -> Project | None:
-        return self.database.get(Project, project_id)
+    def get(self, project_id: int) -> Project:
+        project = self.database.get(Project, project_id)
+        if not project:
+            raise ResourceNotFoundException("Projects", project_id)
+        return project
 
     def list(self) -> list[Project]:
         return list(self.database.scalars(select(Project)).all())
 
-    def update(self, project_id: int, new: UpdateProject) -> Project | None:
+    def update(self, project_id: int, new: UpdateProject) -> Project:
         project = self.get(project_id)
-
-        if not project:
-            return None
 
         if new.agent_id is not None:
             project.agent_id = new.agent_id
@@ -48,9 +49,7 @@ class ProjectRepository:
         self.database.refresh(project)
         return project
 
-    def delete(self, project_id: int) -> bool:
-        result = self.database.execute(
-            delete(Project).where(Project.id == project_id)
-        )
+    def delete(self, project_id: int) -> None:
+        project = self.get(project_id)
+        self.database.delete(project)
         self.database.commit()
-        return result.rowcount > 0

@@ -1,13 +1,17 @@
 import os
 import uvicorn
 from fastapi import FastAPI, APIRouter
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from sqlalchemy import Engine
 from sqlalchemy.orm import sessionmaker
-from fastapi.staticfiles import StaticFiles
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+
+from api.api_exception import APIException
 from api.routes import video_router, project_router, agent_router, preference_router, chat_router
-from settings import Settings, settings
-from fastapi.middleware.cors import CORSMiddleware
+from settings import settings
 
 API_PREFIX = "/api"
 
@@ -38,7 +42,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["X-User-Text"] # Show user input text
+    expose_headers=["X-User-Text"]  # Show user input text
 )
 
 router = APIRouter(prefix=API_PREFIX)
@@ -49,6 +53,18 @@ router.include_router(project_router)
 router.include_router(agent_router)
 router.include_router(preference_router)
 router.include_router(chat_router)
+
+
+# exception handler
+@app.exception_handler(APIException)
+async def handler(request: Request, exception: APIException) -> JSONResponse:
+    return JSONResponse(
+        status_code=exception.status_code,
+        content={
+            "message": exception.message,
+            "code": exception.code,
+        }
+    )
 
 
 # connect main router containing all nested routers to app

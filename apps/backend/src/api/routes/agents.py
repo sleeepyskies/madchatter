@@ -46,11 +46,9 @@ def update_agent(
     return agent
 
 
-@router.delete("/{agent_id}")
+@router.delete("/{agent_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_agent(
         agent_id: int,
         agent_service: AgentService = Depends(get_agent_service),
 ):
-    deleted = agent_service.delete_agent(agent_id)
-    if not deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent not found")
+    agent_service.delete_agent(agent_id)
