@@ -1,3 +1,3 @@
-# madchatter - docs
+# MadChatter Docs
 
-todo
+TODO
