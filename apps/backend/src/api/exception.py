@@ -1,5 +1,3 @@
-from typing import Mapping
-
 from starlette.status import HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
 
 
