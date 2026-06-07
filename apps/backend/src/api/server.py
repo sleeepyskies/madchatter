@@ -58,6 +58,7 @@ router.include_router(chat_router)
 # exception handler
 @app.exception_handler(APIException)
 async def handler(request: Request, exception: APIException) -> JSONResponse:
+    logger.error(exception)
     return JSONResponse(
         status_code=exception.status_code,
         content={
