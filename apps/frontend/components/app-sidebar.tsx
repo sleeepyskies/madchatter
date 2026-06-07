@@ -45,8 +45,8 @@ const data = {
       icon: <HugeiconsIcon icon={Settings05Icon} strokeWidth={2} />,
     },
     {
-      title: "Tutorial",
-      url: "/tutorial",
+      title: "Documentation",
+      url: "https://madchatter.pages.dev",
       icon: <HugeiconsIcon icon={BookOpen02Icon} strokeWidth={2} />,
     },
   ],
