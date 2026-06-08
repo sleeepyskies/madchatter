@@ -1,47 +1,62 @@
 import ky from "ky";
 
-const api = ky.create({prefix: "/api/videos/"});
+const backendPort = process.env.SERVER_PORT || "8000";
+const address = process.env.ADDRESS || "127.0.0.1";
+// const api = ky.create({ prefix: "/api/videos" });
+const api = ky.create({
+  prefix: `http://${address}:${backendPort}/api/videos`,
+});
 
 export interface CreateVideoRequest {
-    label: string,
-    description: string,
+  label: string;
+  description: string;
 }
 
 export interface UpdateVideoRequest {
-    label?: string,
-    description?: string,
+  label?: string;
+  description?: string;
 }
 
 export interface SimpleVideoResponse {
-    id: number,
-    filename: string,
-    description: string,
+  id: number;
+  filename: string;
+  description: string;
 }
 
 export const videosApi = {
-    uploadVideo: async (file: File, request: CreateVideoRequest): Promise<SimpleVideoResponse> => {
-        const form = new FormData();
+  uploadVideo: async (
+    file: File,
+    request: CreateVideoRequest,
+  ): Promise<SimpleVideoResponse> => {
+    const form = new FormData();
 
-        form.append("file", file);
-        form.append("label", request.label);
-        form.append("description", request.description);
+    form.append("file", file);
+    form.append("label", request.label);
+    form.append("description", request.description);
 
-        return await api.post<SimpleVideoResponse>("upload", {body: form}).json();
-    },
+    return await api
+      .post<SimpleVideoResponse>("upload", { body: form, timeout: false })
+      .json();
+  },
 
-    listVideos: async (): Promise<SimpleVideoResponse[]> => {
-        return await api.get<SimpleVideoResponse>("").json();
-    },
+  listVideos: async (): Promise<SimpleVideoResponse[]> => {
+    return await api.get<SimpleVideoResponse>("").json();
+  },
 
-    getVideo: async (videoId: number): Promise<SimpleVideoResponse> => {
-        return await api.get<SimpleVideoResponse>(`${videoId}`).json();
-    },
+  getVideo: async (videoId: number): Promise<SimpleVideoResponse> => {
+    return await api.get<SimpleVideoResponse>(`${videoId}`).json();
+  },
 
-    updateVideo: async (videoId: number, request: UpdateVideoRequest): Promise<SimpleVideoResponse> => {
-        return await api.patch<SimpleVideoResponse>(`${videoId}`, {json: request}).json();
-    },
+  updateVideo: async (
+    videoId: number,
+    request: UpdateVideoRequest,
+  ): Promise<SimpleVideoResponse> => {
+    return await api
+      .patch<SimpleVideoResponse>(`${videoId}`, { json: request })
+      .json();
+  },
 
-    deleteVideo: async (videoId: number): Promise<void> => {
-        await api.delete(`${videoId}`);
-    }
+  deleteVideo: async (videoId: number): Promise<void> => {
+    await api.delete(`${videoId}`);
+  },
 };
