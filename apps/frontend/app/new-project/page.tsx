@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Check, ArrowLeft } from "lucide-react";
-import { VideoUpload } from "@/components/video-upload";
+import { VideoUpload, type VideoDraft } from "@/components/video-upload";
 import { AgentConfiguration } from "@/components/agent-configuration";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,28 +20,110 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
+import { videosApi } from "@/api/videos";
+import { projectsApi } from "@/api/projects";
+import { agentsApi } from "@/api/agents";
 const STEPS = [
   { id: 1, name: "Videos Upload", description: "" },
   { id: 2, name: "Voice Configuration", description: "" },
   { id: 3, name: "Agent Configuration", description: "" },
 ];
 
-type ProjectDraft = {
-  id: string;
-  label: string;
-  // videos
-  // voice
-  // agent
-  agent: {
-    label: string;
-    systemPrompt: string;
-  };
-};
 export default function Page() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [videos, setVideos] = useState<string[]>([]);
+
+  const [videos, setVideos] = useState<VideoDraft[]>([]);
+  const [videoIds, setVideoIds] = useState<number[]>([]);
+  const [agent, setAgent] = useState({
+    label: "",
+    systemPrompt: "",
+  });
+  const [agentId, setAgentId] = useState<number | undefined>(undefined);
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
+
+  const handleNext = async () => {
+    if (currentStep === 1) {
+      const success = await uploadVideoStep();
+      if (!success) return;
+    }
+
+    if (currentStep === STEPS.length) {
+      setIsSaving(true);
+      console.log("Save project config...");
+      try {
+        const agentRes = await agentsApi.createAgent({
+          label: agent.label || "Untitled Agent",
+          systemPrompt: agent.systemPrompt || "You are a helpful assistant.",
+        });
+        const res = await projectsApi.createProject({
+          label: agentRes.label,
+          agentId: agentRes.id,
+          videoIds: videoIds,
+        });
+        console.log("project created", res);
+        toast.success("Project saved successfully!", {
+          position: "top-center",
+        });
+        return;
+      } catch (error) {
+        console.error("Failed to save project:", error);
+        return;
+      } finally {
+        setIsSaving(false);
+      }
+    }
+
+    setCurrentStep((prev) => prev + 1);
+  };
+
+  const uploadVideoStep = async () => {
+    const isAllUploaded =
+      videos.length > 0 &&
+      videos.every((v) => v.id !== undefined && v.id !== null);
+
+    if (isAllUploaded) {
+      return true;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const updatedVideosWithId = [];
+
+      for (const video of videos) {
+        if (video.id) {
+          updatedVideosWithId.push(video);
+          continue;
+        }
+
+        const res = await videosApi.uploadVideo(video.file, {
+          label: video.label,
+          description: video.description || "No description available",
+        });
+
+        updatedVideosWithId.push({
+          ...video,
+          id: res.id,
+        });
+      }
+
+      setVideos(updatedVideosWithId);
+
+      const newVideoIds = updatedVideosWithId.map((v) => v.id) as number[];
+      setVideoIds(newVideoIds);
+
+      console.log("All videos processed successfully.");
+      return true;
+    } catch (error) {
+      console.error("Videos Upload failed:", error);
+      return false;
+    } finally {
+      setIsUploading(false);
+    }
+  };
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex min-h-screen flex-col bg-background">
@@ -47,10 +131,7 @@ export default function Page() {
           <div className="flex items-center gap-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button
-                  // onClick={handleBackButton}
-                  className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-muted-foreground hover:text-black transition cursor-pointer"
-                >
+                <button className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-muted-foreground hover:text-black transition cursor-pointer">
                   <ArrowLeft />
                   Back to Dashboard
                 </button>
@@ -132,22 +213,40 @@ export default function Page() {
             {currentStep === 1 && (
               <VideoUpload videos={videos} setVideos={setVideos} />
             )}
-            {currentStep === 3 && <AgentConfiguration />}
+            {currentStep === 3 && (
+              <AgentConfiguration agent={agent} setAgent={setAgent} />
+            )}
           </div>
 
           <div className="flex justify-between items-center pt-4 mt-auto border-t">
             <Button
+              className="cursor-pointer"
               variant="outline"
-              disabled={currentStep === 1}
+              disabled={currentStep === 1 || isUploading || isSaving}
               onClick={() => setCurrentStep((prev) => prev - 1)}
             >
               Back
             </Button>
             <Button
-              disabled={currentStep === STEPS.length}
-              onClick={() => setCurrentStep((prev) => prev + 1)}
+              disabled={isUploading || isSaving}
+              onClick={handleNext}
+              className="cursor-pointer"
             >
-              {currentStep === STEPS.length ? "Save" : "Next"}
+              {isUploading ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                  Uploading...
+                </span>
+              ) : isSaving ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                  Saving...
+                </span>
+              ) : currentStep === STEPS.length ? (
+                "Save"
+              ) : (
+                "Next"
+              )}
             </Button>
           </div>
         </main>
