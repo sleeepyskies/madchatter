@@ -7,8 +7,8 @@ from repositories.video_repository import VideoRepository
 class ProjectService:
     """Handles project related business logic."""
 
-    def __init__(self, scene_repository: ProjectRepository, video_repository: VideoRepository):
-        self.project_repository = scene_repository
+    def __init__(self, project_repository: ProjectRepository, video_repository: VideoRepository):
+        self.project_repository = project_repository
         self.video_repository = video_repository
 
     def create_project(self, request: CreateProjectRequest) -> ProjectResponse:

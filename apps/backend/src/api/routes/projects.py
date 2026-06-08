@@ -34,12 +34,12 @@ def get_project(
 
 
 @router.put("/{project_id}", response_model=ProjectResponse)
-def update_scene(
+def update_project(
         project_id: int,
         request: UpdateProjectRequest,
-        scene_service: ProjectService = Depends(get_project_service),
+        project_service: ProjectService = Depends(get_project_service),
 ):
-    return scene_service.update_project(project_id, request)
+    return project_service.update_project(project_id, request)
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_project(
