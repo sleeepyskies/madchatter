@@ -42,6 +42,8 @@ class ProjectService:
             id=project.id,
             label=project.label,
             agent_id=project.agent_id,
+            agent_label=project.agent.label if project.agent else None,
+            agent_system_prompt=project.agent.system_prompt if project.agent else None,
             video_ids=[video.id for video in project.videos],
         )
 
@@ -51,6 +53,8 @@ class ProjectService:
             id=s.id,
             label=s.label,
             agent_id=s.agent_id,
+            agent_label=s.agent.label if s.agent else None,
+            agent_system_prompt=s.agent.system_prompt if s.agent else None,
             video_ids=[video.id for video in s.videos],
         ) for s in projects]
 
