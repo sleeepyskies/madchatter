@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, ChangeEvent } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +23,7 @@ import {
 import { videosApi } from "@/api/videos";
 import { projectsApi } from "@/api/projects";
 import { agentsApi } from "@/api/agents";
+
 const STEPS = [
   { id: 1, name: "Videos Upload", description: "" },
   { id: 2, name: "Voice Configuration", description: "" },

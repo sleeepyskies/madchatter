@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 
 from api.api_exception import ResourceNotFoundException
 from db.models.projects import Project
@@ -33,7 +34,11 @@ class ProjectRepository:
         return project
 
     def list(self) -> list[Project]:
-        return list(self.database.scalars(select(Project)).all())
+        # return list(self.database.scalars(select(Project)).all())
+        stmt = select(Project).options(
+            joinedload(Project.agent)
+        )
+        return list(self.database.scalars(stmt).all())
 
     def update(self, project_id: int, new: UpdateProject) -> Project:
         project = self.get(project_id)

@@ -59,7 +59,7 @@ export default function Page() {
 
               <div className="flex gap-3 mt-4">
                 <button
-                  onClick={() => router.push("/new-project")}
+                  onClick={() => router.push("/project/new")}
                   className="rounded-lg bg-black text-white px-5 py-3 text-base hover:bg-black/80 cursor-pointer"
                 >
                   New Project

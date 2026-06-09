@@ -5,6 +5,8 @@ class ProjectResponse(BaseSchema):
     id: int
     label: str
     agent_id: int | None
+    agent_label: str | None    
+    agent_system_prompt: str | None
     video_ids: list[int]
 
 class CreateProjectRequest(BaseSchema):
