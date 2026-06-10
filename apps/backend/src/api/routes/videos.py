@@ -4,7 +4,7 @@ from fastapi.params import Depends, Form
 from starlette import status
 
 from api.dependencies import get_video_service
-from models.videos import SimpleVideoResponse, UpdateVideoRequest, CreateVideoRequest
+from models.videos import SimpleVideoResponse, VideoResponse, UpdateVideoRequest, CreateVideoRequest
 from services.video_service import VideoService
 
 VIDEO_PREFIX = "/videos"
@@ -12,7 +12,7 @@ VIDEO_PREFIX = "/videos"
 router = APIRouter(prefix=VIDEO_PREFIX, tags=["videos"])
 
 
-@router.post("/upload", response_model=SimpleVideoResponse)
+@router.post("/upload", response_model=VideoResponse)
 def upload_video(
         label: str = Form(...),
         description: str = Form(...),
@@ -25,12 +25,12 @@ def upload_video(
     )
 
 
-@router.get("", response_model=list[SimpleVideoResponse])
+@router.get("", response_model=list[VideoResponse])
 def list_videos(video_service: VideoService = Depends(get_video_service)):
     return video_service.list_videos()
 
 
-@router.get("/{video_id}", response_model=SimpleVideoResponse)
+@router.get("/{video_id}", response_model=VideoResponse)
 def get_video(video_id: int, video_service: VideoService = Depends(get_video_service)):
     video = video_service.get_video(video_id)
     if not video:
@@ -38,7 +38,7 @@ def get_video(video_id: int, video_service: VideoService = Depends(get_video_ser
     return video
 
 
-@router.patch("/{video_id}", response_model=SimpleVideoResponse | None)
+@router.patch("/{video_id}", response_model=VideoResponse | None)
 def update_video(
         video_id: int,
         request: UpdateVideoRequest,

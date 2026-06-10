@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useMicVAD, utils } from "@ricky0123/vad-react";
+import VideoPlayer from "./VideoPlayer.jsx";
+import ListeningAnimation from "./ListeningAnimation.jsx";
+import SubtitlePanel from "./SubtitlePanel.jsx";
 
 export default function Vad() {
   const [userText, setUserText] = useState("");
@@ -7,6 +10,9 @@ export default function Vad() {
   const [aiText, setAiText] = useState("");
 
   const [state, setState] = useState("LISTEN"); // LISTEN | THINKING | SPEAKING
+  const [videos, setVideos] = useState([]);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState("");
 
   const audioCtxRef = useRef(null);
   const nextStartTimeRef = useRef(0);
@@ -22,6 +28,28 @@ export default function Vad() {
       audioCtxRef.current.resume();
     }
   };
+
+  // Fetch videos on component mount
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/videos");
+        if (res.ok) {
+          const data = await res.json();
+          setVideos(data);
+          if (data.length > 0) {
+            // Set default video to first one
+            setCurrentVideoIndex(0);
+            setCurrentVideoUrl(data[0].fileUrl);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch videos:", err);
+      }
+    };
+
+    fetchVideos();
+  }, []);
 
   useEffect(() => {
     if (!vad) return;
@@ -155,6 +183,15 @@ export default function Vad() {
 
         setAiText(replyData.reply);
 
+        // Check if AI suggested a different video
+        if (replyData.suggested_video_id) {
+          const videoIndex = videos.findIndex(v => v.id === replyData.suggested_video_id);
+          if (videoIndex !== -1) {
+            setCurrentVideoIndex(videoIndex);
+            setCurrentVideoUrl(videos[videoIndex].fileUrl);
+          }
+        }
+
       } catch (err) {
         console.error(err);
         setLoading(false);
@@ -164,30 +201,26 @@ export default function Vad() {
   });
 
 
+  // Start listening immediately on mount
+  useEffect(() => {
+    if (vad && state === "LISTEN") {
+      initAudioContext();
+      vad.start();
+    }
+  }, [vad]);
+
   return (
-    <div style={{ padding: 20, fontFamily: "sans-serif" }}>
-      <h1>AI Voice Assistant</h1>
-
-      <button
-        onClick={() => {
-          initAudioContext();
-          vad.toggle();
-        }}
-        style={{ padding: "10px 20px", fontSize: 16 }}
-      >
-        {vad.listening ? "🛑 Stop Listening" : "🎙️ Start Voice Chat"}
-      </button>
-
-      <div style={{ marginTop: 15, fontWeight: "bold" }}>
-        {state === "LISTEN" && "Listening..."}
-        {state === "THINKING" && "Thinking..."}
-        {state === "SPEAKING" && "Speaking..."}
+    <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", margin: 0, padding: 0, overflow: "hidden" }}>
+      {/* Video Player - Top half */}
+      <div style={{ width: "100%", height: "50%", overflow: "hidden", backgroundColor: "black" }}>
+        <VideoPlayer videoUrl={currentVideoUrl} />
       </div>
 
-      <hr />
-
-      <p><b>User:</b> {userText}</p>
-      <p><b>Agent:</b> {aiText || (loading ? "" : "")}</p>
+      {/* Subtitles and Listening Animation - Bottom half */}
+      <div style={{ width: "100%", height: "50%", backgroundColor: "#1a1a1a", overflow: "hidden", display: "flex", flexDirection: "column", padding: "20px", boxSizing: "border-box" }}>
+        <SubtitlePanel userText={userText} aiText={aiText} loading={loading} />
+        <ListeningAnimation isActive={vad.listening || state === "THINKING"} />
+      </div>
     </div>
   );
 }

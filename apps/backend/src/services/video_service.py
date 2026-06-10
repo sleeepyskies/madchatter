@@ -6,12 +6,15 @@ from fastapi import UploadFile
 
 from db.models.videos import Video
 from repositories.video_repository import VideoRepository, UpdateVideo
-from models.videos import SimpleVideoResponse, UpdateVideoRequest, CreateVideoRequest
+from models.videos import SimpleVideoResponse, VideoResponse, UpdateVideoRequest, CreateVideoRequest
 
 
 class VideoService:
     """Handles video related business logic."""
-    VIDEO_DIRECTORY = "./videos"
+    VIDEO_DIRECTORY = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "videos"
+    )
 
     def __init__(self, repository: VideoRepository):
         self.repository = repository
@@ -20,7 +23,7 @@ class VideoService:
             self,
             request: CreateVideoRequest,
             file: UploadFile
-    ) -> SimpleVideoResponse:
+    ) -> VideoResponse:
         filename = self._save_file(file)
 
         video = Video(
@@ -30,28 +33,28 @@ class VideoService:
         )
 
         created = self.repository.create(video)
-        return SimpleVideoResponse.model_validate(created)
+        return self._add_file_url(SimpleVideoResponse.model_validate(created))
 
-    def list_videos(self) -> list[SimpleVideoResponse]:
+    def list_videos(self) -> list[VideoResponse]:
         videos = self.repository.list()
-        return [SimpleVideoResponse.model_validate(video) for video in videos]
+        return [self._add_file_url(SimpleVideoResponse.model_validate(video)) for video in videos]
 
-    def get_video(self, video_id: int) -> SimpleVideoResponse | None:
+    def get_video(self, video_id: int) -> VideoResponse | None:
         video = self.repository.get(video_id)
         if not video:
             return None
-        return SimpleVideoResponse.model_validate(video)
+        return self._add_file_url(SimpleVideoResponse.model_validate(video))
 
     def update_video(
             self,
             video_id: int,
             request: UpdateVideoRequest
-    ) -> SimpleVideoResponse | None:
+    ) -> VideoResponse | None:
         video = self.repository.update(video_id, UpdateVideo(description=request.description, label=request.label))
 
         if not video:
             return None
-        return SimpleVideoResponse.model_validate(video)
+        return self._add_file_url(SimpleVideoResponse.model_validate(video))
 
     def delete_video(self, video_id: int) -> bool:
         video = self.repository.get(video_id)
@@ -86,3 +89,12 @@ class VideoService:
         path = os.path.join(self.VIDEO_DIRECTORY, filename)
         if os.path.exists(path):
             os.remove(path)
+
+    def _add_file_url(self, video_response: SimpleVideoResponse) -> VideoResponse:
+        """Add file_url to video response. Converts SimpleVideoResponse to VideoResponse with populated file_url."""
+        return VideoResponse(
+            id=video_response.id,
+            label=video_response.label,
+            description=video_response.description,
+            file_url=f"http://127.0.0.1:8000/videos/{self.repository.get(video_response.id).filename}"
+        )

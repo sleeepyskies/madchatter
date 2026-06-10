@@ -1,3 +1,4 @@
+import os
 import uvicorn
 from fastapi import FastAPI, APIRouter
 from loguru import logger
@@ -15,7 +16,18 @@ app = FastAPI(
     title="MadChatter",
     summary="Backend server for the MadChatter application."
 )
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Use absolute paths for static file directories
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+VIDEOS_DIR = os.path.join(BASE_DIR, "videos")
+
+# Ensure directories exist
+os.makedirs(STATIC_DIR, exist_ok=True)
+os.makedirs(VIDEOS_DIR, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/videos", StaticFiles(directory=VIDEOS_DIR), name="videos")
 
 app.state.SessionLocal = None
 app.state.engine = None

@@ -6,7 +6,7 @@ class TextToSpeech:
     """
     A TextToSpeech class that uses the Piper TTS engine to convert text to speech. It loads a specified TTS model and provides a method to stream synthesized audio for given text input.
     """
-    def __init__(self, model_name="de_DE-eva_k-x_low.onnx"):
+    def __init__(self, model_name="en_US-amy-low.onnx"):
 
         self.backend_root = Path(__file__).resolve().parents[3]
         self.static_dir = self.backend_root / "static"
