@@ -7,16 +7,13 @@ from loguru import logger
 
 from api.api_exception import InvalidFileException
 from db.models.videos import Video
+from models.videos import SimpleVideoResponse, UpdateVideoRequest, CreateVideoRequest
 from repositories.video_repository import VideoRepository, UpdateVideo
-from models.videos import SimpleVideoResponse, VideoResponse, UpdateVideoRequest, CreateVideoRequest
 
 
 class VideoService:
     """Handles video related business logic."""
-    VIDEO_DIRECTORY = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-        "videos"
-    )
+    VIDEO_DIRECTORY = "./run/videos"
 
     def __init__(self, repository: VideoRepository):
         self.repository = repository
@@ -41,22 +38,18 @@ class VideoService:
         videos = self.repository.list()
         return [self._add_file_url(SimpleVideoResponse.model_validate(video)) for video in videos]
 
-    def get_video(self, video_id: int) -> VideoResponse | None:
+    def get_video(self, video_id: int) -> SimpleVideoResponse:
         video = self.repository.get(video_id)
-        if not video:
-            return None
-        return self._add_file_url(SimpleVideoResponse.model_validate(video))
+        return SimpleVideoResponse.model_validate(video)
 
     def update_video(
             self,
             video_id: int,
             request: UpdateVideoRequest
-    ) -> VideoResponse | None:
-        video = self.repository.update(video_id, UpdateVideo(description=request.description, label=request.label))
-
-        if not video:
-            return None
-        return self._add_file_url(SimpleVideoResponse.model_validate(video))
+    ) -> SimpleVideoResponse:
+        video = self.repository.update(video_id, UpdateVideo(description=request.description,
+                                                             label=request.label))
+        return SimpleVideoResponse.model_validate(video)
 
     def delete_video(self, video_id: int) -> None:
         video = self.repository.get(video_id)

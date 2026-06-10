@@ -20,7 +20,7 @@ class SpeechToText:
             beam_size=1,
             temperature=0.0,
             vad_filter=True,
-            language="en")
+            language="de")
 
         text_list = [segment.text for segment in segments]
         return "".join(text_list).strip()

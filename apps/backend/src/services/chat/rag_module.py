@@ -19,7 +19,7 @@ class RAG:
     def _setup_rag_chain(self):
         prompt = ChatPromptTemplate.from_messages([
             ("system",
-             "You are a capable assistant, answering user questions based on the following background information, answer should be brief within 10 words. You MUST always answer in English only. Background: {context}"),
+             "You are a capable assistant, answering user questions based on the following background information, answer should be brief within 10 words. You MUST always answer in German only. Background: {context}"),
             MessagesPlaceholder(variable_name="history"),
             ("human", "Answer the following questions: {question}")
         ])
