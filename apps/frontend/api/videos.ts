@@ -1,11 +1,8 @@
-import ky from "ky";
+import client from "@/api/client";
 
-const backendPort = process.env.SERVER_PORT || "8000";
-const address = process.env.ADDRESS || "127.0.0.1";
-// const api = ky.create({ prefix: "/api/videos" });
-const api = ky.create({
-  prefix: `http://${address}:${backendPort}/api/videos`,
-});
+const api = client.extend((options) =>
+    ({prefix: `${options.prefix}/videos`})
+);
 
 export interface CreateVideoRequest {
   label: string;

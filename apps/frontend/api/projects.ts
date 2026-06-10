@@ -1,12 +1,8 @@
-import ky from "ky";
+import client from "@/api/client";
 
-// const api = ky.create({ prefix: "/api/projects" });
-
-const backendPort = process.env.SERVER_PORT || "8000";
-const address = process.env.ADDRESS || "127.0.0.1";
-const api = ky.create({
-  prefix: `http://${address}:${backendPort}/api/projects`,
-});
+const api = client.extend((options) =>
+    ({prefix: `${options.prefix}/projects`})
+);
 
 export interface ProjectResponse {
   id: number;

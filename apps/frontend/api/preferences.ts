@@ -1,6 +1,8 @@
-import ky from "ky";
+import client from "@/api/client";
 
-const api = ky.create({prefix: "/api/preferences"});
+const api = client.extend((options) =>
+    ({prefix: `${options.prefix}/preferences`})
+);
 
 export type Theme = "light" | "dark" | "system";
 export type Language = "en" | "de";
