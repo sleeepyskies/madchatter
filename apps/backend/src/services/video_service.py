@@ -3,6 +3,7 @@ import shutil
 import uuid
 
 from fastapi import UploadFile
+from loguru import logger
 
 from api.api_exception import InvalidFileException
 from db.models.videos import Video
@@ -12,7 +13,7 @@ from repositories.video_repository import VideoRepository, UpdateVideo
 
 class VideoService:
     """Handles video related business logic."""
-    VIDEO_DIRECTORY = "./videos"
+    VIDEO_DIRECTORY = "./run/videos"
 
     def __init__(self, repository: VideoRepository):
         self.repository = repository
@@ -68,6 +69,7 @@ class VideoService:
         path = os.path.join(self.VIDEO_DIRECTORY, filename)
 
         with open(path, "wb") as f:
+            logger.debug(f"Saving {file.filename} to {os.path.abspath(path)}")
             shutil.copyfileobj(file.file, f)
 
         return filename
