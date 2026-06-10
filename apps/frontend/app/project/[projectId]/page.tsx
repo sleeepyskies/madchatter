@@ -29,9 +29,11 @@ const STEPS = [
   { id: 2, name: "Voice Configuration", description: "" },
   { id: 3, name: "Agent Configuration", description: "" },
 ];
+const backendPort = process.env.SERVER_PORT || "8000";
+const address = process.env.ADDRESS || "127.0.0.1";
 
 export default function Page() {
-  const params = useParams(); // 如果是 Next.js App Router
+  const params = useParams();
   const projectId = Number(params.projectId);
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -53,13 +55,25 @@ export default function Page() {
       try {
         const projectRes = await projectsApi.getProject(projectId);
         const agentRes = await agentsApi.getProject(projectRes.agentId!);
-        // const videoRes = await videosApi.getVideo(projectRes.);
-        // setVideos(project.videos);
-        // setVideoIds(project.videoIds);
         setAgent({
           label: agentRes.label,
           systemPrompt: agentRes.systemPrompt,
         });
+        setAgentId(agentRes.id);
+
+        const videoDrafts: VideoDraft[] = [];
+        for (const id of projectRes.videoIds) {
+          const vid = await videosApi.getVideo(id);
+          videoDrafts.push({
+            id: vid.id,
+            previewUrl: `http://${address}:${backendPort}/videos/${vid.filename}`,
+            label: vid.label,
+            description: vid.description,
+          });
+          console.log(videoDrafts);
+        }
+        setVideos(videoDrafts);
+        setVideoIds(projectRes.videoIds);
       } catch (error) {
         toast.error("Failed to load project");
       }
@@ -70,19 +84,19 @@ export default function Page() {
 
   const handleNext = async () => {
     if (currentStep === 1) {
-      const success = await uploadVideoStep();
+      const success = await uploadVideoStep(videos);
       if (!success) return;
     }
 
     if (currentStep === STEPS.length) {
+      console.log(videoIds, "now");
       setIsSaving(true);
-      console.log("Save project config...");
       try {
-        const agentRes = await agentsApi.createAgent({
+        const agentRes = await agentsApi.updateAgent(agentId!, {
           label: agent.label || "Untitled Agent",
           systemPrompt: agent.systemPrompt || "You are a helpful assistant.",
         });
-        const res = await projectsApi.createProject({
+        const res = await projectsApi.updateProject(projectId, {
           label: agentRes.label,
           agentId: agentRes.id,
           videoIds: videoIds,
@@ -91,6 +105,8 @@ export default function Page() {
         toast.success("Project saved successfully!", {
           position: "top-center",
         });
+        router.push("/dashboard");
+
         return;
       } catch (error) {
         console.error("Failed to save project:", error);
@@ -103,43 +119,37 @@ export default function Page() {
     setCurrentStep((prev) => prev + 1);
   };
 
-  const uploadVideoStep = async () => {
-    const isAllUploaded =
-      videos.length > 0 &&
-      videos.every((v) => v.id !== undefined && v.id !== null);
-
-    if (isAllUploaded) {
-      return true;
-    }
-
+  const uploadVideoStep = async (videos: VideoDraft[]) => {
     setIsUploading(true);
 
     try {
-      const updatedVideosWithId = [];
+      const updatedVideos = [];
 
       for (const video of videos) {
-        if (video.id) {
-          updatedVideosWithId.push(video);
-          continue;
+        const currentVideo = { ...video };
+        if (!currentVideo.id) {
+          const res = await videosApi.uploadVideo(currentVideo.file!, {
+            label: currentVideo.label,
+            description: currentVideo.description || "No description available",
+          });
+          currentVideo.id = res.id;
+        } else {
+          const res = await videosApi.updateVideo(currentVideo.id, {
+            label: currentVideo.label,
+            description: currentVideo.description,
+          });
+          currentVideo.previewUrl = `http://${address}:${backendPort}/videos/${res.filename}`;
         }
-
-        const res = await videosApi.uploadVideo(video.file, {
-          label: video.label,
-          description: video.description || "No description available",
-        });
-
-        updatedVideosWithId.push({
-          ...video,
-          id: res.id,
-        });
+        updatedVideos.push(currentVideo);
       }
 
-      setVideos(updatedVideosWithId);
+      setVideos(updatedVideos);
 
-      const newVideoIds = updatedVideosWithId.map((v) => v.id) as number[];
-      setVideoIds(newVideoIds);
+      const updateVideoIds = updatedVideos
+        .map((v) => v.id)
+        .filter((id): id is number => id !== undefined);
+      setVideoIds(updateVideoIds);
 
-      console.log("All videos processed successfully.");
       return true;
     } catch (error) {
       console.error("Videos Upload failed:", error);

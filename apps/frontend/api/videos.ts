@@ -19,6 +19,7 @@ export interface UpdateVideoRequest {
 
 export interface SimpleVideoResponse {
   id: number;
+  label: string;
   filename: string;
   description: string;
 }

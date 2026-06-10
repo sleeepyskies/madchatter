@@ -4,6 +4,7 @@ from models.base import BaseSchema
 class SimpleVideoResponse(BaseSchema):
     id: int
     label: str
+    filename: str
     description: str
 
 

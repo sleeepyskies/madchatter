@@ -68,6 +68,8 @@ export default function Page() {
         toast.success("Project saved successfully!", {
           position: "top-center",
         });
+        router.push("/dashboard");
+
         return;
       } catch (error) {
         console.error("Failed to save project:", error);
@@ -100,7 +102,7 @@ export default function Page() {
           continue;
         }
 
-        const res = await videosApi.uploadVideo(video.file, {
+        const res = await videosApi.uploadVideo(video.file!, {
           label: video.label,
           description: video.description || "No description available",
         });

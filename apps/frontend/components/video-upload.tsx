@@ -8,7 +8,7 @@ import { videosApi } from "@/api/videos";
 
 export interface VideoDraft {
   id?: number;
-  file: File;
+  file?: File | null;
   previewUrl: string;
   label: string;
   description: string;
