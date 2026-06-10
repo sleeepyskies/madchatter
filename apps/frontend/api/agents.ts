@@ -39,7 +39,7 @@ export const agentsApi = {
     agentId: number,
     request: UpdateAgentRequest,
   ): Promise<AgentResponse> => {
-    return await api.put(`${agentId}`, { json: request }).json();
+    return await api.patch(`${agentId}`, { json: request }).json();
   },
 
   deleteAgent: async (agentId: number): Promise<void> => {

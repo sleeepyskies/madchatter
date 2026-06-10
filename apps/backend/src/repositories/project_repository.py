@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 
 from api.api_exception import ResourceNotFoundException
 from db.models.projects import Project
-
+from db.models.videos import Video
 
 @dataclass
 class UpdateProject:
@@ -48,8 +48,9 @@ class ProjectRepository:
         if new.label is not None:
             project.label = new.label
         if new.video_ids is not None:
-            project.video_ids = new.video_ids
-
+            new_videos = self.database.query(Video).filter(Video.id.in_(new.video_ids)).all()
+            project.videos = new_videos
+        
         self.database.commit()
         self.database.refresh(project)
         return project

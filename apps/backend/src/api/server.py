@@ -20,6 +20,7 @@ app = FastAPI(
     summary="Backend server for the MadChatter application."
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/videos", StaticFiles(directory="videos"), name="videos")
 
 app.state.SessionLocal = None
 app.state.engine = None

@@ -33,6 +33,8 @@ class ProjectService:
             id=project.id,
             label=project.label,
             agent_id=project.agent_id,
+            agent_label=project.agent.label if project.agent else None,
+            agent_system_prompt=project.agent.system_prompt if project.agent else None,
             video_ids=[v.id for v in project.videos],
         )
 
@@ -70,6 +72,7 @@ class ProjectService:
             label=project.label,
             agent_id=project.agent_id,
             video_ids=[video.id for video in project.videos],
+            
         )
 
     def delete_project(self, project_id: int) -> None:
