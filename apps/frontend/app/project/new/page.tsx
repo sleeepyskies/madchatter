@@ -20,9 +20,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { videosApi } from "@/api/videos";
-import { projectsApi } from "@/api/projects";
-import { agentsApi } from "@/api/agents";
+import {agentsApi} from "@madchatter/api/src/agents";
+import {projectsApi} from "@madchatter/api/src/projects";
+import {videosApi} from "@madchatter/api/src/videos";
 
 const STEPS = [
   { id: 1, name: "Videos Upload", description: "" },

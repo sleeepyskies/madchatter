@@ -19,7 +19,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { BotIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
-import { projectsApi, ProjectResponse } from "@/api/projects";
+import { projectsApi, ProjectResponse } from "@madchatter/api/src/projects"
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import {

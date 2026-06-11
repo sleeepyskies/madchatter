@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import type { Theme } from "@/api/settings";
+import type { Theme } from "@madchatter/api/src/preferences";
 
 const THEME_STORAGE_KEY = "theme-preference";
 

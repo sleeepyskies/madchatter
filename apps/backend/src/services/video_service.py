@@ -7,7 +7,7 @@ from loguru import logger
 
 from api.api_exception import InvalidFileException
 from db.models.videos import Video
-from models.videos import SimpleVideoResponse, UpdateVideoRequest, CreateVideoRequest
+from models.videos import VideoResponse, UpdateVideoRequest, CreateVideoRequest
 from repositories.video_repository import VideoRepository, UpdateVideo
 
 
@@ -32,24 +32,24 @@ class VideoService:
         )
 
         created = self.repository.create(video)
-        return self._add_file_url(SimpleVideoResponse.model_validate(created))
+        return VideoResponse.model_validate(created)
 
     def list_videos(self) -> list[VideoResponse]:
         videos = self.repository.list()
-        return [self._add_file_url(SimpleVideoResponse.model_validate(video)) for video in videos]
+        return [VideoResponse.model_validate(video) for video in videos]
 
-    def get_video(self, video_id: int) -> SimpleVideoResponse:
+    def get_video(self, video_id: int) -> VideoResponse:
         video = self.repository.get(video_id)
-        return SimpleVideoResponse.model_validate(video)
+        return VideoResponse.model_validate(video)
 
     def update_video(
             self,
             video_id: int,
             request: UpdateVideoRequest
-    ) -> SimpleVideoResponse:
+    ) -> VideoResponse:
         video = self.repository.update(video_id, UpdateVideo(description=request.description,
                                                              label=request.label))
-        return SimpleVideoResponse.model_validate(video)
+        return VideoResponse.model_validate(video)
 
     def delete_video(self, video_id: int) -> None:
         video = self.repository.get(video_id)
@@ -78,12 +78,3 @@ class VideoService:
         path = os.path.join(self.VIDEO_DIRECTORY, filename)
         if os.path.exists(path):
             os.remove(path)
-
-    def _add_file_url(self, video_response: SimpleVideoResponse) -> VideoResponse:
-        """Add file_url to video response. Converts SimpleVideoResponse to VideoResponse with populated file_url."""
-        return VideoResponse(
-            id=video_response.id,
-            label=video_response.label,
-            description=video_response.description,
-            file_url=f"http://127.0.0.1:8000/videos/{self.repository.get(video_response.id).filename}"
-        )

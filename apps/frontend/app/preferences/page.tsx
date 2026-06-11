@@ -14,16 +14,10 @@ import {Separator} from "@/components/ui/separator";
 import {SidebarInset, SidebarProvider, SidebarTrigger,} from "@/components/ui/sidebar";
 import {TooltipProvider} from "@/components/ui/tooltip";
 import {Button} from "@/components/ui/button";
-import {Language, preferencesApi} from "@/api/preferences";
 import {applyTheme} from "@/components/theme-provider";
+import {Language, Preferences, preferencesApi} from "@madchatter/api/src/preferences";
 
-type Settings = {
-  theme: "light" | "dark" | "system";
-  language: Language;
-  notificationsEnabled: boolean;
-};
-
-const themeOptions: { value: Settings["theme"]; label: string }[] = [
+const themeOptions: { value: Preferences["theme"]; label: string }[] = [
   { value: "light", label: "Light" },
   { value: "dark", label: "Dark" },
   { value: "system", label: "System" },
@@ -34,7 +28,7 @@ const languageOptions: { value: Language; label: string }[] = [
 ];
 
 export default function Page() {
-  const [preferences, setPreferences] = React.useState<Settings | null>(null);
+  const [preferences, setPreferences] = React.useState<Preferences | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
@@ -50,7 +44,7 @@ export default function Page() {
         applyTheme(response.theme);
       } catch (err) {
         if (!isMounted) return;
-        setError("Unable to load settings.");
+        setError("Unable to load preferences.");
       }
     }
 
@@ -61,7 +55,7 @@ export default function Page() {
     };
   }, []);
 
-  const handleChange = (field: keyof Settings, value: string | boolean) => {
+  const handleChange = (field: keyof Preferences, value: string | boolean) => {
     setPreferences((current) =>
       current ? { ...current, [field]: value } : null
     );
@@ -84,7 +78,7 @@ export default function Page() {
         applyTheme(updated.theme);
       setSuccess("Settings saved.");
     } catch (err) {
-      setError("Failed to save settings.");
+      setError("Failed to save preferences.");
     } finally {
       setIsSaving(false);
     }
@@ -121,7 +115,7 @@ export default function Page() {
                 <div>
                   <h1 className="text-2xl font-semibold">Settings</h1>
                   <p className="text-sm text-muted-foreground">
-                    Change your application settings and save them to the backend.
+                    Change your application preferences and save them to the backend.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -145,7 +139,7 @@ export default function Page() {
                     <select
                       className="h-10 w-full rounded-none border border-input bg-transparent px-3 text-base outline-none transition-colors focus:border-primary"
                         value={preferences.theme}
-                      onChange={(event) => handleChange("theme", event.target.value as Settings["theme"])}
+                      onChange={(event) => handleChange("theme", event.target.value as Preferences["theme"])}
                         disabled={false}
                     >
                       {themeOptions.map((option) => (
@@ -182,13 +176,13 @@ export default function Page() {
                 </div>
                 <div className="md:col-span-2 flex items-center justify-end gap-2">
                   <Button type="submit" disabled={!preferences || isSaving}>
-                    {isSaving ? "Saving..." : "Save settings"}
+                    {isSaving ? "Saving..." : "Save preferences"}
                   </Button>
                 </div>
               </form>
               ) : (
                 <div className="rounded-xl border border-border bg-background/70 p-6 text-sm text-muted-foreground">
-                  Loading current settings...
+                  Loading current preferences...
                 </div>
               )}
             </div>

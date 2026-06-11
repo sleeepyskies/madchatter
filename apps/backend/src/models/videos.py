@@ -1,15 +1,11 @@
 from models.base import BaseSchema
 
 
-class SimpleVideoResponse(BaseSchema):
+class VideoResponse(BaseSchema):
     id: int
     label: str
     filename: str
     description: str
-
-
-class VideoResponse(SimpleVideoResponse):
-    file_url: str
 
 
 class CreateVideoRequest(BaseSchema):

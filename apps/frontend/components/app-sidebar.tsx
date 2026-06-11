@@ -40,8 +40,8 @@ const data = {
       icon: <HugeiconsIcon icon={CropIcon} strokeWidth={2} />,
     },
     {
-      title: "Settings",
-      url: "/settings",
+      title: "Preferences",
+      url: "/preferences",
       icon: <HugeiconsIcon icon={Settings05Icon} strokeWidth={2} />,
     },
     {

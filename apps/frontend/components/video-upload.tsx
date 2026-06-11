@@ -4,7 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { videosApi } from "@/api/videos";
+import { videosApi } from "@madchatter/api";
 
 export interface VideoDraft {
   id?: number;

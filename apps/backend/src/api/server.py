@@ -24,7 +24,7 @@ app = FastAPI(
 # Use absolute paths for static file directories
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-VIDEOS_DIR = os.path.join(BASE_DIR, "videos")
+VIDEOS_DIR = os.path.join(BASE_DIR, "run", "videos")
 
 # Ensure directories exist
 os.makedirs(STATIC_DIR, exist_ok=True)
@@ -57,13 +57,25 @@ router.include_router(chat_router)
 
 # exception handler
 @app.exception_handler(APIException)
-async def handler(request: Request, exception: APIException) -> JSONResponse:
+async def api_exception_handler(request: Request, exception: APIException) -> JSONResponse:
     logger.error(exception)
     return JSONResponse(
         status_code=exception.status_code,
         content={
             "message": exception.message,
             "code": exception.code,
+        }
+    )
+
+@app.exception_handler(Exception)
+async def exception_handler(request: Request, exception: Exception) -> JSONResponse:
+    logger.error(exception)
+    return JSONResponse(
+        status_code=500,
+        content={
+            "message": "An unhandled exception occurred.",
+            "detail": str(exception),
+            "code": 500,
         }
     )
 

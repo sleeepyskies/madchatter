@@ -1,4 +1,4 @@
-import client from "@/api/client";
+import {client} from "./client";
 
 const api = client.extend((options) =>
     ({prefix: `${options.prefix}/preferences`})
