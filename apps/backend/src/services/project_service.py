@@ -76,4 +76,7 @@ class ProjectService:
         )
 
     def delete_project(self, project_id: int) -> None:
+        project = self.project_repository.get(project_id)
+        for video in project.videos:
+            self.video_repository.delete(video.id)
         self.project_repository.delete(project_id)

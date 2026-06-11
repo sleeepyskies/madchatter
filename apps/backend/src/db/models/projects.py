@@ -15,14 +15,19 @@ class Project(Base):
     __tablename__ = "projects"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    """ID of the project."""
     label: Mapped[str] = mapped_column(String(256), nullable=False)
+    """Label of the project."""
     agent_id: Mapped[int | None] = mapped_column(
         ForeignKey("agents.id", ondelete="SET NULL"),
         nullable=True,
     )
+    """Agent ID the project makes use of."""
     agent: Mapped["Agent | None"] = relationship("Agent")
+    """Reference to the Agent object."""
     videos: Mapped[list["Video"]] = relationship(
         "Video",
         secondary=projects_videos,
     )
+    """Reference to videos of this project."""
 

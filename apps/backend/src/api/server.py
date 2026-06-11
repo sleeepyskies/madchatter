@@ -17,7 +17,7 @@ API_PREFIX = "/api"
 # configure app and state
 app = FastAPI(
     title="MadChatter",
-    summary="Backend server for the MadChatter application."
+    summary="Backend server for the MadChatter application.",
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

@@ -9,7 +9,8 @@ class UserPreferences(Base):
 	__tablename__ = "user_preferences"
 
 	id: Mapped[int] = mapped_column(Integer, primary_key=True)
-	"""Singleton record identifier."""
+	"""Entry ID."""
+
 	theme: Mapped[str] = mapped_column(String(16), nullable=False, default="system")
 	"""Preferred theme: light, dark, or system."""
 

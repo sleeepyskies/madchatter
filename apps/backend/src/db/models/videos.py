@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from db.base import Base
 
@@ -12,7 +12,7 @@ class Video(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     """Primary key for Video Model."""
-    description: Mapped[str] = mapped_column(String(4096), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
     """User defined description of the video."""
     label: Mapped[str] = mapped_column(String(512), nullable=False)
     """User defined name of the video."""
