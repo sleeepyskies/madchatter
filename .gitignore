@@ -20,3 +20,4 @@ build/
 /apps/backend/videos/
 /apps/frontend_viewer/node_modules
 /apps/frontend_viewer/dist
+node_modules/
