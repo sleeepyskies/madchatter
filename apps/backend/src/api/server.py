@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from sqlalchemy import Engine
 from sqlalchemy.orm import sessionmaker
+from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -57,14 +58,19 @@ async def api_exception_handler(request: Request, exception: APIException) -> JS
 
 
 @app.exception_handler(Exception)
-async def exception_handler(request: Request, exception: Exception) -> JSONResponse:
-    logger.error(exception)
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Unhandled exception encountered during request processing")
+
+    exception_type = type(exc).__name__
+    exception_message = str(exc)
+
     return JSONResponse(
-        status_code=500,
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
-            "message": "An unhandled exception occurred.",
-            "detail": str(exception),
-            "code": 500,
+            "message": "An unhandled error occurred on the server.",
+            "error_type": exception_type,
+            "detail": exception_message,
+            "path": request.url.path
         }
     )
 
