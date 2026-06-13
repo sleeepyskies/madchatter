@@ -31,7 +31,9 @@ def configure_logging():
     logging.getLogger().handlers = [LogInterceptHandler()]
 
     for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
-        logging.getLogger(name).handlers = [LogInterceptHandler()]
+        _logger = logging.getLogger(name)
+        _logger.handlers = [LogInterceptHandler()]
+        _logger.propagate = False
 
     logger.remove()
 
