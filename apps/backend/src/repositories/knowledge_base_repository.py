@@ -1,55 +1,81 @@
-from langchain_ollama import OllamaEmbeddings
+import uuid
+from pathlib import Path
+
 from langchain_chroma import Chroma
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document
+from langchain_core.vectorstores import VectorStoreRetriever
+from langchain_ollama import OllamaEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from api.api_exception import InvalidArgumentException
 from settings import settings
 
 
-class KnowledgeRepository:
-    def __init__(self):
+class KnowledgeBase:
+    """
+    KnowledgeBase acts as an interface to the vectorized database.
+
+    We instantiate a new instance of this class per collection.
+    """
+
+    def __init__(self, collection_name: str):
         """
-        Initialize the knowledge repository with:
+        Creates a KnowledgeBase instance for a collection. If no collection with this name exists,
+        a new collection will be created on disk. Otherwise, the existing collection will be referenced.
+        :param collection_name: Name of the collection.
         """
         self.embeddings = OllamaEmbeddings(model="nomic-embed-text")
-        
-        raw_url = settings.vector_db_url
-       
-        if raw_url.startswith("chroma:///"):
-            clean_path = raw_url.replace("chroma:///", "")
+        self.collection_name = collection_name
+        if settings.vector_db_url:
+            self.persist_directory = settings.vector_db_url.replace("chroma:///", "")
+        else:
+            self.persist_directory = settings.vector_db_url
 
         self.vector_store = Chroma(
             embedding_function=self.embeddings,
-            collection_name="my_knowledge_base",
-            persist_directory=clean_path  
+            collection_name=self.collection_name,
+            persist_directory=self.persist_directory,
         )
-        
-        self._init_knowledge_base()
 
-    def _init_knowledge_base(self):
-        """
-        Initialize the vector database with default knowledge data.
-
-        This function runs only when the vector store is empty.
-        It inserts a predefined document set to bootstrap the knowledge base.
-
-        """
-        if self.vector_store._collection.count() == 0:
-            raw_text = (
-                "The Hochschule der Bildenden Kunste Saar (HBKsaar) was formally established "
-                "as an independent institution in 1989 through legislation enacted by the state of Saarland. "
-                "Its foundation marked the continuation and restructuring of earlier art and design education "
-                "in the region, particularly from the postwar Schule für Kunst und Handwerk, which had operated "
-                "within the former Fachhochschule des Saarlandes since the 1970s."
-            )
-
-            docs = [Document(page_content=x) for x in raw_text.strip().split("\n")]
-
-            self.vector_store.add_documents(
-                documents=docs,
-                ids=["id" + str(i) for i in range(1, len(docs) + 1)]
-            )
-
-    def get_retriever(self):
-        """
-        Return a LangChain retriever interface for the vector store.
-        """
+    def get_retriever(self) -> VectorStoreRetriever:
+        """Return a LangChain retriever interface for the vector store."""
         return self.vector_store.as_retriever()
+
+    def add_file(self, filepath: Path) -> list[str]:
+        """
+        Adds a new file to this collection. Any file passed in is split into documents.
+        Returns a list of the document ids added.
+        """
+
+        ext = Path(filepath).suffix
+        if ext.lower() == ".pdf":
+            initial_documents = PyPDFLoader(str(filepath)).load()
+        elif ext.lower() in [".txt", ".md"]:
+            with open(filepath, "r", encoding="utf-8") as f:
+                text = f.read()
+            initial_documents = [Document(page_content=text, metadata={"source": filepath})]
+        else:
+            raise InvalidArgumentException(f"Files of type {ext.lower()} are not supported")
+
+        chunked_documents = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+        ).split_documents(initial_documents)
+
+        document_ids = [uuid.uuid4().hex for _ in range(len(chunked_documents))]
+
+        self.vector_store.add_documents(
+            documents=chunked_documents,
+            ids=document_ids
+        )
+
+        return document_ids
+
+    def delete_documents(self, document_ids: list[str]) -> None:
+        """Deletes the provided documents from the knowledge base."""
+        self.vector_store.delete(document_ids)
+
+    def erase_collection(self) -> None:
+        """Completely wipes the whole knowledge base. And removes any instance of it from disk."""
+        self.vector_store.delete_collection()

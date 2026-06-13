@@ -1,4 +1,3 @@
-import os
 import uvicorn
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,10 +9,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from api.api_exception import APIException
-from api.routes import video_router, project_router, agent_router, preference_router, chat_router
+from api.routes import video_router, project_router, agent_router, knowledge_router, chat_router
 from settings import settings
-
-API_PREFIX = "/api"
 
 # configure app and state
 app = FastAPI(
@@ -21,17 +18,8 @@ app = FastAPI(
     summary="Backend server for the MadChatter application.",
 )
 
-# Use absolute paths for static file directories
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-STATIC_DIR = os.path.join(BASE_DIR, "static")
-VIDEOS_DIR = os.path.join(BASE_DIR, "run", "videos")
-
-# Ensure directories exist
-os.makedirs(STATIC_DIR, exist_ok=True)
-os.makedirs(VIDEOS_DIR, exist_ok=True)
-
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-app.mount("/videos", StaticFiles(directory=VIDEOS_DIR), name="videos")
+app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
+app.mount("/files", StaticFiles(directory=settings.files_dir), name="files")
 
 app.state.SessionLocal = None
 app.state.engine = None
@@ -45,13 +33,13 @@ app.add_middleware(
     expose_headers=["X-User-Text"]  # Show user input text
 )
 
-router = APIRouter(prefix=API_PREFIX)
+router = APIRouter(prefix=settings.api_prefix)
 
 # link all sub routers
 router.include_router(video_router)
 router.include_router(project_router)
 router.include_router(agent_router)
-router.include_router(preference_router)
+router.include_router(knowledge_router)
 router.include_router(chat_router)
 
 
@@ -66,6 +54,7 @@ async def api_exception_handler(request: Request, exception: APIException) -> JS
             "code": exception.code,
         }
     )
+
 
 @app.exception_handler(Exception)
 async def exception_handler(request: Request, exception: Exception) -> JSONResponse:
@@ -92,8 +81,7 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
     :param SessionLocal: DB session factory.
     :return: None
     """
-    logger.info(f"Starting server at http://{settings.server_address}:{settings.server_port}")
-    logger.info(f"Docs: http://{settings.server_address}:{settings.server_port}/docs")
+    logger.info(f"Starting server at {settings.url_string}")
 
     app.state.engine = engine
     app.state.SessionLocal = SessionLocal

@@ -1,34 +1,41 @@
-import os
-import shutil
 import uuid
-
+from pathlib import Path
 from fastapi import UploadFile
-from loguru import logger
 
 from api.api_exception import InvalidFileException
 from db.models.videos import Video
 from models.videos import VideoResponse, UpdateVideoRequest, CreateVideoRequest
-from repositories.video_repository import VideoRepository, UpdateVideo
+from repositories.video_repository import VideoRepository
+from util.file_handler import FileHandler
 
 
 class VideoService:
-    """Handles video related business logic."""
-    VIDEO_DIRECTORY = "./run/videos"
+    """Handles video related business logic using an isolated FileHandler."""
 
-    def __init__(self, repository: VideoRepository):
+    def __init__(self, repository: VideoRepository, file_handler: FileHandler):
         self.repository = repository
+        self.file_handler = file_handler
 
     def upload_video(
             self,
             request: CreateVideoRequest,
             file: UploadFile
     ) -> VideoResponse:
-        filename = self._save_file(file)
+        if not file.filename:
+            raise InvalidFileException("Missing filename")
+        if not file.content_type or not file.content_type.startswith("video/"):
+            raise InvalidFileException("Invalid file type")
+
+        ext = Path(file.filename).suffix
+        unique_filename = f"{uuid.uuid4().hex}{ext}"
+
+        self.file_handler.save_file(file, unique_filename)
 
         video = Video(
-            description=request.description,
             label=request.label,
-            filename=filename,
+            description=request.description,
+            filename=unique_filename,
+            project_id=request.project_id,
         )
 
         created = self.repository.create(video)
@@ -47,34 +54,10 @@ class VideoService:
             video_id: int,
             request: UpdateVideoRequest
     ) -> VideoResponse:
-        video = self.repository.update(video_id, UpdateVideo(description=request.description,
-                                                             label=request.label))
+        video = self.repository.update(video_id, request)
         return VideoResponse.model_validate(video)
 
     def delete_video(self, video_id: int) -> None:
         video = self.repository.get(video_id)
         self.repository.delete(video_id)
-        self._delete_file(video.filename)
-
-    def _save_file(self, file: UploadFile) -> str:
-        os.makedirs(self.VIDEO_DIRECTORY, exist_ok=True)
-
-        if not file.filename:
-            raise InvalidFileException("Missing filename")
-        if not file.content_type or not file.content_type.startswith("video/"):
-            raise InvalidFileException("Invalid file type")
-
-        ext = os.path.splitext(file.filename)[1]
-        filename = f"{uuid.uuid4().hex}{ext}"
-        path = os.path.join(self.VIDEO_DIRECTORY, filename)
-
-        with open(path, "wb") as f:
-            logger.debug(f"Saving {file.filename} to {os.path.abspath(path)}")
-            shutil.copyfileobj(file.file, f)
-
-        return filename
-
-    def _delete_file(self, filename: str) -> None:
-        path = os.path.join(self.VIDEO_DIRECTORY, filename)
-        if os.path.exists(path):
-            os.remove(path)
+        self.file_handler.delete_file(video.filename)

@@ -4,7 +4,7 @@ from fastapi.params import Depends, Form
 from starlette import status
 
 from api.dependencies import get_video_service
-from models.videos import VideoResponse, VideoResponse, UpdateVideoRequest, CreateVideoRequest
+from models.videos import VideoResponse, UpdateVideoRequest, CreateVideoRequest
 from services.video_service import VideoService
 
 VIDEO_PREFIX = "/videos"

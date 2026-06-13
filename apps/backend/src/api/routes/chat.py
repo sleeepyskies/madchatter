@@ -15,7 +15,7 @@ CHAT_PREFIX = "/chat"
 router = APIRouter(prefix=CHAT_PREFIX, tags=["chat"])
 
 stt_service = SpeechToText(model_size="base", device="cpu", compute_type="int8")
-rag_service = RAG()
+rag_service = RAG("random-ting")
 tts_service = TextToSpeech()
 
 chat_memory = []

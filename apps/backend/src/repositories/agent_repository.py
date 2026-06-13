@@ -1,16 +1,9 @@
-from dataclasses import dataclass
-
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from api.api_exception import ResourceNotFoundException
 from db.models.agents import Agent
-
-
-@dataclass
-class UpdateAgent:
-    label: str | None
-    system_prompt: str | None
+from models.agent import UpdateAgentRequest
 
 
 class AgentRepository:
@@ -34,15 +27,15 @@ class AgentRepository:
     def list(self) -> list[Agent]:
         return list(self.database.scalars(select(Agent)).all())
 
-    def update(self, agent_id: int, update: UpdateAgent) -> Agent:
+    def update(self, agent_id: int, update: UpdateAgentRequest) -> Agent:
         agent = self.get(agent_id)
-        if not agent:
-            return None
 
         if update.label is not None:
             agent.label = update.label
         if update.system_prompt is not None:
             agent.system_prompt = update.system_prompt
+        if update.voice_model is not None:
+            agent.voice_model = update.voice_model
 
         self.database.commit()
         self.database.refresh(agent)

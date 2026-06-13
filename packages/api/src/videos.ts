@@ -1,57 +1,48 @@
 import {client} from "./client";
 
-const api = client.extend((options) =>
-    ({prefix: `${options.prefix}/videos`})
-);
+const api = client.extend((options) => ({
+    prefix: `${options.prefix}/videos`,
+}));
 
-export interface CreateVideoRequest {
-    label: string;
-    description: string;
-}
-
-export interface UpdateVideoRequest {
-    label?: string;
-    description?: string;
-}
-
-export interface SimpleVideoResponse {
+export interface VideoResponse {
     id: number;
     label: string;
     filename: string;
     description: string;
 }
 
+export interface UpdateVideoRequest {
+    label?: string | null;
+    description?: string | null;
+}
+
 export const videosApi = {
     uploadVideo: async (
+        label: string,
+        description: string,
         file: File,
-        request: CreateVideoRequest,
-    ): Promise<SimpleVideoResponse> => {
-        const form = new FormData();
+    ): Promise<VideoResponse> => {
+        const formData = new FormData();
+        formData.append("label", label);
+        formData.append("description", description);
+        formData.append("file", file);
 
-        form.append("file", file);
-        form.append("label", request.label);
-        form.append("description", request.description);
-
-        return await api
-            .post<SimpleVideoResponse>("upload", { body: form, timeout: false })
-            .json();
+        return await api.post("upload", {body: formData}).json();
     },
 
-    listVideos: async (): Promise<SimpleVideoResponse[]> => {
-        return await api.get<SimpleVideoResponse>("").json();
+    listVideos: async (): Promise<VideoResponse[]> => {
+        return await api.get("").json();
     },
 
-    getVideo: async (videoId: number): Promise<SimpleVideoResponse> => {
-        return await api.get<SimpleVideoResponse>(`${videoId}`).json();
+    getVideo: async (videoId: number): Promise<VideoResponse> => {
+        return await api.get(`${videoId}`).json();
     },
 
     updateVideo: async (
         videoId: number,
         request: UpdateVideoRequest,
-    ): Promise<SimpleVideoResponse> => {
-        return await api
-            .patch<SimpleVideoResponse>(`${videoId}`, { json: request })
-            .json();
+    ): Promise<VideoResponse> => {
+        return await api.patch(`${videoId}`, {json: request}).json();
     },
 
     deleteVideo: async (videoId: number): Promise<void> => {

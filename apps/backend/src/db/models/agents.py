@@ -1,13 +1,27 @@
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base
 
 
 class Agent(Base):
+    """
+    An agent is essentially a collection of configuration options used when triggering the AI pipeline.
+    These options influence the agents personality, voice and model.
+    """
     __tablename__ = "agents"
 
-    id = Column(Integer, primary_key=True)
-    label = Column(String(256), nullable=False)
-    system_prompt = Column(String, nullable=False)
-    # todo: what other fields do we need? voice_model, llm_model ...
+    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    """ID of the row."""
 
+    label: Mapped[str] = mapped_column(nullable=False)
+    """User provided label for this agent."""
+
+    system_prompt: Mapped[str] = mapped_column(nullable=False)
+    """User provided system prompt for this agent."""
+
+    # todo: how to correctly list models from /static? maintain an enum? search dir?
+    voice_model: Mapped[str] = mapped_column(nullable=False)
+    """The voice model to use for this agent. Note that this must correspond to a model located in /static."""
+
+    # todo: could we add more options here? custom LLM for example.
+    # llm_model: Mapped[str] = mapped_column(nullable=False)

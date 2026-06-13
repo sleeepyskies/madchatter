@@ -1,4 +1,4 @@
 export * from "./agents";
-export * from "./preferences";
+export * from "./knowledge";
 export * from "./projects";
 export * from "./videos";

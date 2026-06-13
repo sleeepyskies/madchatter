@@ -1,23 +1,27 @@
 import {client} from "./client";
 
-const api = client.extend((options) =>
-    ({prefix: `${options.prefix}/agents`})
-);
+// Extends client with prefix and optional automatic snake_case transformation body hook
+const api = client.extend((options) => ({
+    prefix: `${options.prefix}/agents`,
+}));
 
 export interface AgentResponse {
     id: number;
     label: string;
     systemPrompt: string;
+    voiceModel: string;
 }
 
 export interface CreateAgentRequest {
     label: string;
     systemPrompt: string;
+    voiceModel: string;
 }
 
 export interface UpdateAgentRequest {
     label?: string;
     systemPrompt?: string;
+    voiceModel?: string;
 }
 
 export const agentsApi = {
@@ -29,7 +33,7 @@ export const agentsApi = {
         return await api.get("").json();
     },
 
-    getProject: async (agentId: number): Promise<AgentResponse> => {
+    getAgent: async (agentId: number): Promise<AgentResponse> => {
         return await api.get(`${agentId}`).json();
     },
 

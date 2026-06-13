@@ -11,6 +11,7 @@ class VideoResponse(BaseSchema):
 class CreateVideoRequest(BaseSchema):
     label: str
     description: str
+    project_id: int
 
 
 class UpdateVideoRequest(BaseSchema):

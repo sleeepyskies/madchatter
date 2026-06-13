@@ -3,6 +3,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 class Base(DeclarativeBase):
     """Base class for all database models, acts as a global table registry."""
+
     def __repr__(self):
         """Return a string representation of the model."""
         # strange syntax but we join strings using ", " as separator

@@ -3,7 +3,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_ollama import ChatOllama
 
-from repositories.knowledge_base_repository import KnowledgeRepository
+from repositories.knowledge_base_repository import KnowledgeBase
 
 
 class RAG:
@@ -11,9 +11,9 @@ class RAG:
     to answer user questions based on retrieved context and chat history.
     """
 
-    def __init__(self):
+    def __init__(self, chroma_collection: str):
         self.llm = ChatOllama(model="llama3.2")
-        self.repo = KnowledgeRepository()
+        self.repo = KnowledgeBase(chroma_collection)
         self.chain = self._setup_rag_chain()
 
     def _setup_rag_chain(self):

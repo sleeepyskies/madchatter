@@ -4,11 +4,12 @@ from fastapi import Request, Depends
 from sqlalchemy.orm import Session
 
 from repositories.agent_repository import AgentRepository
-from repositories.preferences_repository import PreferencesRepository
+from repositories.knowledge_source_repository import KnowledgeSourceRepository
 from repositories.project_repository import ProjectRepository
+from repositories.vector_collection_repository import VectorCollectionRepository
 from repositories.video_repository import VideoRepository
 from services.agent_service import AgentService
-from services.preferences_service import PreferencesService
+from services.knowledge_service import KnowledgeService
 from services.project_service import ProjectService
 from services.video_service import VideoService
 
@@ -41,7 +42,8 @@ def get_project_service(db: DBSession) -> ProjectService:
     """Provides access to the ProjectService."""
     project_repository = ProjectRepository(db)
     video_repository = VideoRepository(db)
-    return ProjectService(project_repository, video_repository)
+    agent_service = get_agent_service(db)
+    return ProjectService(project_repository, video_repository, agent_service)
 
 
 def get_agent_service(db: DBSession) -> AgentService:
@@ -50,7 +52,8 @@ def get_agent_service(db: DBSession) -> AgentService:
     return AgentService(agent_repository)
 
 
-def get_preferences_service(db: DBSession) -> PreferencesService:
-    """Provides access to the PreferencesService."""
-    preferences_repository = PreferencesRepository(db)
-    return PreferencesService(preferences_repository)
+def get_knowledge_service(db: DBSession) -> KnowledgeService:
+    """Provides access to the KnowledgeService."""
+    knowledge_source_repository = KnowledgeSourceRepository(db)
+    vector_collection_repository = VectorCollectionRepository(db)
+    return KnowledgeService(knowledge_source_repository, vector_collection_repository)

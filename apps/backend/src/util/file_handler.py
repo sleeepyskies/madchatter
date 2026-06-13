@@ -1,0 +1,55 @@
+from pathlib import Path
+
+from fastapi import UploadFile
+
+from api.api_exception import InvalidArgumentException
+
+
+class FileHandler:
+    """
+    Simple utility class for managing files based in a root directory.
+    """
+
+    def __init__(self, root_dir: Path) -> None:
+        """Creates a new FileHandler and creates any necessary directories."""
+
+        self.directory = root_dir
+        self.directory.mkdir(parents=True, exist_ok=True)
+
+    def create_path(self, filename: str) -> Path:
+        """
+        Creates a filepath suiting the provided filename.
+        Note that the filename should include the extension.
+        """
+        return self.directory / filename
+
+    def save_file(self, file: UploadFile, filename: str | None = None) -> Path:
+        """
+        Saves a new file to the directory. Can optionally provide a filename override.
+        Note that the filename should include the extension.
+        """
+
+        final_name = filename or file.filename
+
+        if not final_name:
+            raise InvalidArgumentException(
+                f"No filename provided, cannot save to disk at {self.directory}"
+            )
+
+        file_path = self.create_path(final_name)
+
+        with open(file_path, "wb") as file:
+            while content := file.read(1024 * 1024):
+                file.write(content)
+
+        return file_path
+
+    def delete_file(self, filename: str) -> None:
+        """
+        Deletes the file from disk if it exists, otherwise does nothing.
+        Note that the filename should include the extension.
+        """
+
+        file_path = self.create_path(filename)
+        if file_path.exists():
+            file_path.unlink()

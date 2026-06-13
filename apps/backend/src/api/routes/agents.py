@@ -28,10 +28,7 @@ def get_agent(
         agent_id: int,
         agent_service: AgentService = Depends(get_agent_service),
 ):
-    agent = agent_service.get_agent(agent_id)
-    if not agent:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent not found")
-    return agent
+    return agent_service.get_agent(agent_id)
 
 
 @router.patch("/{agent_id}", response_model=AgentResponse)
@@ -40,10 +37,7 @@ def update_agent(
         request: UpdateAgentRequest,
         agent_service: AgentService = Depends(get_agent_service),
 ):
-    agent = agent_service.update_agent(agent_id, request)
-    if not agent:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent not found")
-    return agent
+    return agent_service.update_agent(agent_id, request)
 
 
 @router.delete("/{agent_id}", status_code=status.HTTP_204_NO_CONTENT)
