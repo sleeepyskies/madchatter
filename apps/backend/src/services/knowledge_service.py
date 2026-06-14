@@ -10,7 +10,6 @@ from models.knowledge import CreateKnowledgeRequest, KnowledgeResponse, Knowledg
 from repositories.knowledge_base_repository import KnowledgeBase
 from repositories.knowledge_source_repository import KnowledgeSourceRepository
 from repositories.vector_collection_repository import VectorCollectionRepository
-from services.agent_service import AgentService
 from settings import settings
 from util.file_handler import FileHandler
 
@@ -160,3 +159,7 @@ class KnowledgeService:
 
         self.file_handler.delete_file(source.filename)
         self.knowledge_source.delete(source.id)
+
+    def fetch_knowledge_base(self, knowledge_id: int) -> KnowledgeBase:
+        collection = self.vector_collection.get(knowledge_id)
+        return KnowledgeBase(collection.chroma_collection)

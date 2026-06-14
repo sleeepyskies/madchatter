@@ -32,6 +32,13 @@ def database(request: Request) -> Generator[Session, None, None]:
 DBSession = Annotated[Session, Depends(database)]
 
 
+def get_knowledge_service(db: DBSession) -> KnowledgeService:
+    """Provides access to the KnowledgeService."""
+    knowledge_source_repository = KnowledgeSourceRepository(db)
+    vector_collection_repository = VectorCollectionRepository(db)
+    return KnowledgeService(knowledge_source_repository, vector_collection_repository)
+
+
 def get_video_service(db: DBSession) -> VideoService:
     """Provides access to the VideoService."""
     video_repository = VideoRepository(db)
@@ -43,17 +50,11 @@ def get_project_service(db: DBSession) -> ProjectService:
     project_repository = ProjectRepository(db)
     video_repository = VideoRepository(db)
     agent_service = get_agent_service(db)
-    return ProjectService(project_repository, video_repository, agent_service)
+    knowledge_service = get_knowledge_service(db)
+    return ProjectService(project_repository, video_repository, agent_service, knowledge_service)
 
 
 def get_agent_service(db: DBSession) -> AgentService:
     """Provides access to the AgentService."""
     agent_repository = AgentRepository(db)
     return AgentService(agent_repository)
-
-
-def get_knowledge_service(db: DBSession) -> KnowledgeService:
-    """Provides access to the KnowledgeService."""
-    knowledge_source_repository = KnowledgeSourceRepository(db)
-    vector_collection_repository = VectorCollectionRepository(db)
-    return KnowledgeService(knowledge_source_repository, vector_collection_repository)

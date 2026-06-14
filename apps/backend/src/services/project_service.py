@@ -2,9 +2,11 @@ from db.models.projects import Project
 from db.models.videos import Video
 from models.project import CreateProjectRequest, ProjectResponse, UpdateProjectRequest
 from models.videos import VideoResponse
+from repositories.knowledge_base_repository import KnowledgeBase
 from repositories.project_repository import ProjectRepository
 from repositories.video_repository import VideoRepository
 from services.agent_service import AgentService
+from services.knowledge_service import KnowledgeService
 from settings import settings
 from util.file_handler import FileHandler
 
@@ -28,10 +30,12 @@ class ProjectService:
             project_repository: ProjectRepository,
             video_repository: VideoRepository,
             agent_service: AgentService,
+            knowledge_service: KnowledgeService,
     ):
         self.project_repository = project_repository
         self.video_repository = video_repository
         self.agent_service = agent_service
+        self.knowledge_service = knowledge_service
         self.file_handler = FileHandler(settings.files_dir)
 
     def create_project(self, request: CreateProjectRequest) -> ProjectResponse:
@@ -87,3 +91,10 @@ class ProjectService:
             self.file_handler.delete_file(video.filename)
             self.video_repository.delete(video.id)
         self.project_repository.delete(project_id)
+
+    def fetch_knowledge_base(self, project_id: int) -> KnowledgeBase | None:
+        project = self.project_repository.get(project_id)
+        if project.vector_collection_id is None:
+            return None
+
+        return self.knowledge_service.fetch_knowledge_base(project.vector_collection_id)
