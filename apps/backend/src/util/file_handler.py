@@ -38,9 +38,9 @@ class FileHandler:
 
         file_path = self.create_path(final_name)
 
-        with open(file_path, "wb") as file:
-            while content := file.read(1024 * 1024):
-                file.write(content)
+        with open(file_path, "wb") as dest:
+            while content := file.file.read(1024 * 1024):
+                dest.write(content)
 
         return file_path
 
