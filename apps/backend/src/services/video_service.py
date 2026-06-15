@@ -6,15 +6,16 @@ from api.api_exception import InvalidFileException
 from db.models.videos import Video
 from models.videos import VideoResponse, UpdateVideoRequest, CreateVideoRequest
 from repositories.video_repository import VideoRepository
+from settings import settings
 from util.file_handler import FileHandler
 
 
 class VideoService:
-    """Handles video related business logic using an isolated FileHandler."""
+    """Handles video related business logic."""
 
-    def __init__(self, repository: VideoRepository, file_handler: FileHandler):
+    def __init__(self, repository: VideoRepository):
         self.repository = repository
-        self.file_handler = file_handler
+        self.file_handler = FileHandler(settings.files_dir)
 
     def upload_video(
             self,
