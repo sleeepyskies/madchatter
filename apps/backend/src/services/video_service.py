@@ -43,7 +43,7 @@ class VideoService:
         return VideoResponse.model_validate(created)
 
     def list_videos(self) -> list[VideoResponse]:
-        videos = self.repository.list()
+        videos = self.repository.list_all()
         return [VideoResponse.model_validate(video) for video in videos]
 
     def get_video(self, video_id: int) -> VideoResponse:
