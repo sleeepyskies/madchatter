@@ -10,7 +10,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from api.api_error import ApiError
+from api.api_error import ApiErrorResponse
 from api.api_exception import APIException
 from api.routes import video_router, project_router, agent_router, knowledge_router, chat_router
 from settings import settings
@@ -51,7 +51,7 @@ router.include_router(chat_router)
 async def api_exception_handler(request: Request, exception: APIException) -> JSONResponse:
     logger.error(exception)
 
-    return ApiError(
+    return ApiErrorResponse(
         code=exception.status_code,
         error_type=exception.error_type,
         path=request.url.path,
@@ -73,7 +73,7 @@ async def integrity_error_handler(request: Request, exception: IntegrityError):
     elif "NOT NULL" in msg:
         detail = "A required field was missing or left empty."
 
-    return ApiError(
+    return ApiErrorResponse(
         code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         error_type="ValidationError",
         path=request.url.path,
@@ -89,7 +89,7 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
     exception_type = type(exc).__name__
     exception_message = str(exc)
 
-    return ApiError(
+    return ApiErrorResponse(
         code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         error_type=exception_type,
         path=request.url.path,

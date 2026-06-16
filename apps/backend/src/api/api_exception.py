@@ -1,4 +1,30 @@
 from starlette import status
+from starlette.responses import JSONResponse
+
+
+class ApiErrorResponse(JSONResponse):
+    """
+    General response type for API errors. Used as a way to unify response of any api failures.
+    """
+
+    def __init__(
+            self,
+            code: int,
+            error_type: str,
+            path: str,
+            message: str,
+            detail: str
+    ):
+        super().__init__(
+            status_code=code,
+            content={
+                "code": code,
+                "type": error_type,
+                "path": path,
+                "message": message,
+                "detail": detail,
+            }
+        )
 
 
 class APIException(Exception):
