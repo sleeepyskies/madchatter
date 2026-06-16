@@ -16,11 +16,12 @@ router = APIRouter(prefix=VIDEO_PREFIX, tags=["videos"])
 def upload_video(
         label: str = Form(...),
         description: str = Form(...),
+        project_id: int = Form(...),
         file: UploadFile = File(...),
         video_service: VideoService = Depends(get_video_service)
 ):
     return video_service.upload_video(
-        CreateVideoRequest(label=label, description=description),
+        CreateVideoRequest(label=label, description=description, project_id=project_id),
         file
     )
 
