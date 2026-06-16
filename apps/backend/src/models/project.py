@@ -27,7 +27,6 @@ class CreateProjectRequest(BaseSchema):
 class UpdateProjectRequest(BaseSchema):
     label: str | None
     agent_id: int | None
-    video_ids: list[int] | None
     knowledge_id: int | None
     idle_video_id: int | None
     enter_video_id: int | None

@@ -30,7 +30,6 @@ export interface CreateProjectRequest {
 export interface UpdateProjectRequest {
   label?: string | null;
   agent_id?: number | null;
-  video_ids?: number[] | null;
   knowledge_id?: number | null;
   idle_video_id?: number | null;
   enter_video_id?: number | null;
