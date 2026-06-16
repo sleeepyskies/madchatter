@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 from sqlalchemy.orm import Session
 
 from api.api_exception import ResourceNotFoundException
@@ -33,15 +33,15 @@ class ProjectRepository:
         return list(self.database.scalars(statement).all())
 
     def update(self, project_id: int, new: UpdateProjectRequest) -> Project:
-        update = new.model_dump(exclude_unset=True)
+        values = new.model_dump(exclude_unset=True)
 
-        if not update:
+        if not values:
             return self.get(project_id)
 
         statement = (
             update(Project)
             .where(Project.id == project_id)
-            .values(**update)
+            .values(**values)
             .returning(Project)
         )
 
