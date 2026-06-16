@@ -4,11 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from sqlalchemy import Engine
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from api.api_error import ApiError
 from api.api_exception import APIException
 from api.routes import video_router, project_router, agent_router, knowledge_router, chat_router
 from settings import settings
@@ -48,12 +50,35 @@ router.include_router(chat_router)
 @app.exception_handler(APIException)
 async def api_exception_handler(request: Request, exception: APIException) -> JSONResponse:
     logger.error(exception)
-    return JSONResponse(
-        status_code=exception.status_code,
-        content={
-            "message": exception.message,
-            "code": exception.code,
-        }
+
+    return ApiError(
+        code=exception.status_code,
+        error_type=exception.error_type,
+        path=request.url.path,
+        message=exception.message,
+        detail=exception.detail,
+    )
+
+
+@app.exception_handler(IntegrityError)
+async def integrity_error_handler(request: Request, exception: IntegrityError):
+    logger.error(exception)
+
+    msg = str(exception.orig)
+    detail = ""
+    if "FOREIGN KEY" in msg:
+        detail = "The resource referenced through a foreign key does not exist."
+    elif "UNIQUE" in msg:
+        detail = "A resource with this unique value already exists."
+    elif "NOT NULL" in msg:
+        detail = "A required field was missing or left empty."
+
+    return ApiError(
+        code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        error_type="ValidationError",
+        path=request.url.path,
+        message="Database integrity was violated.",
+        detail=detail,
     )
 
 
@@ -64,14 +89,12 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
     exception_type = type(exc).__name__
     exception_message = str(exc)
 
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
-            "message": "An unhandled error occurred on the server.",
-            "error_type": exception_type,
-            "detail": exception_message,
-            "path": request.url.path
-        }
+    return ApiError(
+        code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        error_type=exception_type,
+        path=request.url.path,
+        message=exception_message,
+        detail=exception_message,
     )
 
 
