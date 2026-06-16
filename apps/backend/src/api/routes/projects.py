@@ -33,7 +33,7 @@ def get_project(
     return project_service.get_project(project_id)
 
 
-@router.put("/{project_id}", response_model=ProjectResponse)
+@router.patch("/{project_id}", response_model=ProjectResponse)
 def update_project(
         project_id: int,
         request: UpdateProjectRequest,

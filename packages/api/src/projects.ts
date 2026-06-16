@@ -54,7 +54,7 @@ export const projectsApi = {
     projectId: number,
     request: UpdateProjectRequest,
   ): Promise<ProjectResponse> => {
-    return await api.put(`${projectId}`, {json: request}).json();
+    return await api.patch(`${projectId}`, {json: request}).json();
   },
 
   deleteProject: async (projectId: number): Promise<void> => {
