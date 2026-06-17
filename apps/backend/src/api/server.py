@@ -10,8 +10,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from api.api_error import ApiErrorResponse
-from api.api_exception import APIException
+from api.api_exception import APIException, ApiErrorResponse
 from api.routes import video_router, project_router, agent_router, knowledge_router, chat_router
 from settings import settings
 
