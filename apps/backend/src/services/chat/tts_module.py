@@ -8,10 +8,10 @@ class TextToSpeech:
     """
     A TextToSpeech class that uses the Piper TTS engine to convert text to speech. It loads a specified TTS model and provides a method to stream synthesized audio for given text input.
     """
-    def __init__(self, model_name="de_DE-eva_k-x_low.onnx"):
+    def __init__(self, voice_model="de_DE-eva_k-x_low.onnx"):
         self.backend_root = Path(__file__).resolve().parents[3]
         self.static_dir = self.backend_root / "static"
-        self.model_path = str(self.static_dir / model_name)
+        self.model_path = str(self.static_dir / voice_model)
         config_path = self.model_path + ".json"
         if not os.path.exists(self.model_path):
             logger.error(f"Error: Path doesn't exist {self.model_path}")

@@ -12,6 +12,8 @@ from services.agent_service import AgentService
 from services.knowledge_service import KnowledgeService
 from services.project_service import ProjectService
 from services.video_service import VideoService
+from services.chat.chat_service_factory import ChatServiceFactory
+from services.chat.chat_application_service import ChatApplicationService
 
 
 def database(request: Request) -> Generator[Session, None, None]:
@@ -30,6 +32,8 @@ def database(request: Request) -> Generator[Session, None, None]:
 
 
 DBSession = Annotated[Session, Depends(database)]
+
+chat_application_service = None
 
 
 def get_knowledge_service(db: DBSession) -> KnowledgeService:
@@ -58,3 +62,18 @@ def get_agent_service(db: DBSession) -> AgentService:
     """Provides access to the AgentService."""
     agent_repository = AgentRepository(db)
     return AgentService(agent_repository)
+
+def get_chat_application_service(db: DBSession) -> ChatApplicationService:
+    """Provides access to the ChatApplicationService, ensuring a single instance is used across the application."""
+    global chat_application_service
+
+    if chat_application_service is None:
+
+        chat_application_service = ChatApplicationService(
+            project_service=get_project_service(db),
+            chat_factory=ChatServiceFactory(),
+            agent_service=get_agent_service(db),
+            knowledge_service=get_knowledge_service(db),
+        )
+
+    return chat_application_service

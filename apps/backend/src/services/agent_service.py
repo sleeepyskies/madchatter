@@ -18,6 +18,7 @@ class AgentService:
             Agent(
                 label=request.label,
                 system_prompt=request.system_prompt,
+                language=request.language,
                 voice_model=request.voice_model,
             )
         )

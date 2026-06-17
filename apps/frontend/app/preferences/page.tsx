@@ -15,7 +15,7 @@ import {SidebarInset, SidebarProvider, SidebarTrigger,} from "@/components/ui/si
 import {TooltipProvider} from "@/components/ui/tooltip";
 import {Button} from "@/components/ui/button";
 import {applyTheme} from "@/components/theme-provider";
-import {Language, Preferences, preferencesApi} from "@madchatter/api/src/preferences";
+// import {Language, Preferences, preferencesApi} from "@madchatter/api/src/preferences";
 
 const themeOptions: { value: Preferences["theme"]; label: string }[] = [
   { value: "light", label: "Light" },

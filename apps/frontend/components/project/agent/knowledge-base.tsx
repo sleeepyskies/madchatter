@@ -1,15 +1,12 @@
+/**
+ * UI component for managing the knowledge base of agent.
+ */
 "use client";
 
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  UploadCloud,
-  FileText,
-  Trash2,
-  FileCode,
-  Presentation,
-} from "lucide-react";
+import { UploadCloud, FileText, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function KnowledgeBaseStep() {
@@ -82,13 +79,11 @@ export function KnowledgeBaseStep() {
   };
 
   return (
-    <div className="flex flex-col gap-4 max-w-2xl w-full border rounded-xl p-6 bg-background shadow-sm">
-      <div>
-        <p className="text-xs text-muted-foreground">
-          Provide background knowledge for your chatebot.
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Please choose one method only (File Upload / Text Input)
+    <div className="flex flex-col gap-3 w-full border rounded-lg p-3 bg-background shadow-sm">
+      {/* helper text */}
+      <div className="space-y-0.5">
+        <p className="text-[12px] text-muted-foreground leading-tight">
+          Provide background knowledge for your chatbot.
         </p>
       </div>
 
@@ -97,19 +92,24 @@ export function KnowledgeBaseStep() {
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2 mb-4 bg-muted/60 p-1 rounded-lg">
-          <TabsTrigger value="file" className="text-xs py-1.5 rounded-md">
-            File Upload
+        <TabsList className="flex w-full gap-1 bg-muted/30 p-1 rounded-lg">
+          <TabsTrigger
+            value="file"
+            className="flex-1 text-xs py-1 rounded-md data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:text-muted-foreground"
+          >
+            File
           </TabsTrigger>
-          <TabsTrigger value="text" className="text-xs py-1.5 rounded-md">
-            Text Input
+
+          <TabsTrigger
+            value="text"
+            className="flex-1 text-xs py-1 rounded-md data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:text-muted-foreground"
+          >
+            Text
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent
-          value="file"
-          className="flex flex-col gap-4 focus-visible:outline-none"
-        >
+        {/* file upload */}
+        <TabsContent value="file" className="flex flex-col gap-3">
           <input
             type="file"
             ref={fileInputRef}
@@ -124,54 +124,45 @@ export function KnowledgeBaseStep() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-200 ${
+            className={`border rounded-lg p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
               isDragging
-                ? "border-primary bg-primary/5 text-primary scale-[0.99]"
-                : "border-slate-200 hover:border-primary/50 hover:bg-muted/30 text-muted-foreground"
+                ? "border-primary bg-primary/5"
+                : "border-slate-200 hover:border-primary/40 hover:bg-muted/20"
             }`}
           >
-            <div
-              className={`p-3 rounded-full border border-dashed transition-colors ${isDragging ? "bg-background border-primary" : "bg-muted"}`}
-            >
-              <UploadCloud
-                className={`h-6 w-6 ${isDragging ? "text-primary" : "text-muted-foreground"}`}
-              />
+            <div className="p-2 rounded-full border bg-muted">
+              <UploadCloud className="h-5 w-5 text-muted-foreground" />
             </div>
+
             <div className="text-center">
-              <p className="text-sm font-medium text-foreground">
-                Click to upload or drag & drop the file here
-              </p>
-              <p className="text-xs text-muted-foreground/80 mt-1">
-                Supports PDF, Word, TXT files.
+              <p className="text-xs font-medium">Upload or drag & drop files</p>
+              <p className="text-[11px] text-muted-foreground">
+                PDF / Word / TXT
               </p>
             </div>
           </div>
 
           {uploadedFiles.length > 0 && (
-            <div className="flex flex-col gap-2 max-h-[160px] overflow-y-auto pr-1">
+            <div className="flex flex-col gap-1 max-h-[120px] overflow-y-auto pr-1">
               {uploadedFiles.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-2.5 rounded-lg border bg-muted/30 text-sm group"
+                  className="flex items-center justify-between p-2 rounded-md border bg-muted/20 text-xs group"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <FileText className="h-4 w-4 shrink-0 text-primary/80" />
-                    <span className="truncate font-medium text-xs text-foreground/80">
-                      {file.name}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground shrink-0">
-                      ({(file.size / 1024).toFixed(1)} KB)
-                    </span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <span className="truncate">{file.name}</span>
                   </div>
+
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       removeFile(index);
                     }}
-                    className="p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
+                    className="opacity-0 group-hover:opacity-100 transition"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
                   </button>
                 </div>
               ))}
@@ -179,14 +170,14 @@ export function KnowledgeBaseStep() {
           )}
         </TabsContent>
 
-        <TabsContent value="text" className="focus-visible:outline-none">
+        {/* text input*/}
+        <TabsContent value="text">
           <Textarea
             value={manualText}
             onChange={(e) => setManualText(e.target.value)}
-            placeholder="Paste or type your knowledge base content here..."
-            className="min-h-[180px] text-sm border-slate-200 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/10 resize-none rounded-lg p-3"
+            placeholder="Paste your knowledge base..."
+            className="min-h-[120px] text-sm border-slate-200 resize-none rounded-md p-2"
           />
-          <div className="flex justify-between items-center mt-2 text-[11px] text-muted-foreground px-1"></div>
         </TabsContent>
       </Tabs>
     </div>

@@ -19,9 +19,13 @@ class Agent(Base):
     system_prompt: Mapped[str] = mapped_column(nullable=False)
     """User provided system prompt for this agent."""
 
+    language: Mapped[str] = mapped_column(nullable=False)
+    """""The language of this agent."""
+
     # todo: how to correctly list models from /static? maintain an enum? search dir?
     voice_model: Mapped[str] = mapped_column(nullable=False)
     """The voice model to use for this agent. Note that this must correspond to a model located in /static."""
+
 
     # todo: could we add more options here? custom LLM for example.
     # llm_model: Mapped[str] = mapped_column(nullable=False)

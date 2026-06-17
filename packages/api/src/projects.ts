@@ -20,7 +20,6 @@ export interface ProjectResponse {
 export interface CreateProjectRequest {
   label: string;
   agent_id: number;
-  video_ids: number[];
   knowledge_id: number | null;
   idle_video_id: number | null;
   enter_video_id: number | null;

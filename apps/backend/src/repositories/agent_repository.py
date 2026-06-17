@@ -34,6 +34,8 @@ class AgentRepository:
             agent.label = update.label
         if update.system_prompt is not None:
             agent.system_prompt = update.system_prompt
+        if update.language is not None:
+            agent.language = update.language
         if update.voice_model is not None:
             agent.voice_model = update.voice_model
 

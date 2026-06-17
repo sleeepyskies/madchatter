@@ -9,18 +9,22 @@ export interface AgentResponse {
     id: number;
     label: string;
     systemPrompt: string;
+    language: string;
     voiceModel: string;
+
 }
 
 export interface CreateAgentRequest {
     label: string;
     systemPrompt: string;
+    language: string;
     voiceModel: string;
 }
 
 export interface UpdateAgentRequest {
     label?: string;
     systemPrompt?: string;
+    language?: string;
     voiceModel?: string;
 }
 
