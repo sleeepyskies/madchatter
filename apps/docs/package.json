@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "zudoku dev",
     "build": "zudoku build",
-    "preview": "zudoku preview",
-    "lint": "eslint"
+    "preview": "wrangler dev",
+    "lint": "eslint",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "react": ">=19.0.0",
@@ -18,9 +19,10 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "typescript": "^6",
-    "eslint": "^8",
     "@typescript-eslint/eslint-plugin": "^8",
-    "@typescript-eslint/parser": "^8"
+    "@typescript-eslint/parser": "^8",
+    "eslint": "^8",
+    "typescript": "^6",
+    "wrangler": "^4.98.0"
   }
 }
