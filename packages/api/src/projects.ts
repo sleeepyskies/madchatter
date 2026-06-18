@@ -11,10 +11,10 @@ export interface ProjectResponse {
   label: string;
   agent: AgentResponse | null;
   videos: VideoResponse[];
-  knowledge_id: number | null;
-  idle_video: VideoResponse | null;
-  enter_video: VideoResponse | null;
-  exit_video: VideoResponse | null;
+  knowledgeId: number | null;
+  idleVideo: VideoResponse | null;
+  enterVideo: VideoResponse | null;
+  exitVideo: VideoResponse | null;
 }
 
 export interface CreateProjectRequest {
