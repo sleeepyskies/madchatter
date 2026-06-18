@@ -41,21 +41,17 @@ export default function ListeningAnimation({ isActive = false }) {
         const update = () => {
           analyser.getByteFrequencyData(dataArray);
 
-          // Map frequency data to 9 bars using exponential distribution
-          // This focuses on mid-to-high frequencies where speech is
           const barCount = 9;
-          const startFreq = 40; // Skip very low frequencies (DC + sub-bass)
-          const endFreq = bufferLength * 0.8; // Use up to 80% of spectrum
+          const startFreq = 40;
+          const endFreq = bufferLength * 0.8;
           const freqRange = endFreq - startFreq;
 
           for (let i = 0; i < barCount; i++) {
-            // Exponential distribution gives more spread to higher frequencies
             const normalizedPos = i / (barCount - 1);
             const exponentialPos = Math.pow(normalizedPos, 1.2);
             const freqIndex = Math.floor(startFreq + exponentialPos * freqRange);
             const frequency = dataArray[Math.min(freqIndex, bufferLength - 1)] || 0;
 
-            // Scale frequency to bar height (10-80px)
             const height = Math.max(10, (frequency / 255) * 70 + 10);
 
             if (barsRef.current[i]) {
@@ -115,12 +111,9 @@ export default function ListeningAnimation({ isActive = false }) {
                 borderRadius: "3px",
                 transition: "none",
               }}
-            ></div>
+            />
           ))}
       </div>
-      <p style={{ marginTop: "10px", color: "#666", fontSize: "12px" }}>
-        Listening...
-      </p>
     </div>
   );
 }

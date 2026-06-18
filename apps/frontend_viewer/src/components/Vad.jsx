@@ -5,20 +5,17 @@ import ListeningAnimation from "./ListeningAnimation.jsx";
 import SubtitlePanel from "./SubtitlePanel.jsx";
 
 export default function Vad() {
-  const [userText, setUserText] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [aiText, setAiText] = useState("");
-
+  const [activeSubtitle, setActiveSubtitle] = useState({ text: "", role: "" });
   const [state, setState] = useState("LISTEN"); // LISTEN | THINKING | SPEAKING
+  const [showWaveform, setShowWaveform] = useState(true);
   const [videos, setVideos] = useState([]);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [currentVideoUrl, setCurrentVideoUrl] = useState("");
 
   const audioCtxRef = useRef(null);
   const nextStartTimeRef = useRef(0);
-
-  // Playback queue to prevent cutting off audio
   const audioQueueRef = useRef(new Set());
+  const waveformTimerRef = useRef(null);
 
   const initAudioContext = () => {
     if (!audioCtxRef.current) {
@@ -29,38 +26,70 @@ export default function Vad() {
     }
   };
 
-  // Fetch videos on component mount
   useEffect(() => {
-    const fetchVideos = async () => {
+    const fetchProject = async () => {
+      const fallbackVideos = [
+        {
+          id: 1,
+          label: "Default Avatar",
+          filename: "avatar.mp4",
+          description: "Static avatar video for development",
+          fileUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
+        },
+      ];
+
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/videos");
-        if (res.ok) {
-          const data = await res.json();
-          setVideos(data);
-          if (data.length > 0) {
-            // Set default video to first one
-    setCurrentVideoIndex(0);
-            setCurrentVideoUrl(data[0].fileUrl);
-          }
+        const res = await fetch("http://127.0.0.1:8000/api/projects");
+        if (!res.ok) throw new Error(`Project fetch failed: ${res.status}`);
+
+        const projects = await res.json();
+        if (!Array.isArray(projects) || projects.length === 0) {
+          setVideos(fallbackVideos);
+          setCurrentVideoIndex(0);
+          setCurrentVideoUrl(fallbackVideos[0].fileUrl);
+          return;
+        }
+
+        const project = projects[0];
+        const projectVideos =
+          project.videos?.map((video) => ({
+            ...video,
+            fileUrl: `http://127.0.0.1:8000/files/${video.filename}`,
+          })) ?? [];
+
+        setVideos(projectVideos);
+
+        if (project.idleVideo?.filename) {
+          setCurrentVideoUrl(`http://127.0.0.1:8000/files/${project.idleVideo.filename}`);
+          const idleIndex = projectVideos.findIndex((v) => v.id === project.idleVideo.id);
+          setCurrentVideoIndex(idleIndex !== -1 ? idleIndex : 0);
+        } else if (projectVideos.length > 0) {
+          setCurrentVideoIndex(0);
+          setCurrentVideoUrl(projectVideos[0].fileUrl);
+        } else {
+          setVideos(fallbackVideos);
+          setCurrentVideoIndex(0);
+          setCurrentVideoUrl(fallbackVideos[0].fileUrl);
         }
       } catch (err) {
-        console.error("Failed to fetch videos:", err);
+        console.error("Failed to fetch project videos:", err);
+        setVideos(fallbackVideos);
+        setCurrentVideoIndex(0);
+        setCurrentVideoUrl(fallbackVideos[0].fileUrl);
       }
     };
 
-    fetchVideos();
+    fetchProject();
   }, []);
 
   useEffect(() => {
     if (!vad) return;
-
     if (state === "LISTEN") {
       vad.start();
     } else {
       vad.pause();
     }
   }, [state]);
-
 
   const playPCMBuffer = (int16Array) => {
     const audioCtx = audioCtxRef.current;
@@ -70,23 +99,18 @@ export default function Vad() {
     const TARGET_SAMPLE_RATE = audioCtx.sampleRate;
 
     const float32 = new Float32Array(int16Array.length);
-
     for (let i = 0; i < int16Array.length; i++) {
       float32[i] = int16Array[i] / 32768;
     }
 
     const ratio = MODEL_SAMPLE_RATE / TARGET_SAMPLE_RATE;
     const resampled = new Float32Array(Math.round(int16Array.length / ratio));
-
     for (let i = 0; i < resampled.length; i++) {
       const src = i * ratio;
       const i0 = Math.floor(src);
       const i1 = Math.min(i0 + 1, int16Array.length - 1);
       const w = src - i0;
-
-      resampled[i] =
-        float32[i0] * (1 - w) +
-        float32[i1] * w;
+      resampled[i] = float32[i0] * (1 - w) + float32[i1] * w;
     }
 
     const buffer = audioCtx.createBuffer(1, resampled.length, TARGET_SAMPLE_RATE);
@@ -97,7 +121,6 @@ export default function Vad() {
     source.connect(audioCtx.destination);
 
     const now = audioCtx.currentTime;
-
     if (nextStartTimeRef.current < now) {
       nextStartTimeRef.current = now;
     }
@@ -109,14 +132,21 @@ export default function Vad() {
 
     source.onended = () => {
       audioQueueRef.current.delete(source);
-
       if (audioQueueRef.current.size === 0) {
         setState("LISTEN");
-        setLoading(false);
+
+        // Hide waveform immediately, subtitle fades out over 1.5s,
+        // then show waveform after subtitle is gone
+        setShowWaveform(false);
+        setActiveSubtitle({ text: "", role: "" }); // triggers SubtitlePanel fade-out (0.4s)
+
+        clearTimeout(waveformTimerRef.current);
+        waveformTimerRef.current = setTimeout(() => {
+          setShowWaveform(true);
+        }, 1500);
       }
     };
   };
-
 
   const vad = useMicVAD({
     model: "v5",
@@ -127,8 +157,9 @@ export default function Vad() {
       if (state !== "LISTEN") return;
 
       setState("THINKING");
-      setLoading(true);
-      setAiText("");
+      setShowWaveform(false);
+      setActiveSubtitle({ text: "", role: "" });
+      clearTimeout(waveformTimerRef.current);
 
       initAudioContext();
 
@@ -148,7 +179,10 @@ export default function Vad() {
 
         const xUserText = res.headers.get("X-User-Text");
         if (xUserText) {
-          setUserText(decodeURIComponent(escape(xUserText)));
+          setActiveSubtitle({
+            text: decodeURIComponent(escape(xUserText)),
+            role: "user",
+          });
         }
 
         setState("SPEAKING");
@@ -158,10 +192,7 @@ export default function Vad() {
 
         while (true) {
           const { done, value } = await reader.read();
-
-          if (done) {
-            break;
-          }
+          if (done) break;
 
           const combined = new Uint8Array(leftover.length + value.length);
           combined.set(leftover);
@@ -177,37 +208,38 @@ export default function Vad() {
           }
         }
 
-
         const replyRes = await fetch("http://127.0.0.1:8000/api/chat/latest_reply");
         const replyData = await replyRes.json();
 
-        setAiText(replyData.reply);
+        setActiveSubtitle({ text: replyData.reply, role: "agent" });
 
-        // Check if AI suggested a different video
         if (replyData.suggested_video_id) {
-          const videoIndex = videos.findIndex(v => v.id === replyData.suggested_video_id);
+          const videoIndex = videos.findIndex((v) => v.id === replyData.suggested_video_id);
           if (videoIndex !== -1) {
             setCurrentVideoIndex(videoIndex);
             setCurrentVideoUrl(videos[videoIndex].fileUrl);
           }
         }
-
       } catch (err) {
         console.error(err);
-        setLoading(false);
         setState("LISTEN");
+        setActiveSubtitle({ text: "", role: "" });
+        setShowWaveform(true);
       }
     },
   });
 
-
-  // Start listening immediately on mount
   useEffect(() => {
     if (vad && state === "LISTEN") {
       initAudioContext();
       vad.start();
     }
   }, [vad]);
+
+  const statusLabel =
+    state === "THINKING" ? "Thinking" :
+    state === "SPEAKING" ? "Speaking" :
+    showWaveform ? "Listening" : "";
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", margin: 0, padding: 0, overflow: "hidden", backgroundColor: "black" }}>
@@ -224,17 +256,37 @@ export default function Vad() {
         pointerEvents: "none",
       }}>
         <SubtitlePanel
-          userText={userText}
-          aiText={aiText}
-          loading={loading}
+          text={activeSubtitle.text}
+          role={activeSubtitle.role}
           style={{
             pointerEvents: "auto",
             width: "100%",
             maxWidth: "1080px",
           }}
         />
-        <div style={{ marginTop: "16px", pointerEvents: "auto" }}>
-          <ListeningAnimation isActive={vad.listening || state === "THINKING"} />
+
+        <div style={{
+          marginTop: "16px",
+          pointerEvents: "auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "6px",
+          minHeight: "140px", // prevent layout shift when waveform appears/disappears
+          justifyContent: "flex-end",
+        }}>
+          {statusLabel ? (
+            <span style={{
+              fontSize: "12px",
+              fontWeight: 500,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.55)",
+            }}>
+              {statusLabel}
+            </span>
+          ) : null}
+          <ListeningAnimation isActive={showWaveform && state === "LISTEN"} />
         </div>
       </div>
     </div>
