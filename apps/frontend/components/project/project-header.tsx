@@ -3,18 +3,7 @@
  * Displays the current step and handles navigation back to the dashboard.
  */
 import { ArrowLeft } from "lucide-react";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/reusable/dialog/confirm-dialog";
 
 interface ProjectHeaderProps {
   currentStep: number;
@@ -29,27 +18,17 @@ export function ProjectHeader({
   return (
     <header className="flex h-16 shrink-0 items-center border-b px-6 justify-between">
       <div className="flex items-center gap-2">
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <button className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-muted-foreground hover:text-black transition cursor-pointer">
-              <ArrowLeft />
-              Back to Dashboard
-            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                You have not saved your project yet. Leaving this page will
-                discard your current setup.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={onBack}>Continue</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmDialog
+          title="Are you absolutely sure?"
+          description="You have not saved your project yet. Leaving this page will discard your current setup."
+          confirmText="Leave Page"
+          onConfirm={onBack}
+        >
+          <button className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-muted-foreground hover:text-black transition cursor-pointer">
+            <ArrowLeft />
+            Back to Dashboard
+          </button>
+        </ConfirmDialog>
       </div>
 
       <div className="text-sm text-muted-foreground">

@@ -6,7 +6,6 @@
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Separator } from "@/components/ui/separator";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   VideoUpload,
   type VideoDraft,
@@ -15,16 +14,17 @@ import { AgentConfiguration } from "@/components/project/agent/agent-configurati
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { StepIndicator } from "@/components/project/step-indicator";
-import { StepNavigation } from "@/components/project/step-navigation";
 import { ProjectHeader } from "@/components/project/project-header";
 import { processVideos } from "@/components/project/video/video-service";
 import { saveProject } from "@/components/project/project-service";
 import { updateProjectOnly } from "@/components/project/update-project-only-service";
 import { VideoAssignments } from "@/components/project/agent/video-setting";
+import dynamic from "next/dynamic";
 
 import { agentsApi } from "@madchatter/api/src/agents";
 import { videosApi } from "@madchatter/api/src/videos";
 import { projectsApi } from "@madchatter/api/src/projects";
+import { knowledgeApi, KnowledgeResponse } from "@madchatter/api/src/knowledge";
 
 const STEPS = [
   { id: 1, name: "Videos Upload", description: "" },
@@ -34,12 +34,19 @@ const STEPS = [
 const backendPort = process.env.SERVER_PORT || "8000";
 const address = process.env.ADDRESS || "127.0.0.1";
 
+// todo: this is a super hacky fix, but there were errors regarding mismatch of client and server, should fix later
+const StepNavigation = dynamic(
+  () => import("@/components/project/step-navigation").then((mod) => mod.StepNavigation),
+  { ssr: false }
+);
+
 // Pass the projectId to enter edit mode, otherwise will create a new project.
 export default function ProjectForm({ projectId }: { projectId?: number }) {
   const [currentStep, setCurrentStep] = useState(1);
 
   const [videos, setVideos] = useState<VideoDraft[]>([]);
   const [videoIds, setVideoIds] = useState<number[]>([]);
+  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeResponse[]>([]);
 
   // The configuration of special videos.
   const [assignedVideos, setAssignedVideos] = useState<VideoAssignments>({
@@ -53,6 +60,7 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
     systemPrompt: "",
     language: "en",
     voiceModel: "",
+    knowledgeId: null as number | null,
   });
   const [agentId, setAgentId] = useState<number | undefined>(undefined);
 
@@ -66,13 +74,17 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
 
     const fetchProjectData = async () => {
       try {
+        console.log('fetching data from api');
         const projectRes = await projectsApi.getProject(projectId!);
         const agentRes = await agentsApi.getAgent(projectRes.agent!.id);
+        const knowledgeBases = await knowledgeApi.listKnowledge();
+        setKnowledgeBases(knowledgeBases);
         setAgent({
           label: agentRes.label,
           systemPrompt: agentRes.systemPrompt,
           language: agentRes.language,
           voiceModel: agentRes.voiceModel,
+          knowledgeId: projectRes.knowledgeId ?? null,
         });
         setAgentId(agentRes.id);
 
@@ -210,52 +222,51 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
   };
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <div className="flex min-h-screen flex-col bg-background">
-        {/* Project Header (Back)*/}
-        <ProjectHeader
-          currentStep={currentStep}
-          totalSteps={STEPS.length}
-          onBack={() => router.push("/dashboard")}
-        />
+    <div className="flex min-h-screen flex-col bg-background">
+      {/* Project Header (Back)*/}
+      <ProjectHeader
+        currentStep={currentStep}
+        totalSteps={STEPS.length}
+        onBack={() => router.push("/dashboard")}
+      />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 max-w-5xl mx-auto w-full flex flex-col gap-8">
-          {/* Step Indicator */}
-          <StepIndicator steps={STEPS} currentStep={currentStep} />
-          <Separator />
+      <main className="flex-1 overflow-y-auto p-6 md:p-10 max-w-5xl mx-auto w-full flex flex-col gap-8">
+        {/* Step Indicator */}
+        <StepIndicator steps={STEPS} currentStep={currentStep} />
+        <Separator />
 
-          <div className="flex flex-1 flex-col gap-6">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">
-                {STEPS[currentStep - 1].name}
-              </h2>
-            </div>
-
-            {currentStep === 1 && (
-              <VideoUpload videos={videos} setVideos={setVideos} />
-            )}
-            {currentStep === 2 && (
-              <AgentConfiguration
-                agent={agent}
-                setAgent={setAgent}
-                videos={videos}
-                assignedVideos={assignedVideos}
-                onAssignedVideos={handleAssignedVideos}
-              />
-            )}
+        <div className="flex flex-1 flex-col gap-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">
+              {STEPS[currentStep - 1].name}
+            </h2>
           </div>
 
-          {/* Step Navigation */}
-          <StepNavigation
-            currentStep={currentStep}
-            totalSteps={STEPS.length}
-            isUploading={isUploading}
-            isSaving={isSaving}
-            onNext={handleNext}
-            onBack={() => setCurrentStep((prev) => prev - 1)}
-          />
-        </main>
-      </div>
-    </TooltipProvider>
+          {currentStep === 1 && (
+            <VideoUpload videos={videos} setVideos={setVideos} />
+          )}
+          {currentStep === 2 && (
+            <AgentConfiguration
+              agent={agent}
+              setAgent={setAgent}
+              videos={videos}
+              assignedVideos={assignedVideos}
+              onAssignedVideos={handleAssignedVideos}
+              knowledgeBases={knowledgeBases}
+            />
+          )}
+        </div>
+
+        {/* Step Navigation */}
+        <StepNavigation
+          currentStep={currentStep}
+          totalSteps={STEPS.length}
+          isUploading={isUploading}
+          isSaving={isSaving}
+          onNext={handleNext}
+          onBack={() => setCurrentStep((prev) => prev - 1)}
+        />
+      </main>
+    </div>
   );
 }

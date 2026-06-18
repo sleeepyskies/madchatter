@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { projectsApi, ProjectResponse } from "@madchatter/api/src/projects";
+import {useEffect, useState} from "react";
+import {ProjectResponse, projectsApi} from "@madchatter/api/src/projects";
 
-import { DashboardLayout } from "@/components/dashboard-layout";
-import { DashboardHeader } from "@/components/dashboard-header";
+import {useDashboardHeader} from "@/components/dashboard-header-provider";
 import { ProjectCard } from "@/components/project-card";
+
 export default function Page() {
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { setDashboardTitle } = useDashboardHeader();
+
+  useEffect(() => {
+    setDashboardTitle("Projects");
+  }, []);
 
   // Load project list on mount
   useEffect(() => {
@@ -37,19 +42,16 @@ export default function Page() {
   };
 
   return (
-    <DashboardLayout>
-      <DashboardHeader title="Projects" />
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
+    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+        {projects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            onDelete={handleDelete}
+          />
+        ))}
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

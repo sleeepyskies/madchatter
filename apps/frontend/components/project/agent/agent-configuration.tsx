@@ -10,6 +10,7 @@ import { VoiceSetting } from "./voice-setting";
 import { VideoSetting } from "./video-setting";
 import { VideoDraft } from "@/components/project/video/video-upload";
 import { VideoAssignments } from "@/components/project/agent/video-setting";
+import { KnowledgeResponse } from "@madchatter/api/src/knowledge";
 
 export interface AgentDraft {
   id?: number;
@@ -17,6 +18,7 @@ export interface AgentDraft {
   systemPrompt: string;
   language: string;
   voiceModel: string;
+  knowledgeId: number | null;
 }
 
 interface AgentConfigurationProps {
@@ -27,6 +29,8 @@ interface AgentConfigurationProps {
 
   assignedVideos: VideoAssignments;
   onAssignedVideos: (newAssignments: VideoAssignments) => void;
+
+  knowledgeBases: KnowledgeResponse[];
 }
 
 export function AgentConfiguration({
@@ -35,9 +39,10 @@ export function AgentConfiguration({
   assignedVideos,
   onAssignedVideos,
   videos,
+  knowledgeBases,
 }: AgentConfigurationProps) {
   // Handle agent name and system prompt
-  const handleChange = (field: "label" | "systemPrompt", value: string) => {
+  const handleChange = (field: "label" | "systemPrompt" | "knowledgeId", value: any) => {
     setAgent((prev) => ({
       ...prev,
       [field]: value,
@@ -112,7 +117,11 @@ export function AgentConfiguration({
               <FieldLabel className="text-sm font-semibold tracking-tight text-foreground/90">
                 Knowledge Base
               </FieldLabel>
-              <KnowledgeBaseStep />
+              <KnowledgeBaseStep
+                selectedId={agent.knowledgeId}
+                options={knowledgeBases}
+                onSelect={(id) => handleChange("knowledgeId", id)}
+              />
             </Field>
           </div>
 

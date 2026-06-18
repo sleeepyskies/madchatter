@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import ThemeProvider from "@/components/theme-provider";
+import {TooltipProvider} from "@/components/ui/tooltip";
 
 const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -41,8 +42,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          {children}
-          <Toaster />
+          <TooltipProvider delayDuration={0}>
+            {children}
+            <Toaster />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

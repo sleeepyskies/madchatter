@@ -15,8 +15,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   LayoutBottomIcon,
   BookOpen02Icon,
-  Settings05Icon,
   CropIcon,
+  Brain03Icon,
 } from "@hugeicons/core-free-icons";
 
 // This is sample data.
@@ -24,7 +24,7 @@ const data = {
   teams: [
     {
       name: "MadChatter",
-      logo: <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2} />,
+      logo: <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2}/>,
       plan: "",
     },
   ],
@@ -32,38 +32,38 @@ const data = {
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2} />,
+      icon: <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2}/>,
     },
     {
       title: "Projects",
       url: "/projects",
-      icon: <HugeiconsIcon icon={CropIcon} strokeWidth={2} />,
+      icon: <HugeiconsIcon icon={CropIcon} strokeWidth={2}/>,
     },
     {
-      title: "Preferences",
-      url: "/preferences",
-      icon: <HugeiconsIcon icon={Settings05Icon} strokeWidth={2} />,
+      title: "Knowledge Bases",
+      url: "/knowledge-bases",
+      icon: <HugeiconsIcon icon={Brain03Icon} strokeWidth={2}/>,
     },
     {
       title: "Documentation",
       url: "https://madchatter.pages.dev",
-      icon: <HugeiconsIcon icon={BookOpen02Icon} strokeWidth={2} />,
+      icon: <HugeiconsIcon icon={BookOpen02Icon} strokeWidth={2}/>,
     },
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={data.teams}/>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain}/>
       </SidebarContent>
       <SidebarFooter>
       </SidebarFooter>
-      <SidebarRail />
+      <SidebarRail/>
     </Sidebar>
   );
 }

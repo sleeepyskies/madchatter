@@ -4,20 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ProjectResponse } from "@madchatter/api/src/projects";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { BotIcon } from "@hugeicons/core-free-icons";
-import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { DeleteButton } from "@/components/reusable/buttons/delete-button";
 
 interface ProjectCardProps {
   project: ProjectResponse;
@@ -39,31 +27,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
           </h3>
         </div>
 
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <button
-              type="button"
-              className="cursor-pointer absolute top-3 right-3 p-1.5 rounded-md bg-secondary text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity z-10"
-            >
-              <Trash2 className="h-5 w-5" />
-            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                project and remove all associated data.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => onDelete(project.id)}>
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <DeleteButton onConfirm={() => onDelete(project.id)} />
       </div>
       <div className="mt-4 bg-muted/30 p-3 rounded-lg border border-border/50 min-h-0 flex flex-col overflow-hidden">
         <p className="text-sm text-muted-foreground line-clamp-3 break-words">
