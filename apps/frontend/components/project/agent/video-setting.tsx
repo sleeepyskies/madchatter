@@ -65,10 +65,13 @@ export function VideoSetting({
                 variant="outline"
                 className="w-[200px] justify-between text-xs font-normal px-3 h-8 normal-case"
               >
-                {assignedVideos[config.key]
-                  ? videos.find((v) => v.tempId === assignedVideos[config.key])
-                      ?.label
-                  : "Select video..."}
+                <span className="flex-1 min-w-0 truncate text-left">
+                  {assignedVideos[config.key]
+                    ? videos.find(
+                        (v) => v.tempId === assignedVideos[config.key],
+                      )?.label
+                    : "Select video..."}
+                </span>
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -99,7 +102,9 @@ export function VideoSetting({
                               : "opacity-0",
                           )}
                         />
-                        {video.label}
+                        <span className="flex-1 min-w-0 truncate">
+                          {video.label}
+                        </span>
                       </CommandItem>
                     ))}
                   </CommandGroup>

@@ -107,7 +107,7 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
               key={video.tempId}
               className="group flex flex-col rounded-xl border bg-card overflow-hidden hover:shadow-lg transition-all duration-300"
             >
-              <div className="relative aspect-video bg-black">
+              <div className="relative aspect-video bg-black overflow-hidden">
                 <video
                   src={video.previewUrl}
                   className="w-full h-full object-cover"

@@ -21,6 +21,13 @@ class ChatApplicationService:
         self.agent_service = agent_service
         self.knowledge_service = knowledge_service
 
+        self.chat_service = self.chat_factory.create(
+            language="en",
+            voice_model="en_US-amy-low.onnx",
+            chroma_collection=None,
+            system_prompt=None
+        )
+
 
     def apply_project(self, project_id: int):
         """Initializes the chat service based on the project's configuration, including the agent and knowledge base."""

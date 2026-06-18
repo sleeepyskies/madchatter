@@ -7,7 +7,7 @@ class ChatServiceFactory:
     """Factory class to create ChatService instances with the appropriate configurations"""
 
     @staticmethod
-    def create(language: str, chroma_collection: str, voice_model: str) -> ChatService:
+    def create(language: str, chroma_collection: str | None, voice_model: str, system_prompt: str | None) -> ChatService:
 
         stt = SpeechToText(
             model_size="base",
@@ -16,7 +16,7 @@ class ChatServiceFactory:
             compute_type="int8"
         )
 
-        rag = RAG(chroma_collection=chroma_collection)
+        rag = RAG(chroma_collection=chroma_collection, system_prompt=system_prompt)
 
         tts = TextToSpeech(voice_model=voice_model)
 
