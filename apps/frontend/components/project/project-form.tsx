@@ -79,26 +79,29 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
         const videoDrafts: VideoDraft[] = [];
         for (const video of projectRes.videos) {
           const vid = await videosApi.getVideo(video.id);
+          console.log("video file name", vid.filename);
           videoDrafts.push({
             tempId: uuidv4(),
             id: vid.id,
-            previewUrl: `http://${address}:${backendPort}/videos/${vid.filename}`,
+            previewUrl: `http://${address}:${backendPort}/files/${vid.filename}`,
             label: vid.label,
             description: vid.description,
           });
         }
+
         setVideos(videoDrafts);
         setVideoIds(projectRes.videos.map((video) => video.id));
+
         const idleVideo = videoDrafts.find(
-          (v) => v.id === projectRes.idle_video?.id,
+          (v) => v.id === projectRes.idleVideo?.id,
         );
 
         const enterVideo = videoDrafts.find(
-          (v) => v.id === projectRes.enter_video?.id,
+          (v) => v.id === projectRes.enterVideo?.id,
         );
 
         const exitVideo = videoDrafts.find(
-          (v) => v.id === projectRes.exit_video?.id,
+          (v) => v.id === projectRes.exitVideo?.id,
         );
 
         setAssignedVideos({
@@ -160,14 +163,15 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
           projectId: projectRes.id,
           label: projectRes.label,
           agentId: projectRes.agent!.id,
-          knowledgeId: projectRes.knowledge_id,
+          knowledgeId: projectRes.knowledgeId,
           idleVideoId: idleVideoId,
           enterVideoId: enterVideoId,
           exitVideoId: exitVideoId,
         });
-        console.log("Project Response", upDatedProjectRes);
 
-        toast.success("Project saved successfully!");
+        toast.success("Project saved successfully!", {
+          position: "top-center",
+        });
         router.push("/dashboard");
       } catch (error) {
         console.error("Failed to save project:", error);
