@@ -33,22 +33,20 @@ class ProjectRepository:
         return list(self.database.scalars(statement).all())
 
     def update(self, project_id: int, new: UpdateProjectRequest) -> Project:
-        values = new.model_dump(exclude_unset=True)
+        project = self.get(project_id)
 
-        if not values:
-            return self.get(project_id)
-
-        statement = (
-            update(Project)
-            .where(Project.id == project_id)
-            .values(**values)
-            .returning(Project)
-        )
-
-        project = self.database.scalar(statement)
-
-        if not project:
-            self._raise_not_found(project_id)
+        if new.label is not None:
+            project.label = new.label
+        if new.agent_id is not None:
+            project.agent_id = new.agent_id
+        if new.knowledge_id is not None:
+            project.vector_collection_id = new.knowledge_id
+        if new.idle_video_id is not None:
+            project.idle_video_id = new.idle_video_id
+        if new.enter_video_id is not None:
+            project.enter_video_id = new.enter_video_id
+        if new.exit_video_id is not None:
+            project.exit_video_id = new.exit_video_id
 
         self.database.commit()
         return project
