@@ -39,7 +39,7 @@ export default function Vad() {
           setVideos(data);
           if (data.length > 0) {
             // Set default video to first one
-            setCurrentVideoIndex(0);
+    setCurrentVideoIndex(0);
             setCurrentVideoUrl(data[0].fileUrl);
           }
         }
@@ -210,16 +210,32 @@ export default function Vad() {
   }, [vad]);
 
   return (
-    <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", margin: 0, padding: 0, overflow: "hidden" }}>
-      {/* Video Player - Top half */}
-      <div style={{ width: "100%", height: "50%", overflow: "hidden", backgroundColor: "black" }}>
-        <VideoPlayer videoUrl={currentVideoUrl} />
-      </div>
+    <div style={{ position: "relative", width: "100vw", height: "100vh", margin: 0, padding: 0, overflow: "hidden", backgroundColor: "black" }}>
+      <VideoPlayer videoUrl={currentVideoUrl} />
 
-      {/* Subtitles and Listening Animation - Bottom half */}
-      <div style={{ width: "100%", height: "50%", backgroundColor: "#1a1a1a", overflow: "hidden", display: "flex", flexDirection: "column", padding: "20px", boxSizing: "border-box" }}>
-        <SubtitlePanel userText={userText} aiText={aiText} loading={loading} />
-        <ListeningAnimation isActive={vad.listening || state === "THINKING"} />
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end",
+        alignItems: "center",
+        padding: "24px",
+        pointerEvents: "none",
+      }}>
+        <SubtitlePanel
+          userText={userText}
+          aiText={aiText}
+          loading={loading}
+          style={{
+            pointerEvents: "auto",
+            width: "100%",
+            maxWidth: "1080px",
+          }}
+        />
+        <div style={{ marginTop: "16px", pointerEvents: "auto" }}>
+          <ListeningAnimation isActive={vad.listening || state === "THINKING"} />
+        </div>
       </div>
     </div>
   );
