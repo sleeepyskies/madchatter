@@ -3,17 +3,8 @@
  */
 const backendPort = process.env.SERVER_PORT || "8000";
 const address = process.env.ADDRESS || "127.0.0.1";
-
+import { VideoDraft } from "@/components/project/video/video-upload";
 import { videosApi } from "@madchatter/api/src/videos";
-
-export interface VideoDraft {
-  tempId?: number;
-  id?: number;
-  file?: File | null;
-  previewUrl: string;
-  label: string;
-  description: string;
-}
 
 export const processVideos = async (
   videos: VideoDraft[],
@@ -33,6 +24,7 @@ export const processVideos = async (
             currentVideo.label,
             currentVideo.description ?? "No description available",
             currentVideo.file,
+            currentVideo.projectId!,
           );
           currentVideo.id = res.id;
         } else {

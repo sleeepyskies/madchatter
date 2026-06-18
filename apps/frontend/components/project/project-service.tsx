@@ -13,7 +13,6 @@ export interface SaveProjectData {
   agentSystemPrompt: string;
   agentLanguage: string;
   agentVoiceModel: string;
-  videoIds: number[];
   knowledgeId?: number | null;
   idleVideoId?: number | null;
   enterVideoId?: number | null;
@@ -39,13 +38,11 @@ export const saveProject = async (
   const projectPayload = {
     label: agentRes.label,
     agent_id: agentRes.id,
-    video_ids: data.videoIds,
     knowledge_id: data.knowledgeId ?? null,
     idle_video_id: data.idleVideoId ?? null,
     enter_video_id: data.enterVideoId ?? null,
     exit_video_id: data.exitVideoId ?? null,
   };
-  console.log(projectPayload, "payload");
   return isUpdate
     ? await projectsApi.updateProject(data.projectId!, projectPayload)
     : await projectsApi.createProject(projectPayload);

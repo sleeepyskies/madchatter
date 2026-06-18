@@ -4,6 +4,7 @@
  */
 "use client";
 import { useRef, ChangeEvent } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { videosApi } from "@madchatter/api/src/videos";
 
 export interface VideoDraft {
+  tempId: string;
   id?: number;
+  projectId?: number;
   file?: File | null;
   previewUrl: string;
   label: string;
@@ -43,6 +46,7 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
         return;
       }
       newVideos.push({
+        tempId: uuidv4(),
         file,
         previewUrl: URL.createObjectURL(file),
         label: file.name.replace(/\.[^/.]+$/, ""),
@@ -55,8 +59,8 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  async function handleDeleteVideo(indexToRemove: number) {
-    const targetVideo = videos[indexToRemove];
+  async function handleDeleteVideo(tempId: string) {
+    const targetVideo = videos.find((v) => v.tempId === tempId);
     if (targetVideo?.previewUrl) {
       URL.revokeObjectURL(targetVideo.previewUrl);
     }
@@ -69,16 +73,18 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
         return;
       }
     }
-    setVideos((prev) => prev.filter((_, index) => index !== indexToRemove));
+    setVideos((prev) => prev.filter((v) => v.tempId !== tempId));
   }
 
   const handleFieldChange = (
-    index: number,
+    tempId: string,
     field: "label" | "description",
     value: string,
   ) => {
     setVideos((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
+      prev.map((item) =>
+        item.tempId === tempId ? { ...item, [field]: value } : item,
+      ),
     );
   };
 
@@ -96,9 +102,9 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
       {/* Video Grid */}
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {videos.map((video, index) => (
+          {videos.map((video) => (
             <div
-              key={index}
+              key={video.tempId}
               className="group flex flex-col rounded-xl border bg-card overflow-hidden hover:shadow-lg transition-all duration-300"
             >
               <div className="relative aspect-video bg-black">
@@ -110,7 +116,7 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
 
                 <button
                   type="button"
-                  onClick={() => handleDeleteVideo(index)}
+                  onClick={() => handleDeleteVideo(video.tempId)}
                   className="absolute top-2 right-2 p-2 rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -123,7 +129,7 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
                   value={video.label}
                   placeholder="Untitled video"
                   onChange={(e) =>
-                    handleFieldChange(index, "label", e.target.value)
+                    handleFieldChange(video.tempId, "label", e.target.value)
                   }
                   className="h-8 px-2 text-sm font-medium border-0 bg-transparent shadow-none leading-tight focus-visible:ring-0 focus-visible:outline-none"
                 />
@@ -132,7 +138,11 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
                   value={video.description}
                   placeholder="Add a short description..."
                   onChange={(e) =>
-                    handleFieldChange(index, "description", e.target.value)
+                    handleFieldChange(
+                      video.tempId,
+                      "description",
+                      e.target.value,
+                    )
                   }
                   className="text-xs border-0 bg-muted/30 rounded-md px-2.5 py-2 shadow-none resize-none max-h-[56px] overflow-y-auto leading-relaxed focus-visible:ring-1 focus-visible:ring-primary/15 focus-visible:ring-offset-0"
                 />

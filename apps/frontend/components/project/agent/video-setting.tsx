@@ -24,7 +24,7 @@ export const VIDEO_CONFIGS = [
 
 export type VideoKey = (typeof VIDEO_CONFIGS)[number]["key"];
 
-export type VideoAssignments = Record<VideoKey, number | null>;
+export type VideoAssignments = Record<VideoKey, string | null>;
 
 interface VideoSettingProps {
   assignedVideos: VideoAssignments;
@@ -66,7 +66,7 @@ export function VideoSetting({
                 className="w-[200px] justify-between text-xs font-normal px-3 h-8 normal-case"
               >
                 {assignedVideos[config.key]
-                  ? videos.find((v) => v.id === assignedVideos[config.key])
+                  ? videos.find((v) => v.tempId === assignedVideos[config.key])
                       ?.label
                   : "Select video..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -79,11 +79,11 @@ export function VideoSetting({
                   <CommandGroup>
                     {videos.map((video) => (
                       <CommandItem
-                        key={video.id}
+                        key={video.tempId}
                         onSelect={() => {
                           onChange({
                             ...assignedVideos,
-                            [config.key]: video.id,
+                            [config.key]: video.tempId,
                           });
                           setOpenStates((prev) => ({
                             ...prev,
@@ -94,7 +94,7 @@ export function VideoSetting({
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            assignedVideos[config.key] === video.id
+                            assignedVideos[config.key] === video.tempId
                               ? "opacity-100"
                               : "opacity-0",
                           )}

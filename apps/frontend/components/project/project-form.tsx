@@ -4,6 +4,7 @@
  */
 "use client";
 import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -18,6 +19,7 @@ import { StepNavigation } from "@/components/project/step-navigation";
 import { ProjectHeader } from "@/components/project/project-header";
 import { processVideos } from "@/components/project/video/video-service";
 import { saveProject } from "@/components/project/project-service";
+import { updateProjectOnly } from "@/components/project/update-project-only-service";
 import { VideoAssignments } from "@/components/project/agent/video-setting";
 
 import { agentsApi } from "@madchatter/api/src/agents";
@@ -78,6 +80,7 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
         for (const video of projectRes.videos) {
           const vid = await videosApi.getVideo(video.id);
           videoDrafts.push({
+            tempId: uuidv4(),
             id: vid.id,
             previewUrl: `http://${address}:${backendPort}/videos/${vid.filename}`,
             label: vid.label,
@@ -86,6 +89,23 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
         }
         setVideos(videoDrafts);
         setVideoIds(projectRes.videos.map((video) => video.id));
+        const idleVideo = videoDrafts.find(
+          (v) => v.id === projectRes.idle_video?.id,
+        );
+
+        const enterVideo = videoDrafts.find(
+          (v) => v.id === projectRes.enter_video?.id,
+        );
+
+        const exitVideo = videoDrafts.find(
+          (v) => v.id === projectRes.exit_video?.id,
+        );
+
+        setAssignedVideos({
+          idle: idleVideo?.tempId ?? null,
+          enter: enterVideo?.tempId ?? null,
+          exit: exitVideo?.tempId ?? null,
+        });
       } catch (error) {
         console.log("Failed to load project:", error);
       }
@@ -96,28 +116,56 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
 
   // Handle Next Button Click
   const handleNext = async () => {
-    // Upload videos in the first step.
-    if (currentStep === 1) {
-      const success = await uploadVideoStep();
-      if (!success) return;
-    }
-
     if (currentStep === STEPS.length) {
-      // save the project in the last step.
+      // save the project in the last step, first create/update project, get project ID, then create videos, get
+      // video ids, and save the videoIds, idle/enter/exitId into project.
       setIsSaving(true);
+
       try {
-        await saveProject(!!projectId, {
+        const projectRes = await saveProject(!!projectId, {
           projectId: projectId || undefined,
           agentId: agentId,
           agentLabel: agent.label,
           agentSystemPrompt: agent.systemPrompt,
           agentLanguage: agent.language,
           agentVoiceModel: agent.voiceModel,
-          videoIds: videoIds,
-          idleVideoId: assignedVideos["idle"],
-          enterVideoId: assignedVideos["enter"],
-          exitVideoId: assignedVideos["exit"],
+          idleVideoId: null,
+          enterVideoId: null,
+          exitVideoId: null,
         });
+
+        const videosWithProjectId = videos.map((video) => ({
+          ...video,
+          projectId: projectRes.id,
+        }));
+
+        const uploadedVideos = await SaveVideos(videosWithProjectId);
+        if (!uploadedVideos) return;
+
+        // map tempID to videoID
+        const idleVideoId =
+          uploadedVideos.find((v) => v.tempId === assignedVideos.idle)?.id ??
+          null;
+
+        const enterVideoId =
+          uploadedVideos.find((v) => v.tempId === assignedVideos.enter)?.id ??
+          null;
+
+        const exitVideoId =
+          uploadedVideos.find((v) => v.tempId === assignedVideos.exit)?.id ??
+          null;
+
+        // update project for updating idle, enter, exit video ID
+        const upDatedProjectRes = await updateProjectOnly({
+          projectId: projectRes.id,
+          label: projectRes.label,
+          agentId: projectRes.agent!.id,
+          knowledgeId: projectRes.knowledge_id,
+          idleVideoId: idleVideoId,
+          enterVideoId: enterVideoId,
+          exitVideoId: exitVideoId,
+        });
+        console.log("Project Response", upDatedProjectRes);
 
         toast.success("Project saved successfully!");
         router.push("/dashboard");
@@ -132,24 +180,25 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
     setCurrentStep((prev) => prev + 1);
   };
 
-  const uploadVideoStep = async () => {
+  const SaveVideos = async (
+    videosToUpload: VideoDraft[],
+  ): Promise<VideoDraft[] | null> => {
     setIsUploading(true);
 
-    const updatedVideos = await processVideos(videos);
+    const updatedVideos = await processVideos(videosToUpload);
 
     setIsUploading(false);
 
     if (!updatedVideos) {
       console.log("Videos Upload failed.");
-      return false;
+      return null;
     }
 
     setVideos(updatedVideos);
 
     const newVideoIds = updatedVideos.map((v) => v.id) as number[];
     setVideoIds(newVideoIds);
-
-    return true;
+    return updatedVideos;
   };
 
   const handleAssignedVideos = (assignments: VideoAssignments) => {

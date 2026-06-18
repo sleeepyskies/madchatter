@@ -1,6 +1,6 @@
-import {client} from "./client";
-import {AgentResponse} from "./agents";
-import {VideoResponse} from "./videos";
+import { client } from "./client";
+import { AgentResponse } from "./agents";
+import { VideoResponse } from "./videos";
 
 const api = client.extend((options) => ({
   prefix: `${options.prefix}/projects`,
@@ -20,7 +20,6 @@ export interface ProjectResponse {
 export interface CreateProjectRequest {
   label: string;
   agent_id: number;
-  video_ids: number[];
   knowledge_id: number | null;
   idle_video_id: number | null;
   enter_video_id: number | null;
@@ -37,8 +36,10 @@ export interface UpdateProjectRequest {
 }
 
 export const projectsApi = {
-  createProject: async (request: CreateProjectRequest): Promise<ProjectResponse> => {
-    return await api.post("", {json: request}).json();
+  createProject: async (
+    request: CreateProjectRequest,
+  ): Promise<ProjectResponse> => {
+    return await api.post("", { json: request }).json();
   },
 
   listProjects: async (): Promise<ProjectResponse[]> => {
@@ -53,7 +54,7 @@ export const projectsApi = {
     projectId: number,
     request: UpdateProjectRequest,
   ): Promise<ProjectResponse> => {
-    return await api.patch(`${projectId}`, {json: request}).json();
+    return await api.patch(`${projectId}`, { json: request }).json();
   },
 
   deleteProject: async (projectId: number): Promise<void> => {
