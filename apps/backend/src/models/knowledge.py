@@ -14,6 +14,8 @@ class KnowledgeSourceResponse(BaseSchema):
     label: str
     download_url: str
 
+class UpdateKnowledgeSourceRequest(BaseSchema):
+    label: str | None
 
 class KnowledgeResponse(BaseSchema):
     id: int

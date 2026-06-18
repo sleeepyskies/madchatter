@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, UploadFile, File, Form
 from starlette import status
 
 from api.dependencies import get_knowledge_service
-from models.knowledge import KnowledgeResponse, CreateKnowledgeRequest, KnowledgeSourceResponse
+from models.knowledge import KnowledgeResponse, CreateKnowledgeRequest, KnowledgeSourceResponse, \
+    UpdateKnowledgeSourceRequest
 from services.knowledge_service import KnowledgeService
 
 KNOWLEDGE_PREFIX = "/knowledge"
@@ -65,3 +66,11 @@ def remove_source_from_knowledge(
         knowledge_service: KnowledgeService = Depends(get_knowledge_service),
 ):
     knowledge_service.remove_source_from_knowledge(knowledge_id, source_id)
+
+@router.patch("/sources/{source_id}", response_model=KnowledgeSourceResponse)
+def update_source(
+        source_id: int,
+        request: UpdateKnowledgeSourceRequest,
+        knowledge_service: KnowledgeService = Depends(get_knowledge_service),
+):
+    return knowledge_service.update_source(source_id, request)

@@ -30,7 +30,7 @@ def configure_logging():
 
     root = logging.getLogger()
     root.handlers = [intercept]
-    root.setLevel(0)  # Let loguru handle filtering
+    root.setLevel(0)
 
     for name in (
             "uvicorn",

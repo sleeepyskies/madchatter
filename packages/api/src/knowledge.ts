@@ -14,6 +14,10 @@ export interface CreateKnowledgeRequest {
     label: string;
 }
 
+export interface UpdateSourceRequest {
+    label?: string | null;
+}
+
 export interface KnowledgeSourceResponse {
     id: number;
     label: string;
@@ -56,4 +60,8 @@ export const knowledgeApi = {
     removeSourceFromKnowledge: async (knowledgeId: number, sourceId: number): Promise<void> => {
         await api.delete(`${knowledgeId}/sources/${sourceId}`);
     },
+
+    updateSource: async(sourceId: number, request: UpdateSourceRequest): Promise<KnowledgeSourceResponse> => {
+        return await api.patch(`sources/${sourceId}`, {json: request}).json();
+    }
 };
