@@ -1,8 +1,9 @@
-import sys
 import logging
+import sys
 
 from loguru import logger
-from settings import Settings, settings
+
+from settings import settings
 
 
 class LogInterceptHandler(logging.Handler):
@@ -14,37 +15,47 @@ class LogInterceptHandler(logging.Handler):
         except ValueError:
             level = str(record.levelno)
 
-        frame, depth = logging.currentframe(), 2
-        while frame.f_code.co_filename == logging.__file__:
+        frame, depth = sys._getframe(6), 6
+        while frame and frame.f_code.co_filename == logging.__file__:
             frame = frame.f_back
             depth += 1
 
-        logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
+        logger.opt(depth=depth, exception=record.exc_info).log(
+            level, record.getMessage()
+        )
 
 
 def configure_logging():
-    """
-    Configures logging for the application.
-    Intercepts all stdlib logging, routes uvicorn logging
-    and splits stdout and stderr by level.
-    """
-    logging.getLogger().handlers = [LogInterceptHandler()]
+    intercept = LogInterceptHandler()
 
-    for name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
-        _logger = logging.getLogger(name)
-        _logger.handlers = [LogInterceptHandler()]
-        _logger.propagate = False
+    root = logging.getLogger()
+    root.handlers = [intercept]
+    root.setLevel(0)  # Let loguru handle filtering
+
+    for name in (
+            "uvicorn",
+            "uvicorn.error",
+            "uvicorn.access",
+            "sqlalchemy.engine",
+            "sqlalchemy.engine.Engine",
+    ):
+        lg = logging.getLogger(name)
+        lg.handlers = [intercept]
+        lg.propagate = False
+        lg.setLevel(0)
 
     logger.remove()
-
     logger.add(
         sys.stdout,
         level=settings.log_level,
         filter=lambda r: r["level"].no < logging.WARNING,
+        enqueue=True,
+        diagnose=False,
     )
-
     logger.add(
         sys.stderr,
         level=settings.log_level,
         filter=lambda r: r["level"].no >= logging.WARNING,
+        enqueue=True,
+        diagnose=False,
     )
