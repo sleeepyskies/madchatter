@@ -1,8 +1,9 @@
-from sqlalchemy import select, delete
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from api.api_exception import ResourceNotFoundException
 from db.models.knowledge_sources import KnowledgeSource
+from models.knowledge import UpdateKnowledgeSourceRequest
 
 
 class KnowledgeSourceRepository:
@@ -29,9 +30,12 @@ class KnowledgeSourceRepository:
             select(KnowledgeSource).where(KnowledgeSource.vector_collection_id == collection_id))
         return list(self.database.scalars(statement).all())
 
-    def rename(self, source_id: int, new_label: str) -> KnowledgeSource:
+    def update(self, source_id: int, new: UpdateKnowledgeSourceRequest) -> KnowledgeSource:
         source = self.get(source_id)
-        source.label = new_label
+
+        if new.label is not None:
+            source.label = new.label
+
         self.database.commit()
         self.database.refresh(source)
         return source

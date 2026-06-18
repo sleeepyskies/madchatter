@@ -6,7 +6,8 @@ from fastapi import UploadFile
 from api.api_exception import InvalidArgumentException
 from db.models.knowledge_sources import KnowledgeSource
 from db.models.vector_collections import VectorCollection
-from models.knowledge import CreateKnowledgeRequest, KnowledgeResponse, KnowledgeSourceResponse
+from models.knowledge import CreateKnowledgeRequest, KnowledgeResponse, KnowledgeSourceResponse, \
+    UpdateKnowledgeSourceRequest
 from repositories.knowledge_base_repository import KnowledgeBase
 from repositories.knowledge_source_repository import KnowledgeSourceRepository
 from repositories.vector_collection_repository import VectorCollectionRepository
@@ -160,6 +161,18 @@ class KnowledgeService:
         self.file_handler.delete_file(source.filename)
         self.knowledge_source.delete(source.id)
 
-    def fetch_knowledge_base(self, knowledge_id: int)  -> str:
+    def fetch_knowledge_base(self, knowledge_id: int) -> str:
         collection = self.vector_collection.get(knowledge_id)
         return collection.chroma_collection
+
+    def update_source(
+            self,
+            source_id: int,
+            request: UpdateKnowledgeSourceRequest
+    ) -> KnowledgeSourceResponse:
+        source = self.knowledge_source.update(source_id, request)
+        return KnowledgeSourceResponse(
+            id=source.id,
+            label=source.label,
+            download_url=create_download_url_for_source(source.filename),
+        )
