@@ -43,15 +43,19 @@ class VideoService:
 
         self.file_handler.save_file(file, unique_filename)
 
-        video = Video(
-            label=request.label,
-            description=request.description,
-            filename=unique_filename,
-            project_id=request.project_id,
-        )
+        try:
+            video = Video(
+                label=request.label,
+                description=request.description,
+                filename=unique_filename,
+                project_id=request.project_id,
+            )
+            self.repository.create(video)
+            return map_db_to_response(video)
+        except Exception as e:
+            self.file_handler.delete_file(unique_filename)
+            raise e
 
-        created = self.repository.create(video)
-        return map_db_to_response(video)
 
     def list_videos(self) -> list[VideoResponse]:
         videos = self.repository.list_all()
