@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from sqlalchemy import Engine
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -60,7 +60,7 @@ async def api_exception_handler(request: Request, exception: APIException) -> JS
 
 
 @app.exception_handler(IntegrityError)
-async def integrity_error_handler(request: Request, exception: IntegrityError):
+async def integrity_error_handler(request: Request, exception: IntegrityError):  # type: ignore[no-untyped-def]
     logger.error(exception)
 
     msg = str(exception.orig)
@@ -101,7 +101,7 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 app.include_router(router)
 
 
-def start_server(engine: Engine, SessionLocal: sessionmaker):
+def start_server(engine: Engine, SessionLocal: sessionmaker[Session]) -> None:
     """
     Starts the server and injects any dependencies into the application context.
 

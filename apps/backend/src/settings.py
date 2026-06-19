@@ -1,6 +1,5 @@
 from enum import StrEnum
 from pathlib import Path
-from typing import Literal
 
 from pydantic_settings import SettingsConfigDict, BaseSettings
 
@@ -67,5 +66,5 @@ class Settings(BaseSettings):
     """Directory reserved for saving static files to serve."""
 
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
 """Globally accessible application settings."""

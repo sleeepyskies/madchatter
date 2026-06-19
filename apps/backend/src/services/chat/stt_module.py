@@ -1,10 +1,18 @@
-from faster_whisper import  WhisperModel
+from faster_whisper import WhisperModel
+
 
 class SpeechToText:
     """
     A class for performing speech-to-text transcription using the WhisperModel from the faster_whisper library.
     """
-    def __init__(self, model_size="base", device="cpu", language="en", compute_type="int8"):
+
+    def __init__(
+            self,
+            model_size: str = "base",
+            device: str = "cpu",
+            language: str = "en",
+            compute_type: str = "int8"
+    ) -> None:
         """
         Initializes the SpeechToText class with the specified model size, device, and compute type.
         
@@ -12,9 +20,11 @@ class SpeechToText:
         :param device: The device to run the model on (e.g., "cpu", "cuda").
         :param compute_type: The compute type for the model (e.g., "int8", "float16"). This can help optimize performance on certain hardware.
         """
-        self.model = WhisperModel(model_size, device=device, cpu_threads=4, num_workers=2,compute_type=compute_type)
+        self.model = WhisperModel(model_size, device=device, cpu_threads=4, num_workers=2,
+                                  compute_type=compute_type)
         self.language = language
-    def transcribe(self, audio_path):
+
+    def transcribe(self, audio_path: str) -> str:
         segments, info = self.model.transcribe(
             audio_path,
             beam_size=1,

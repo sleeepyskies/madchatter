@@ -1,10 +1,9 @@
-from fastapi import APIRouter, File
-from fastapi import UploadFile
+from fastapi import APIRouter, File, UploadFile
 from fastapi.params import Depends, Form
 from starlette import status
 
 from api.dependencies import get_video_service
-from models.videos import VideoResponse, UpdateVideoRequest, CreateVideoRequest
+from models.videos import CreateVideoRequest, UpdateVideoRequest, VideoResponse
 from services.video_service import VideoService
 
 VIDEO_PREFIX = "/videos"
@@ -19,21 +18,30 @@ def upload_video(
         project_id: int = Form(...),
         includes_audio: bool = Form(...),
         file: UploadFile = File(...),
-        video_service: VideoService = Depends(get_video_service)
-):
+        video_service: VideoService = Depends(get_video_service),
+) -> VideoResponse:
     return video_service.upload_video(
-        CreateVideoRequest(label=label, description=description, project_id=project_id, includes_audio=includes_audio),
-        file
+        CreateVideoRequest(
+            label=label,
+            description=description,
+            project_id=project_id,
+            includes_audio=includes_audio,
+        ),
+        file,
     )
 
 
 @router.get("", response_model=list[VideoResponse])
-def list_videos(video_service: VideoService = Depends(get_video_service)):
+def list_videos(
+        video_service: VideoService = Depends(get_video_service),
+) -> list[VideoResponse]:
     return video_service.list_videos()
 
 
 @router.get("/{video_id}", response_model=VideoResponse)
-def get_video(video_id: int, video_service: VideoService = Depends(get_video_service)):
+def get_video(
+        video_id: int, video_service: VideoService = Depends(get_video_service)
+) -> VideoResponse:
     return video_service.get_video(video_id)
 
 
@@ -41,11 +49,13 @@ def get_video(video_id: int, video_service: VideoService = Depends(get_video_ser
 def update_video(
         video_id: int,
         request: UpdateVideoRequest,
-        video_service: VideoService = Depends(get_video_service)
-):
+        video_service: VideoService = Depends(get_video_service),
+) -> VideoResponse:
     return video_service.update_video(video_id, request)
 
 
 @router.delete("/{video_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_video(video_id: int, video_service: VideoService = Depends(get_video_service)):
+def delete_video(
+        video_id: int, video_service: VideoService = Depends(get_video_service)
+) -> None:
     video_service.delete_video(video_id)

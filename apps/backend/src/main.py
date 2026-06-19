@@ -15,7 +15,7 @@ class ExitCode(IntEnum):
     FAILURE = 1
 
 
-def setup_environment():
+def setup_environment() -> None:
     """Makes sure all required directories exist on disk before starting."""
     logger.debug("Setting up environment.")
     settings.run_dir.mkdir(parents=True, exist_ok=True)
@@ -23,7 +23,7 @@ def setup_environment():
     settings.files_dir.mkdir(parents=True, exist_ok=True)
 
 
-def main():
+def main() -> ExitCode:
     """Entry point of the application."""
     try:
         configure_logging()

@@ -113,7 +113,6 @@ export function VideoUpload({ videos, setVideos }: VideoUploadProps) {
                   className="w-full h-full object-cover"
                   controls
                 />
-
                 <button
                   type="button"
                   onClick={() => handleDeleteVideo(video.tempId)}

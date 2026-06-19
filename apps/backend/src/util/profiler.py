@@ -1,11 +1,12 @@
 import time
 from contextlib import contextmanager
+from typing import Generator
 
 from loguru import logger
 
 
 @contextmanager
-def profile(name: str):
+def profile(name: str) -> Generator[None, None, None]:
     """
     Profiles a code block,
 

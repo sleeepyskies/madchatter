@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 
 from api.api_exception import ResourceNotFoundException

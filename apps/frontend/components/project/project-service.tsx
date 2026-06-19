@@ -2,7 +2,7 @@
  * Handles project and agent creating and updating operations.
  */
 
-import { agentsApi } from "@madchatter/api/src/agents";
+import { agentsApi, Language, UpdateAgentRequest } from "@madchatter/api/src/agents";
 import { projectsApi, ProjectResponse } from "@madchatter/api/src/projects";
 
 export interface SaveProjectData {
@@ -11,7 +11,7 @@ export interface SaveProjectData {
   agentId?: number;
   agentLabel: string;
   agentSystemPrompt: string;
-  agentLanguage: string;
+  agentLanguage: Language;
   agentVoiceModel: string;
   knowledgeId?: number | null;
   idleVideoId?: number | null;
@@ -37,11 +37,11 @@ export const saveProject = async (
   // Project Service
   const projectPayload = {
     label: agentRes.label,
-    agent_id: agentRes.id,
-    knowledge_id: data.knowledgeId ?? null,
-    idle_video_id: data.idleVideoId ?? null,
-    enter_video_id: data.enterVideoId ?? null,
-    exit_video_id: data.exitVideoId ?? null,
+    agentId: agentRes.id,
+    knowledgeId: data.knowledgeId ?? null,
+    idleVideoId: data.idleVideoId ?? null,
+    enterVideoId: data.enterVideoId ?? null,
+    exitVideoId: data.exitVideoId ?? null,
   };
   return isUpdate
     ? await projectsApi.updateProject(data.projectId!, projectPayload)

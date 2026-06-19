@@ -1,9 +1,10 @@
-from services.chat.chat_service import ChatService
-from services.project_service import ProjectService
-from services.chat.chat_service_factory import ChatServiceFactory
+from fastapi import UploadFile
+
 from services.agent_service import AgentService
+from services.chat.chat_service import ChatService
+from services.chat.chat_service_factory import ChatServiceFactory
 from services.knowledge_service import KnowledgeService
-from fastapi import UploadFile, File
+from services.project_service import ProjectService
 
 
 class ChatApplicationService:

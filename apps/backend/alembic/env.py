@@ -1,14 +1,12 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config, create_engine
+from alembic import context
+from sqlalchemy import create_engine
 from sqlalchemy import pool
 
-from alembic import context
-
 from src.db.base import Base
-from src.settings import load_settings
+from src.settings import settings
 
-settings = load_settings()
 DATABASE_URL = settings.database_url
 
 # this is the Alembic Config object, which provides
@@ -25,6 +23,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

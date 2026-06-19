@@ -35,6 +35,5 @@ class AgentService:
         agent = self.agent_repository.update(agent_id, request)
         return AgentResponse.model_validate(agent)
 
-
     def delete_agent(self, agent_id: int) -> None:
         self.agent_repository.delete(agent_id)
