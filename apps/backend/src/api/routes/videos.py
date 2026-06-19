@@ -17,11 +17,12 @@ def upload_video(
         label: str = Form(...),
         description: str = Form(...),
         project_id: int = Form(...),
+        includes_audio: bool = Form(...),
         file: UploadFile = File(...),
         video_service: VideoService = Depends(get_video_service)
 ):
     return video_service.upload_video(
-        CreateVideoRequest(label=label, description=description, project_id=project_id),
+        CreateVideoRequest(label=label, description=description, project_id=project_id, includes_audio=includes_audio),
         file
     )
 
