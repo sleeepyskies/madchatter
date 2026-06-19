@@ -1,7 +1,7 @@
 import ky from "ky";
 
-const address = process.env.ADDRESS;
-const port = process.env.PORT;
+const address = process.env.ADDRESS ?? "127.0.0.1";
+const port = process.env.PORT ?? "8000";
 
 if (!address) {
   throw new Error("Can not init api, server address is undefined");
