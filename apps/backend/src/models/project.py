@@ -16,17 +16,17 @@ class ProjectResponse(BaseSchema):
 
 class CreateProjectRequest(BaseSchema):
     label: str
-    agent_id: int | None
-    knowledge_id: int | None
-    idle_video_id: int | None
-    enter_video_id: int | None
-    exit_video_id: int | None
+    agent_id: int | None = None
+    knowledge_id: int | None = None
+    idle_video_id: int | None = None
+    enter_video_id: int | None = None
+    exit_video_id: int | None = None
 
 
 class UpdateProjectRequest(BaseSchema):
-    label: str | None
-    agent_id: int | None
-    knowledge_id: int | None
-    idle_video_id: int | None
-    enter_video_id: int | None
-    exit_video_id: int | None
+    label: str | None = None
+    agent_id: int | None = None
+    knowledge_id: int | None = None
+    idle_video_id: int | None = None
+    enter_video_id: int | None = None
+    exit_video_id: int | None = None

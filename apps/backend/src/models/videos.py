@@ -17,6 +17,6 @@ class CreateVideoRequest(BaseSchema):
 
 
 class UpdateVideoRequest(BaseSchema):
-    label: str | None
-    description: str | None
-    includes_audio: bool | None
+    label: str | None = None
+    description: str | None = None
+    includes_audio: bool | None = None

@@ -8,7 +8,7 @@ class KnowledgeSourceResponse(BaseSchema):
 
 
 class UpdateKnowledgeSourceRequest(BaseSchema):
-    label: str | None
+    label: str | None = None
 
 
 class KnowledgeResponse(BaseSchema):
@@ -22,4 +22,4 @@ class CreateKnowledgeRequest(BaseSchema):
 
 
 class UpdateKnowledgeRequest(BaseSchema):
-    label: str | None
+    label: str | None = None
