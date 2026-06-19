@@ -37,7 +37,7 @@ def get_video(video_id: int, video_service: VideoService = Depends(get_video_ser
     return video_service.get_video(video_id)
 
 
-@router.patch("/{video_id}", response_model=VideoResponse | None)
+@router.patch("/{video_id}", response_model=VideoResponse)
 def update_video(
         video_id: int,
         request: UpdateVideoRequest,
