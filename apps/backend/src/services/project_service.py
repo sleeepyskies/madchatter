@@ -8,6 +8,7 @@ from repositories.video_repository import VideoRepository
 from services.agent_service import AgentService
 from services.knowledge_service import KnowledgeService
 from settings import settings
+from util.download_url import create_download_url
 from util.file_handler import FileHandler
 
 
@@ -15,7 +16,8 @@ def map_video_to_response(video: Video) -> VideoResponse:
     return VideoResponse(
         id=video.id,
         label=video.label,
-        filename=video.filename,
+        includes_audio=video.includes_audio,
+        download_url=create_download_url(video.filename),
         description=video.description,
     )
 
