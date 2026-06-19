@@ -109,8 +109,6 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
     :param SessionLocal: DB session factory.
     :return: None
     """
-    logger.info(f"Starting server at {settings.url_string}")
-
     app.state.engine = engine
     app.state.SessionLocal = SessionLocal
 

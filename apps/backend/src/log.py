@@ -44,18 +44,41 @@ def configure_logging():
         lg.propagate = False
         lg.setLevel(0)
 
+    for name in (
+            "uvicorn.middleware.message_logger",
+            "uvicorn.protocols.http.httptools_impl",
+            "python_multipart.multipart",
+    ):
+        lg = logging.getLogger(name)
+        lg.handlers = []
+        lg.propagate = False
+        lg.setLevel(logging.WARNING)
+
+    noise_filter = [
+        "uvicorn.middleware.message_logger",
+        "uvicorn.protocols.http.httptools_impl",
+        "uvicorn.lifespan",
+        "python_multipart.multipart",
+        "asyncio.proactor_events",
+    ]
+
+    def log_filter(record, base_condition):
+        if any(noisy in record["name"] for noisy in noise_filter) or record["level"].name == "TRACE":
+            return False
+        return base_condition(record)
+
     logger.remove()
     logger.add(
         sys.stdout,
         level=settings.log_level,
-        filter=lambda r: r["level"].no < logging.WARNING,
+        filter=lambda r: log_filter(r, lambda x: x["level"].no < logging.WARNING),
         enqueue=True,
         diagnose=False,
     )
     logger.add(
         sys.stderr,
         level=settings.log_level,
-        filter=lambda r: r["level"].no >= logging.WARNING,
+        filter=lambda r: log_filter(r, lambda x: x["level"].no >= logging.WARNING),
         enqueue=True,
         diagnose=False,
     )
