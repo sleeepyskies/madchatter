@@ -4,8 +4,8 @@ from models.base import BaseSchema
 
 
 class Language(str, Enum):
-    DE = "DE"
-    EN = "EN"
+    DE = "de"
+    EN = "en"
 
 
 class AgentResponse(BaseSchema):

@@ -4,7 +4,7 @@ const api = client.extend((options) => ({
   prefix: `${options.prefix}/agents`,
 }));
 
-export type Language = "DE" | "EN";
+export type Language = "de" | "en";
 
 export interface AgentResponse {
   id: number;
