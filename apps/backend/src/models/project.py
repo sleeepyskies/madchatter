@@ -16,7 +16,7 @@ class ProjectResponse(BaseSchema):
 
 class CreateProjectRequest(BaseSchema):
     label: str
-    agent_id: int
+    agent_id: int | None
     knowledge_id: int | None
     idle_video_id: int | None
     enter_video_id: int | None

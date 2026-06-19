@@ -10,7 +10,7 @@ AGENT_PREFIX = "/agents"
 router = APIRouter(prefix=AGENT_PREFIX, tags=["agents"])
 
 
-@router.post("/", response_model=AgentResponse)
+@router.post("", response_model=AgentResponse)
 def create_agent(
         request: CreateAgentRequest,
         agent_service: AgentService = Depends(get_agent_service),

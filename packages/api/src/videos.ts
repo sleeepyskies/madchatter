@@ -7,29 +7,31 @@ const api = client.extend((options) => ({
 export interface VideoResponse {
   id: number;
   label: string;
-  filename: string;
   description: string;
+  includesAudio: boolean;
+  downloadUrl: string;
 }
 
 export interface UpdateVideoRequest {
   label?: string | null;
   description?: string | null;
+  includesAudio?: boolean | null;
 }
 
 export const videosApi = {
   uploadVideo: async (
     label: string,
     description: string,
-    file: File,
     projectId: number,
+    file: File,
   ): Promise<VideoResponse> => {
     const formData = new FormData();
     formData.append("label", label);
     formData.append("description", description);
-    formData.append("file", file);
     formData.append("project_id", projectId.toString());
+    formData.append("file", file);
 
-    return await api.post("upload", { body: formData }).json();
+    return await api.post("/upload", { body: formData }).json();
   },
 
   listVideos: async (): Promise<VideoResponse[]> => {

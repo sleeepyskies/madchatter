@@ -19,20 +19,20 @@ export interface ProjectResponse {
 
 export interface CreateProjectRequest {
   label: string;
-  agent_id: number;
-  knowledge_id: number | null;
-  idle_video_id: number | null;
-  enter_video_id: number | null;
-  exit_video_id: number | null;
+  agentId: number | null;
+  knowledgeId: number | null;
+  idleVideoId: number | null;
+  enterVideoId: number | null;
+  exitVideoId: number | null;
 }
 
 export interface UpdateProjectRequest {
   label?: string | null;
-  agent_id?: number | null;
-  knowledge_id?: number | null;
-  idle_video_id?: number | null;
-  enter_video_id?: number | null;
-  exit_video_id?: number | null;
+  agentId?: number | null;
+  knowledgeId?: number | null;
+  idleVideoId?: number | null;
+  enterVideoId?: number | null;
+  exitVideoId?: number | null;
 }
 
 export const projectsApi = {

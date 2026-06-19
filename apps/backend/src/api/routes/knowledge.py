@@ -3,7 +3,7 @@ from starlette import status
 
 from api.dependencies import get_knowledge_service
 from models.knowledge import KnowledgeResponse, CreateKnowledgeRequest, KnowledgeSourceResponse, \
-    UpdateKnowledgeSourceRequest
+    UpdateKnowledgeSourceRequest, UpdateKnowledgeRequest
 from services.knowledge_service import KnowledgeService
 
 KNOWLEDGE_PREFIX = "/knowledge"
@@ -11,7 +11,7 @@ KNOWLEDGE_PREFIX = "/knowledge"
 router = APIRouter(prefix=KNOWLEDGE_PREFIX, tags=["knowledge"])
 
 
-@router.post("/", response_model=KnowledgeResponse)
+@router.post("", response_model=KnowledgeResponse)
 def create_knowledge(
         request: CreateKnowledgeRequest,
         knowledge_service: KnowledgeService = Depends(get_knowledge_service),
@@ -19,7 +19,7 @@ def create_knowledge(
     return knowledge_service.create_knowledge(request)
 
 
-@router.get("/", response_model=list[KnowledgeResponse])
+@router.get("", response_model=list[KnowledgeResponse])
 def list_knowledge(knowledge_service: KnowledgeService = Depends(get_knowledge_service)):
     return knowledge_service.list_knowledge()
 
@@ -46,6 +46,14 @@ def delete_knowledge(
         knowledge_service: KnowledgeService = Depends(get_knowledge_service),
 ):
     knowledge_service.delete_knowledge(knowledge_id)
+
+@router.patch("/{knowledge_id}", response_model=KnowledgeResponse)
+def update_knowledge(
+        knowledge_id: int,
+        request: UpdateKnowledgeRequest,
+        knowledge_service: KnowledgeService = Depends(get_knowledge_service),
+):
+    knowledge_service.update_knowledge(knowledge_id, request)
 
 
 @router.patch("/{knowledge_id}/sources", response_model=KnowledgeSourceResponse)

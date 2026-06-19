@@ -1,8 +1,6 @@
 /**
  * Handles video upload and update operations.
  */
-const backendPort = process.env.SERVER_PORT || "8000";
-const address = process.env.ADDRESS || "127.0.0.1";
 import { VideoDraft } from "@/components/project/video/video-upload";
 import { videosApi } from "@madchatter/api/src/videos";
 
@@ -23,8 +21,8 @@ export const processVideos = async (
           const res = await videosApi.uploadVideo(
             currentVideo.label,
             currentVideo.description ?? "No description available",
-            currentVideo.file,
             currentVideo.projectId!,
+            currentVideo.file,
           );
           currentVideo.id = res.id;
         } else {
@@ -33,7 +31,7 @@ export const processVideos = async (
             label: currentVideo.label,
             description: currentVideo.description,
           });
-          currentVideo.previewUrl = `http://${address}:${backendPort}/videos/${res.filename}`;
+          currentVideo.previewUrl = res.downloadUrl;
         }
         return currentVideo;
       }),

@@ -31,9 +31,6 @@ const STEPS = [
   { id: 2, name: "Agent Configuration", description: "" },
 ];
 
-const backendPort = process.env.SERVER_PORT || "8000";
-const address = process.env.ADDRESS || "127.0.0.1";
-
 // todo: this is a super hacky fix, but there were errors regarding mismatch of client and server, should fix later
 const StepNavigation = dynamic(
   () => import("@/components/project/step-navigation").then((mod) => mod.StepNavigation),
@@ -91,11 +88,11 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
         const videoDrafts: VideoDraft[] = [];
         for (const video of projectRes.videos) {
           const vid = await videosApi.getVideo(video.id);
-          console.log("video file name", vid.filename);
+          console.log("video file name", vid.label);
           videoDrafts.push({
             tempId: uuidv4(),
             id: vid.id,
-            previewUrl: `http://${address}:${backendPort}/files/${vid.filename}`,
+            previewUrl: vid.downloadUrl,
             label: vid.label,
             description: vid.description,
           });

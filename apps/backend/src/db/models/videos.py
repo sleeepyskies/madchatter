@@ -23,6 +23,9 @@ class Video(Base):
     filename: Mapped[str] = mapped_column(nullable=False, unique=True)
     """Filename of the video on disk. This is used over videos.label to avoid naming collisions."""
 
+    includes_audio: Mapped[bool] = mapped_column(nullable=False, unique=False, default=False)
+    """A flag indicating whether this video has audio that should be played back. Defaults to false."""
+
     project_id: Mapped[int] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"),
         nullable=False,

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from api.api_exception import ResourceNotFoundException
 from db.models.vector_collections import VectorCollection
+from models.knowledge import UpdateKnowledgeRequest
 
 
 class VectorCollectionRepository:
@@ -28,9 +29,12 @@ class VectorCollectionRepository:
         statement = select(VectorCollection)
         return list(self.database.scalars(statement).all())
 
-    def rename(self, collection_id: int, new_label: str) -> VectorCollection:
+    def update(self, collection_id: int, new: UpdateKnowledgeRequest) -> VectorCollection:
         collection = self.get(collection_id)
-        collection.label = new_label
+
+        if new.label is not None:
+            collection.label = new.label
+
         self.database.commit()
         self.database.refresh(collection)
         return collection

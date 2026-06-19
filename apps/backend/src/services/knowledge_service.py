@@ -7,16 +7,13 @@ from api.api_exception import InvalidArgumentException
 from db.models.knowledge_sources import KnowledgeSource
 from db.models.vector_collections import VectorCollection
 from models.knowledge import CreateKnowledgeRequest, KnowledgeResponse, KnowledgeSourceResponse, \
-    UpdateKnowledgeSourceRequest
+    UpdateKnowledgeSourceRequest, UpdateKnowledgeRequest
 from repositories.knowledge_base_repository import KnowledgeBase
 from repositories.knowledge_source_repository import KnowledgeSourceRepository
 from repositories.vector_collection_repository import VectorCollectionRepository
 from settings import settings
+from util.download_url import create_download_url
 from util.file_handler import FileHandler
-
-
-def create_download_url_for_source(filename: str) -> str:
-    return f"{settings.url_string}/files/{filename}"
 
 
 def create_unique_filename(file: UploadFile) -> str:
@@ -95,7 +92,7 @@ class KnowledgeService:
         return [KnowledgeSourceResponse(
             id=source.id,
             label=source.label,
-            download_url=create_download_url_for_source(source.filename)
+            download_url=create_download_url(source.filename)
         ) for source in self.knowledge_source.list_by_collection(knowledge_id)]
 
     def delete_knowledge(self, knowledge_id: int) -> None:
@@ -116,6 +113,11 @@ class KnowledgeService:
 
         # erase the chroma db data
         knowledge_base.erase_collection()
+
+
+    def update_knowledge(self, knowledge_id: int, request: UpdateKnowledgeRequest) -> KnowledgeResponse:
+        self.vector_collection.update(knowledge_id, request)
+        return self.get_knowledge(knowledge_id)
 
     def add_source_to_knowledge(
             self,
@@ -147,7 +149,7 @@ class KnowledgeService:
         return KnowledgeSourceResponse(
             id=source.id,
             label=source.label,
-            download_url=create_download_url_for_source(filename),
+            download_url=create_download_url(filename),
         )
 
     def remove_source_from_knowledge(self, knowledge_id: int, source_id: int) -> None:
@@ -174,5 +176,5 @@ class KnowledgeService:
         return KnowledgeSourceResponse(
             id=source.id,
             label=source.label,
-            download_url=create_download_url_for_source(source.filename),
+            download_url=create_download_url(source.filename),
         )

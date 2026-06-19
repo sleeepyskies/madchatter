@@ -1,5 +1,6 @@
 import uuid
 from pathlib import Path
+
 from fastapi import UploadFile
 
 from api.api_exception import InvalidFileException
@@ -7,8 +8,18 @@ from db.models.videos import Video
 from models.videos import VideoResponse, UpdateVideoRequest, CreateVideoRequest
 from repositories.video_repository import VideoRepository
 from settings import settings
+from util.download_url import create_download_url
 from util.file_handler import FileHandler
 
+
+def map_db_to_response(video: Video) -> VideoResponse:
+    return VideoResponse(
+        id=video.id,
+        label=video.label,
+        description=video.description,
+        includes_audio=video.includes_audio,
+        download_url=create_download_url(video.filename),
+    )
 
 class VideoService:
     """Handles video related business logic."""
@@ -40,15 +51,15 @@ class VideoService:
         )
 
         created = self.repository.create(video)
-        return VideoResponse.model_validate(created)
+        return map_db_to_response(video)
 
     def list_videos(self) -> list[VideoResponse]:
         videos = self.repository.list_all()
-        return [VideoResponse.model_validate(video) for video in videos]
+        return [map_db_to_response(video) for video in videos]
 
     def get_video(self, video_id: int) -> VideoResponse:
         video = self.repository.get(video_id)
-        return VideoResponse.model_validate(video)
+        return map_db_to_response(video)
 
     def update_video(
             self,
@@ -56,7 +67,7 @@ class VideoService:
             request: UpdateVideoRequest
     ) -> VideoResponse:
         video = self.repository.update(video_id, request)
-        return VideoResponse.model_validate(video)
+        return map_db_to_response(video)
 
     def delete_video(self, video_id: int) -> None:
         video = self.repository.get(video_id)
