@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-import { useDashboardHeader } from "@/components/dashboard-header-provider";
 import { knowledgeApi, KnowledgeResponse } from "@madchatter/api/src/knowledge";
 import { KnowledgeCard } from "./components/knowledge-card";
+import { useAdminHeader } from "../../../providers/admin-header-provider";
 
 export default function Page() {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeResponse[]>([]);
-  const {setDashboardTitle} = useDashboardHeader();
+  const {setTitle} = useAdminHeader();
 
   useEffect(() => {
-    setDashboardTitle("Knowledge Bases");
+    setTitle("Knowledge Bases");
   }, []);
 
   useEffect(() => {

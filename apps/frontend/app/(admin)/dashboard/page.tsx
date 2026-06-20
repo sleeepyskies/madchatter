@@ -1,13 +1,13 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useDashboardHeader } from "@/components/dashboard-header-provider";
 import { useEffect } from "react";
+import { useAdminHeader } from "@/providers/admin-header-provider";
 
 export default function Page() {
   const router = useRouter();
-  const { setDashboardTitle } = useDashboardHeader();
+  const { setTitle } = useAdminHeader();
   useEffect(() => {
-    setDashboardTitle("Dashboard");
+    setTitle("Dashboard");
   }, []);
 
   return (

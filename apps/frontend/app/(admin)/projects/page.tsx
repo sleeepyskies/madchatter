@@ -3,16 +3,16 @@
 import {useEffect, useState} from "react";
 import {ProjectResponse, projectsApi} from "@madchatter/api/src/projects";
 
-import {useDashboardHeader} from "@/components/dashboard-header-provider";
 import { ProjectCard } from "@/components/project-card";
+import { useAdminHeader } from "../../../providers/admin-header-provider";
 
 export default function Page() {
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { setDashboardTitle } = useDashboardHeader();
+  const { setTitle } = useAdminHeader();
 
   useEffect(() => {
-    setDashboardTitle("Projects");
+    setTitle("Projects");
   }, []);
 
   // Load project list on mount

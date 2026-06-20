@@ -1,6 +1,3 @@
-/**
- * Dashboard page header with sidebar trigger and breadcrumb navigation.
- */
 "use client";
 import {
   Breadcrumb,
@@ -13,10 +10,10 @@ import {
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useDashboardHeader } from "@/components/dashboard-header-provider";
+import { useAdminHeader } from "@/providers/admin-header-provider";
 
-export function DashboardHeader() {
-  const {dashboardTitle} = useDashboardHeader();
+export function AdminHeader() {
+  const {title} = useAdminHeader();
 
   return (
     <header
@@ -38,7 +35,7 @@ export function DashboardHeader() {
             <BreadcrumbSeparator className="hidden md:block"/>
 
             <BreadcrumbItem>
-              <BreadcrumbPage>{dashboardTitle}</BreadcrumbPage>
+              <BreadcrumbPage>{title}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

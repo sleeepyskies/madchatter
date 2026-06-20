@@ -7,11 +7,12 @@ import {
 } from "@madchatter/api/src/knowledge";
 import { KnowledgeHeader } from "../components/knowledge-header";
 import { SourceRow } from "../components/source-row";
-import { redirect, useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, HardDrive, Loader2, Upload } from "lucide-react";
 
 export default function EditKnowledgePage() {
+  const router = useRouter();
   const {knowledgeId} = useParams();
   const id = Number(knowledgeId);
 
@@ -20,7 +21,7 @@ export default function EditKnowledgePage() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const goToDashboard = () => redirect("/dashboard");
+  const goToDashboard = () => router.push("/dashboard");
 
   useEffect(() => {
     if (isNaN(id)) {
@@ -78,7 +79,7 @@ export default function EditKnowledgePage() {
             className="flex items-center justify-between border border-border bg-muted/40 p-4 rounded-xl">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <HardDrive className="h-4 w-4"/>
-              <span>{sources.length} total objects stored</span>
+              <span>{sources.length} sources saved</span>
             </div>
 
             <input
@@ -96,7 +97,7 @@ export default function EditKnowledgePage() {
             >
               {isUploading ? <Loader2 className="h-4 w-4 animate-spin"/> :
                 <Upload className="h-4 w-4"/>}
-              {isUploading ? "Uploading..." : "Upload Document"}
+              {isUploading ? "Uploading..." : "Upload"}
             </button>
           </div>
 
