@@ -4,6 +4,7 @@ from loguru import logger
 from services.chat.rag_module import RAG
 from services.chat.stt_module import SpeechToText
 from services.chat.tts_module import TextToSpeech
+from services.chat.video_matcher_module import VideoMatcher
 import os
 import shutil
 import time
@@ -12,12 +13,14 @@ from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
 class ChatService:
     """A service that handles the entire chat pipeline"""
 
-    def __init__(self, stt_service: SpeechToText = None, rag_service: RAG = None, tts_service: TextToSpeech = None):
+    def __init__(self, stt_service: SpeechToText = None, rag_service: RAG = None, tts_service: TextToSpeech = None, video_matcher_service: VideoMatcher = None):
         self.chat_memory = []
         self.latest_reply = ""
         self.stt_service = stt_service
         self.rag_service = rag_service
         self.tts_service = tts_service
+        self.video_matcher_service = video_matcher_service
+
 
     def chat(self, file: UploadFile):
         """Main method to handle the chat process"""
