@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProjectResponse } from "@madchatter/api/src/projects";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { BotIcon } from "@hugeicons/core-free-icons";
 import { useRouter } from "next/navigation";
 import { DeleteButton } from "@/components/reusable/buttons/delete-button";
+import { toast } from "sonner";
+import { chatApi } from "@madchatter/api/src/chat";
 
 interface ProjectCardProps {
   project: ProjectResponse;
@@ -14,6 +17,23 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onDelete }: ProjectCardProps) {
   const router = useRouter();
+
+  const [loadingId, setLoadingId] = useState<number | null>(null);
+
+  const handleApply = async (projectId: number) => {
+    try {
+      setLoadingId(projectId);
+
+      await chatApi.applyProject(projectId);
+      toast.success("Project applied successfully.", {
+        position: "top-center",
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   return (
     <div className="group relative min-h-[192px] rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50 flex flex-col justify-between">
@@ -43,9 +63,14 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
         >
           Edit
         </Button>
-        <Button size="sm" className="cursor-pointer"
-        onClick={()=>{}}>
-          Apply
+        <Button
+          size="sm"
+          className="cursor-pointer"
+          onClick={() => {
+            handleApply(project.id);
+          }}
+        >
+          {loadingId === project.id ? "Applying..." : "Apply"}
         </Button>
       </div>
     </div>
