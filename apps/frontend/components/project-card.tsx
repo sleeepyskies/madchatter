@@ -43,7 +43,8 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
         >
           Edit
         </Button>
-        <Button size="sm" className="cursor-pointer">
+        <Button size="sm" className="cursor-pointer"
+        onClick={()=>{}}>
           Apply
         </Button>
       </div>

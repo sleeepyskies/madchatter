@@ -1,46 +1,148 @@
+import os
+import shutil
+
 from fastapi import UploadFile, File
+from fastapi.responses import StreamingResponse, FileResponse
 from loguru import logger
 
 from services.chat.rag_module import RAG
 from services.chat.stt_module import SpeechToText
 from services.chat.tts_module import TextToSpeech
 from services.chat.video_matcher_module import VideoMatcher
-import os
-import shutil
-import time
-from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
+from models.chat import ChatModeResponse, Mode
+from models.videos import VideoResponse
 
 class ChatService:
-    """A service that handles the entire chat pipeline"""
+    """
+    The entire chat pipeline.
+    STT -> mode selection -> video matching -> LLM (RAG) -> TTS streaming.
 
-    def __init__(self, stt_service: SpeechToText = None, rag_service: RAG = None, tts_service: TextToSpeech = None, video_matcher_service: VideoMatcher = None):
+    Includes:
+    - conversation state (IDLE / CHAT)
+    - short-term chat memory
+    - latest assistant reply for frontend retrieval
+    """
+
+    def __init__(self, stt_service: SpeechToText = None,
+                 rag_service: RAG = None,
+                 tts_service: TextToSpeech = None,
+                 video_matcher_service: VideoMatcher = None,
+                 idle_video: VideoResponse = None,
+                 enter_video: VideoResponse = None,
+                 exit_video: VideoResponse = None):
+
+        self.state = "IDLE"
         self.chat_memory = []
         self.latest_reply = ""
         self.stt_service = stt_service
         self.rag_service = rag_service
         self.tts_service = tts_service
         self.video_matcher_service = video_matcher_service
+        self.idle_video = idle_video
+        self.enter_video = enter_video
+        self.exit_video = exit_video
 
+    def analyze_mode(self, file: UploadFile) -> ChatModeResponse:
+        """
+        Step 1 of pipeline:
+        - STT
+        - Determine interaction state (IDLE → CHAT)
+        - Select response mode (video / tts / both)
 
-    def chat(self, file: UploadFile):
-        """Main method to handle the chat process"""
-
+        This does NOT trigger LLM or TTS streaming.
+        """
         temp_input_path = self._save_input_audio(file)
 
         try:
             user_text = self._transcribe_audio(temp_input_path)
-            self._update_memory_user(user_text)
-            return StreamingResponse(self._stream_pipeline(user_text),
-                                     media_type="audio/pcm",
-                                     headers={
-                                         "X-User-Text":
-                                             user_text.encode("utf-8").decode("latin-1")
-                                     })
+
+            # First enter interaction, transition from IDLE to CHAT
+            if self.state == "IDLE":
+                self.state = "CHAT"
+
+                return self._handle_enter_interaction(user_text)
+
+            # normal CHAT State
+            return self._handle_chat(user_text)
+
         except Exception as e:
-            logger.error(f"Error: {e}")
-            if os.path.exists(temp_input_path):
+            logger.error(f"Error: {e} ")
+            raise
+
+        finally:
+            if temp_input_path and os.path.exists(temp_input_path):
                 os.remove(temp_input_path)
-            return JSONResponse(status_code=500, content={"error": str(e)})
+
+    def stream_chat(self, user_text: str) -> StreamingResponse:
+        """
+        Step 2 of pipeline:
+        LLM -> streaming text -> TTS -> audio stream output
+        """
+        self._update_memory_user(user_text)
+        return StreamingResponse(
+            self._stream_pipeline(user_text),
+            media_type="audio/pcm"
+        )
+
+    def exit_chat(self) -> ChatModeResponse:
+        """
+        Exit session:
+        - reset state to IDLE
+        - clear memory
+        - return exit video if configured
+        """
+        self.state = "IDLE"
+        self._reset_session()
+
+        return ChatModeResponse(
+            mode=Mode.video_only,
+            video_id=self.exit_video.id
+        )
+
+    def _handle_enter_interaction(self, user_text) -> ChatModeResponse:
+        """
+        Handle first interaction in a session, return enter welcome video.
+        """
+        video = self.enter_video
+
+        if video:
+            return ChatModeResponse(
+                mode=Mode.video_and_tts,
+                video_id=video.id,
+                user_text=user_text
+            )
+
+        return ChatModeResponse(
+            mode=Mode.tts_only,
+            user_text=user_text
+        )
+
+    def _handle_chat(self, user_text: str) -> ChatModeResponse:
+        """
+        Normal chat mode:
+        - match video by user text.
+        - decide response mode.
+        """
+
+        # Match customized videos
+        video = self.video_matcher_service.match_video(user_text)
+
+        if video:
+            if video.includes_audio:
+                return ChatModeResponse(mode=Mode.video_only,
+                                        video_id=video.id,
+                                        user_text=user_text)
+            return ChatModeResponse(mode=Mode.video_and_tts,
+                                    video_id=video.id,
+                                    user_text=user_text)
+        return ChatModeResponse(mode=Mode.tts_only,
+                                user_text=user_text)
+
+
+    def _reset_session(self):
+        """Reset session, clear chat history."""
+        self.chat_memory.clear()
+        self.latest_reply = ""
 
     def _save_input_audio(self, file: UploadFile) -> str:
         """Saves the user input audio file to a temporary location and returns the path"""
@@ -54,11 +156,8 @@ class ChatService:
 
     def _transcribe_audio(self, audio_path: str) -> str:
         """Transcribes the audio file to text using the STT service"""
-        t_stt_start = time.perf_counter()
         user_text = self.stt_service.transcribe(audio_path)
-        t_stt = time.perf_counter() - t_stt_start
-        os.remove(audio_path)
-        logger.debug(f"\n[STT]: {t_stt:.3f}s | Text: '{user_text}'")
+        logger.debug(f"\n[STT] Text: '{user_text}'")
         return user_text
 
     def _update_memory_user(self, user_text: str):
@@ -74,10 +173,15 @@ class ChatService:
 
     def _stream_pipeline(self, user_text: str):
         """Streams the response from the RAG service, processes it in chunks, and yields audio bytes from the TTS service"""
-        llm_stream = self.rag_service.ask_stream(user_text, self.chat_memory[:-1])
-        text_stream = self._chunk_text(llm_stream)
-        audio_stream = self.tts_service.speak_stream(text_stream)
-        yield from self._fix_pcm_stream(audio_stream)
+        try:
+            llm_stream = self.rag_service.ask_stream(user_text, self.chat_memory[:-1])
+            text_stream = self._chunk_text(llm_stream)
+            audio_stream = self.tts_service.speak_stream(text_stream)
+            yield from self._fix_pcm_stream(audio_stream)
+
+        except Exception as e:
+            logger.exception(e)
+            return
 
 
     def _chunk_text(self, stream):

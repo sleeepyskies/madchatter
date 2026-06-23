@@ -5,9 +5,8 @@ import numpy as np
 class VideoMatcher:
     """Matches videos to user messages based on the video's description."""
 
-    def __init__(self, videos:list[VideoResponse],idle_video: VideoResponse):
+    def __init__(self, videos:list[VideoResponse]):
         self.videos = videos
-        self.idle_video = idle_video
         self.embeddings = OllamaEmbeddings(model="nomic-embed-text")
         self.video_matrix = None
         self._build_video_matrix()
@@ -36,7 +35,7 @@ class VideoMatcher:
 
         # Set a threshold for relevance.
         if best_score < 0.6:
-            return self.idle_video
+            return None
 
         return self.videos[best_index]
 

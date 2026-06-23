@@ -4,7 +4,9 @@ from services.video_service import VideoService
 from services.chat.chat_service_factory import ChatServiceFactory
 from services.agent_service import AgentService
 from services.knowledge_service import KnowledgeService
-from fastapi import UploadFile, File
+from fastapi import UploadFile
+from fastapi.responses import StreamingResponse
+from models.chat import VideoPreloadResponse, ChatModeResponse, LatestReplyResponse, ApplyProjectResponse
 
 
 class ChatApplicationService:
@@ -24,22 +26,25 @@ class ChatApplicationService:
         self.agent_service = agent_service
         self.knowledge_service = knowledge_service
 
-        self.chat_service = self.chat_factory.create(
-            language="en",
-            voice_model="en_US-amy-low.onnx",
-            chroma_collection=None,
-            system_prompt=None
-        )
+        # mock data
+        # self.chat_service = self.chat_factory.create(
+        #     language="en",
+        #     voice_model="en_US-amy-low.onnx",
+        #     chroma_collection=None,
+        #     system_prompt=None
+        # )
 
 
-    def apply_project(self, project_id: int):
+    def apply_project(self, project_id: int) -> ApplyProjectResponse:
         """Initializes the chat service based on the project's configuration, including the agent and knowledge base."""
         project = self.project_service.get_project(project_id)
+
+        videos = self.video_service.list_videos_for_project(project_id)
         idle_video = project.idle_video
         enter_video = project.enter_video
         exit_video = project.exit_video
+
         agent = self.agent_service.get_agent(project.agent_id)
-        videos = self.video_service.list_videos_for_project(project_id)
         chroma_collection = self.knowledge_service.fetch_knowledge_base(project.knowledge_id)
 
         config = {
@@ -55,21 +60,44 @@ class ChatApplicationService:
 
         self.chat_service = self.chat_factory.create(**config)
 
-    def chat(self, file: UploadFile):
-        """Main chat process"""
+        return ApplyProjectResponse(
+            project_id=project_id
+        )
+
+    def get_chat_mode(self, file: UploadFile) -> ChatModeResponse:
+        """
+        Get chat mode for each session.
+        Includes: video_only, video_and_tts, only_tts
+        """
         if self.chat_service is None:
             raise RuntimeError("No project applied")
 
-        return self.chat_service.chat(file)
+        return self.chat_service.analyze_mode(file)
 
-    def get_latest_reply(self) -> str:
-        """Returns the latest reply from the chat service, or an empty string if no chat service is initialized."""
+    def stream_chat(self, user_text: str) -> StreamingResponse:
+        """Stream chat process: LLM + TTS"""
         if self.chat_service is None:
-            return ""
+            raise RuntimeError("No project applied")
 
-        return self.chat_service.latest_reply
+        return self.chat_service.stream_chat(user_text)
 
-    def reset(self):
-        """Resets the chat service's memory, effectively clearing the conversation history."""
-        if self.chat_service:
-            self.chat_service.chat_memory.clear()
+    def get_latest_reply(self) -> LatestReplyResponse:
+        """Return the latest reply from the chat service."""
+        if self.chat_service is None:
+            raise RuntimeError("No project applied")
+
+        return LatestReplyResponse(
+            reply=self.chat_service.latest_reply
+        )
+
+    def get_all_videos(self) -> VideoPreloadResponse:
+        """Return all videos for preload"""
+        if not self.chat_service:
+            raise RuntimeError("No project applied")
+
+        return VideoPreloadResponse(
+            idle_video=self.chat_service.idle_video,
+            enter_video=self.chat_service.enter_video,
+            exit_video=self.chat_service.exit_video,
+            videos=self.chat_service.video_matcher_service.videos
+        )
