@@ -66,14 +66,20 @@ def get_agent_service(db: DBSession) -> AgentService:
 def get_chat_application_service(db: DBSession) -> ChatApplicationService:
     """Provides access to the ChatApplicationService, ensuring a single instance is used across the application."""
     global chat_application_service
+    project_service = get_project_service(db)
+    chat_factory = ChatServiceFactory()
+    agent_service = get_agent_service(db)
+    knowledge_service = get_knowledge_service(db)
+    video_service = get_video_service(db)
 
     if chat_application_service is None:
 
         chat_application_service = ChatApplicationService(
-            project_service=get_project_service(db),
-            chat_factory=ChatServiceFactory(),
-            agent_service=get_agent_service(db),
-            knowledge_service=get_knowledge_service(db),
+            project_service=project_service,
+            chat_factory=chat_factory,
+            agent_service=agent_service,
+            knowledge_service=knowledge_service,
+            video_service=video_service
         )
 
     return chat_application_service

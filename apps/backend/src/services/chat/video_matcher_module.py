@@ -17,16 +17,16 @@ class VideoMatcher:
             return
 
         # Precompute the normalized embedding matrix for the video descriptions.
-        video_embeddings = np.array([self.embeddings.embed(f"{video.label}\n{video.description or ''}") for video in self.videos])
+        video_embeddings = np.array([self.embeddings.embed_query(f"{video.label}\n{video.description or ''}") for video in self.videos])
         self.video_matrix = video_embeddings / np.linalg.norm(video_embeddings, axis=1, keepdims=True)
 
     def match_video(self, query: str):
         """Matches the user message to the most relevant video based on cosine similarity."""
-        if not self.video_matrix:
+        if self.video_matrix is None:
             return None
 
         # Compute the normalized embedding for the query.
-        query_embedding = np.array(self.embeddings.embed(query))
+        query_embedding = np.array(self.embeddings.embed_query(query))
         query_norm = query_embedding / np.linalg.norm(query_embedding)
 
         similarities = np.dot(self.video_matrix, query_norm)

@@ -26,25 +26,16 @@ class ChatApplicationService:
         self.agent_service = agent_service
         self.knowledge_service = knowledge_service
 
-        # mock data
-        # self.chat_service = self.chat_factory.create(
-        #     language="en",
-        #     voice_model="en_US-amy-low.onnx",
-        #     chroma_collection=None,
-        #     system_prompt=None
-        # )
-
-
     def apply_project(self, project_id: int) -> ApplyProjectResponse:
         """Initializes the chat service based on the project's configuration, including the agent and knowledge base."""
         project = self.project_service.get_project(project_id)
-
+        agent = project.agent
         videos = self.video_service.list_videos_for_project(project_id)
         idle_video = project.idle_video
         enter_video = project.enter_video
         exit_video = project.exit_video
 
-        agent = self.agent_service.get_agent(project.agent_id)
+
         chroma_collection = self.knowledge_service.fetch_knowledge_base(project.knowledge_id)
 
         config = {

@@ -15,14 +15,14 @@ class ChatRequest(BaseSchema):
 
 class ChatModeResponse(BaseSchema):
     mode: Mode
-    video_id: int | None
-    user_text: str | None
+    video_id: int | None = None
+    user_text: str | None = None
 
 class VideoPreloadResponse(BaseSchema):
-    idle_video: VideoResponse | None
-    enter_video: VideoResponse | None
-    exit_video: VideoResponse | None
-    videos: list[VideoResponse] | None
+    idle_video: VideoResponse | None =  None
+    enter_video: VideoResponse | None = None
+    exit_video: VideoResponse | None = None
+    videos: list[VideoResponse] | None = None
 
 class LatestReplyResponse(BaseSchema):
-    reply: str | None
+    reply: str | None = None
