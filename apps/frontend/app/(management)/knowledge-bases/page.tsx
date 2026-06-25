@@ -26,8 +26,8 @@ export default function KnowledgeAdminPage() {
   }, []);
 
   const handleCreate = async () => {
-    const knowledge = await knowledgeApi.createKnowledge({ label: 'New Project'});
-    router.push(`/knowledge-base/${knowledge.id}`);
+    const knowledge = await knowledgeApi.createKnowledge({label: 'New Project'});
+    router.push(`/knowledge-bases/${knowledge.id}`);
   };
 
   const handleDelete = async (id: number) => {
@@ -37,10 +37,14 @@ export default function KnowledgeAdminPage() {
 
   const handleRename = async (id: number, newLabel: string) => {
     setKnowledgeBases((prev) =>
-      prev.map((k) => (k.id === id ? { ...k, label: newLabel } : k))
+      prev.map((k) => (k.id === id ? {...k, label: newLabel} : k))
     );
-    await knowledgeApi.updateKnowledge(id, { label: newLabel });
+    await knowledgeApi.updateKnowledge(id, {label: newLabel});
   };
+
+  const handleEdit = (knowledgeBaseId: number) => {
+    router.push(`/knowledge-bases/${knowledgeBaseId}`)
+  }
 
   return (
     <ResourcePageLayout
@@ -50,7 +54,7 @@ export default function KnowledgeAdminPage() {
       isLoading={isLoading}
       headerAction={
         <Button onClick={handleCreate} size="sm" className="gap-2 cursor-pointer">
-          <PlusIcon className="w-4 h-4" /> Create Knowledge Base
+          <PlusIcon className="w-4 h-4"/> Create Knowledge Base
         </Button>
       }
     >
@@ -61,7 +65,7 @@ export default function KnowledgeAdminPage() {
           label={knowledge.label}
           description=""
           onDelete={() => handleDelete(knowledge.id)}
-          onEdit={() => router.push(`/knowledge-base/${knowledge.id}`)}
+          onEdit={() => handleEdit(knowledge.id)}
           onRename={(newLabel) => handleRename(knowledge.id, newLabel)}
         />
       ))}

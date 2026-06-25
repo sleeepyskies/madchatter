@@ -13,12 +13,7 @@ import {
 import { projectsApi } from "@madchatter/api/src/projects";
 import { knowledgeApi } from "@madchatter/api/src/knowledge";
 import { agentsApi } from "@madchatter/api/src/agents";
-import {
-  Card, CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from '@/components/ui/card';
 
 interface DashboardCardProps {
   label: string;
@@ -29,20 +24,21 @@ interface DashboardCardProps {
 }
 
 export function DashboardCard({
-  label,
-  description,
-  icon: Icon,
-  onCreateNew,
-  onClickCard,
-}: DashboardCardProps) {
+                                label,
+                                description,
+                                icon: Icon,
+                                onCreateNew,
+                                onClickCard,
+                              }: DashboardCardProps) {
   return (
     <Card
       className="flex flex-col justify-between p-5 rounded-xl transition-all duration-300 hover:shadow-lg w-full"
     >
       <div>
         <CardHeader className="p-0 mt-2 space-y-1">
-          <CardTitle className="flex items-center gap-2 font-semibold text-base text-neutral-900 dark:text-neutral-100">
-            <Icon className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
+          <CardTitle
+            className="flex items-center gap-2 font-semibold text-base text-neutral-900 dark:text-neutral-100">
+            <Icon className="w-5 h-5 text-neutral-500 dark:text-neutral-400"/>
             <span>{label}</span>
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground leading-relaxed">
@@ -57,7 +53,7 @@ export function DashboardCard({
           variant="default"
           className="flex-1 min-w-0 gap-1.5 cursor-pointer text-xs justify-center px-2"
         >
-          <CirclePlusIcon className="w-3.5 h-3.5 shrink-0" />
+          <CirclePlusIcon className="w-3.5 h-3.5 shrink-0"/>
           <span className="truncate">Create New</span>
         </Button>
         <Button
@@ -66,7 +62,7 @@ export function DashboardCard({
           className="flex-1 min-w-0 gap-1.5 cursor-pointer text-xs justify-center px-2"
         >
           <span className="truncate">Manage</span>
-          <ArrowRightIcon className="w-3.5 h-3.5 shrink-0" />
+          <ArrowRightIcon className="w-3.5 h-3.5 shrink-0"/>
         </Button>
       </CardContent>
     </Card>
@@ -77,12 +73,17 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const createNewProject = async () => {
-    const project = await projectsApi.createProject({ label: "New Project" });
+    const project = await projectsApi.createProject({label: "New Project"});
     router.push(`/project/${project.id}`);
   };
 
   const createNewAgent = async () => {
-    const agent = await agentsApi.createAgent({ label: "New Agent", systemPrompt: "", language: "en", voiceModel: "nothing" });
+    const agent = await agentsApi.createAgent({
+      label: "New Agent",
+      systemPrompt: "",
+      language: "en",
+      voiceModel: "nothing"
+    });
     router.push(`/agent/${agent.id}`);
   };
 
@@ -116,21 +117,21 @@ export default function DashboardPage() {
   ];
 
   return (
-      <div className="flex flex-1 flex-col gap-8 p-8 max-w-6xl mx-auto w-full pt-15">
-        <div className="flex flex-col gap-1 border-b pb-6 dark:border-neutral-800">
-          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-            Welcome back! 👋
-          </h1>
-          <p className="text-muted-foreground">
-            Create your customized AI agent quickly!
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {actionCards.map((card) => (
-              <DashboardCard key={card.label} {...card} />
-          ))}
-        </div>
+    <div className="flex flex-1 flex-col gap-8 p-8 max-w-6xl mx-auto w-full pt-15">
+      <div className="flex flex-col gap-1 border-b pb-6 dark:border-neutral-800">
+        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+          Welcome back! 👋
+        </h1>
+        <p className="text-muted-foreground">
+          Create your customized AI agent quickly!
+        </p>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {actionCards.map((card) => (
+          <DashboardCard key={card.label} {...card} />
+        ))}
+      </div>
+    </div>
   );
 }

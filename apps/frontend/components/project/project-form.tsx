@@ -4,7 +4,6 @@
  */
 "use client";
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { Separator } from "@/components/ui/separator";
 import {
   VideoUpload,
@@ -90,7 +89,7 @@ export default function ProjectForm({ projectId }: { projectId?: number }) {
           const vid = await videosApi.getVideo(video.id);
           console.log("video file name", vid.label);
           videoDrafts.push({
-            tempId: uuidv4(),
+            tempId: "TODO",
             id: vid.id,
             previewUrl: vid.downloadUrl,
             label: vid.label,

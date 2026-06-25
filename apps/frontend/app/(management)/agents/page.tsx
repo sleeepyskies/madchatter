@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserCheckIcon, PlusIcon } from "lucide-react";
+import { PlusIcon, UserCheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { agentsApi, AgentResponse } from "@madchatter/api/src/agents";
+import { AgentResponse, agentsApi } from "@madchatter/api/src/agents";
 import { ResourcePageLayout } from "@/components/admin/resource-page-layout";
 import { ResourceCard } from "@/components/admin/resource-card";
 
@@ -25,21 +25,31 @@ export default function AgentsAdminPage() {
     fetchData();
   }, []);
 
+  const handleCreate = async () => {
+    const agent = await agentsApi.createAgent({
+      label: "New Agent",
+      systemPrompt: "",
+      language: "en",
+      voiceModel: ""
+    });
+    router.push(`/agents/${agent.id}`);
+  };
+
   const handleDelete = async (id: number) => {
-    try {
-      await agentsApi.deleteAgent(id);
-      setAgents((prev) => prev.filter((agent) => agent.id !== id));
-    } catch (error) {
-      console.error("Could not delete agent:", error);
-    }
+    await agentsApi.deleteAgent(id);
+    setAgents((prev) => prev.filter((agent) => agent.id !== id));
   };
 
   const handleRename = async (id: number, newLabel: string) => {
     setAgents((prev) =>
-      prev.map((agent) => (agent.id === id ? { ...agent, label: newLabel } : agent))
+      prev.map((agent) => (agent.id === id ? {...agent, label: newLabel} : agent))
     );
-    await agentsApi.updateAgent(id, { label: newLabel });
+    await agentsApi.updateAgent(id, {label: newLabel});
   };
+
+  const handleEdit = (agentId: number) => {
+    router.push(`/agents/${agentId}`)
+  }
 
   return (
     <ResourcePageLayout
@@ -48,8 +58,8 @@ export default function AgentsAdminPage() {
       itemsCount={agents.length}
       isLoading={isLoading}
       headerAction={
-        <Button onClick={() => router.push("/agents/create")} size="sm" className="gap-2 cursor-pointer">
-          <PlusIcon className="w-4 h-4" /> Create Agent
+        <Button onClick={handleCreate} size="sm" className="gap-2 cursor-pointer">
+          <PlusIcon className="w-4 h-4"/> Create Agent
         </Button>
       }
     >
@@ -60,7 +70,7 @@ export default function AgentsAdminPage() {
           label={agent.label}
           description=""
           onDelete={() => handleDelete(agent.id)}
-          onEdit={() => router.push(`/agents/${agent.id}`)}
+          onEdit={() => handleEdit(agent.id)}
           onRename={(newLabel) => handleRename(agent.id, newLabel)}
         />
       ))}

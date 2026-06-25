@@ -36,19 +36,18 @@ export function ResourcePageLayout({
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear border-b border-border/40">
         <div className="flex items-center gap-2 px-4 w-full justify-between">
           <div className="flex items-center gap-2">
-            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-vertical:h-4 data-vertical:self-auto"
+            />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/dashboard" className="normal-case tracking-normal">
-                    Mad Chatter
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href="/dashboard">Mad Chatter</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="normal-case tracking-normal font-medium">
-                    {title}
-                  </BreadcrumbPage>
+                  <BreadcrumbPage> {title} </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>

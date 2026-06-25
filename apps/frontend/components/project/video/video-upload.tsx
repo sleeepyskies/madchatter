@@ -4,7 +4,6 @@
  */
 "use client";
 import { useRef, ChangeEvent } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";

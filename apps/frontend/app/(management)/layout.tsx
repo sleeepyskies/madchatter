@@ -3,8 +3,8 @@ import React from "react";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 
 export default function AdminLayout({
-  children,
-}: Readonly<{
+                                      children,
+                                    }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (

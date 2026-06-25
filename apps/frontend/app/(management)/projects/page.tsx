@@ -26,31 +26,36 @@ export default function ProjectsAdminPage() {
     fetchData();
   }, []);
 
+  const handleCreate = async () => {
+    const project = await projectsApi.createProject({label: "New Project"});
+    router.push(`/projects/${project.id}`);
+  }
+
   const handleDelete = async (projectId: number) => {
     await projectsApi.deleteProject(projectId);
     setProjects((prev) => prev.filter((p) => p.id !== projectId));
   };
 
-  const handleEdit = (projectId: number) => {
-    router.push(`/project/${projectId}`);
-  };
-
   const handleRename = async (projectId: number, newLabel: string) => {
     setProjects((prev) =>
-      prev.map((p) => (p.id === projectId ? { ...p, label: newLabel } : p))
+      prev.map((p) => (p.id === projectId ? {...p, label: newLabel} : p))
     );
-    await projectsApi.updateProject(projectId, { label: newLabel });
+    await projectsApi.updateProject(projectId, {label: newLabel});
+  };
+
+  const handleEdit = (projectId: number) => {
+    router.push(`/projects/${projectId}`);
   };
 
   return (
     <ResourcePageLayout
-      title="All Projects"
+      title="Projects"
       resourceName="projects"
       itemsCount={projects.length}
       isLoading={isLoading}
       headerAction={
-        <Button onClick={() => router.push("/project/create")} size="sm" className="gap-2 cursor-pointer">
-          <PlusIcon className="w-4 h-4" /> Create Project
+        <Button onClick={handleCreate} size="sm" className="gap-2 cursor-pointer">
+          <PlusIcon className="w-4 h-4"/> Create Project
         </Button>
       }
     >

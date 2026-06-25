@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ThemeProvider from "@/providers/theme-provider";
 
-const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const notoSans = Noto_Sans({subsets: ["latin"], variable: "--font-sans"});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,8 +24,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children,
+                                   }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
@@ -40,14 +40,14 @@ export default function RootLayout({
         notoSans.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
-        <ThemeProvider>
-          <TooltipProvider delayDuration={0}>
-            {children}
-            <Toaster />
-          </TooltipProvider>
-        </ThemeProvider>
-      </body>
+    <body className="min-h-full flex flex-col">
+    <ThemeProvider>
+      <TooltipProvider delayDuration={0}>
+        {children}
+        <Toaster/>
+      </TooltipProvider>
+    </ThemeProvider>
+    </body>
     </html>
   );
 }
