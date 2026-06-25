@@ -9,14 +9,19 @@ import { chatApi } from "@madchatter/api/src/chat";
 import { ResourcePageLayout } from '@/components/admin/resource-page-layout';
 import { ResourceCard } from '@/components/admin/resource-card';
 
-export default function Page() {
+export default function ProjectsAdminPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await projectsApi.listProjects();
-      setProjects(data);
+      try {
+        const data = await projectsApi.listProjects();
+        setProjects(data);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -40,34 +45,35 @@ export default function Page() {
   return (
     <ResourcePageLayout
       title="All Projects"
+      resourceName="projects"
+      itemsCount={projects.length}
+      isLoading={isLoading}
       headerAction={
         <Button onClick={() => router.push("/project/create")} size="sm" className="gap-2 cursor-pointer">
           <PlusIcon className="w-4 h-4" /> Create Project
         </Button>
       }
     >
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        {projects.map((project) => (
-          <ResourceCard
-            key={project.id}
-            icon={BotIcon}
-            label={project.label}
-            description=""
-            onDelete={() => handleDelete(project.id)}
-            onEdit={() => handleEdit(project.id)}
-            onRename={(newLabel: string) => handleRename(project.id, newLabel)}
-            extraButtons={
-              <Button
-                size="sm"
-                className="cursor-pointer"
-                onClick={() => chatApi.applyProject(project.id)}
-              >
-                Apply
-              </Button>
-            }
-          />
-        ))}
-      </div>
+      {projects.map((project) => (
+        <ResourceCard
+          key={project.id}
+          icon={BotIcon}
+          label={project.label}
+          description=""
+          onDelete={() => handleDelete(project.id)}
+          onEdit={() => handleEdit(project.id)}
+          onRename={(newLabel: string) => handleRename(project.id, newLabel)}
+          extraButtons={
+            <Button
+              size="sm"
+              className="cursor-pointer"
+              onClick={() => chatApi.applyProject(project.id)}
+            >
+              Apply
+            </Button>
+          }
+        />
+      ))}
     </ResourcePageLayout>
   );
 }

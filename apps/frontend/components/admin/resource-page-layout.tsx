@@ -10,6 +10,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ResourcePageLayoutProps {
   title: string;
@@ -17,6 +18,7 @@ interface ResourcePageLayoutProps {
   children: React.ReactNode;
   itemsCount?: number;
   resourceName?: string;
+  isLoading?: boolean;
 }
 
 export function ResourcePageLayout({
@@ -25,18 +27,16 @@ export function ResourcePageLayout({
                                      children,
                                      itemsCount,
                                      resourceName = "resources",
+                                     isLoading = false,
                                    }: ResourcePageLayoutProps) {
-  const isEmpty = itemsCount === 0;
+  const isEmpty = !isLoading && itemsCount === 0;
 
   return (
     <div className="flex flex-col flex-1 w-full">
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear border-b border-border/40">
         <div className="flex items-center gap-2 px-4 w-full justify-between">
           <div className="flex items-center gap-2">
-            <Separator
-              orientation="vertical"
-              className="mr-2 h-4"
-            />
+            <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
@@ -64,7 +64,13 @@ export function ResourcePageLayout({
             No {resourceName} found.
           </div>
         ) : (
-          children
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="min-h-[192px] w-full rounded-xl" />
+              ))
+              : children}
+          </div>
         )}
       </main>
     </div>

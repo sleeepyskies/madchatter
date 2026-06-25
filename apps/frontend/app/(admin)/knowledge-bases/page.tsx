@@ -1,47 +1,70 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { useRouter } from "next/navigation";
+import { DatabaseIcon, PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { knowledgeApi, KnowledgeResponse } from "@madchatter/api/src/knowledge";
-import { KnowledgeCard } from "./components/knowledge-card";
+import { ResourcePageLayout } from "@/components/admin/resource-page-layout";
+import { ResourceCard } from "@/components/admin/resource-card";
 
-export default function Page() {
+export default function KnowledgeAdminPage() {
+  const router = useRouter();
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetch = async () => {
-      const knowledge = await knowledgeApi.listKnowledge();
-      setKnowledgeBases(knowledge);
+    const fetchData = async () => {
+      try {
+        const data = await knowledgeApi.listKnowledge();
+        setKnowledgeBases(data);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetch();
+    fetchData();
   }, []);
 
-  const handleDelete = async (knowledgeId: number) => {
-    try {
-      await knowledgeApi.deleteKnowledge(knowledgeId);
-      setKnowledgeBases((prev) => prev.filter((p) => p.id !== knowledgeId));
-    } catch (error) {
-      console.error("Could not delete knowledge base:", error);
-    }
+  const handleCreate = async () => {
+    const knowledge = await knowledgeApi.createKnowledge({ label: 'New Project'});
+    router.push(`/knowledge-base/${knowledge.id}`);
+  };
+
+  const handleDelete = async (id: number) => {
+    await knowledgeApi.deleteKnowledge(id);
+    setKnowledgeBases((prev) => prev.filter((k) => k.id !== id));
+  };
+
+  const handleRename = async (id: number, newLabel: string) => {
+    setKnowledgeBases((prev) =>
+      prev.map((k) => (k.id === id ? { ...k, label: newLabel } : k))
+    );
+    await knowledgeApi.updateKnowledge(id, { label: newLabel });
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        {knowledgeBases.length === 0 ? (
-          <div className="col-span-full mt-8 text-center text-muted-foregroundr">
-            No knowledge bases found.
-          </div>
-        ) : (
-          knowledgeBases.map((knowledge) => (
-            <KnowledgeCard
-              key={knowledge.id}
-              knowledge={knowledge}
-              onDelete={handleDelete}
-            />
-          ))
-        )}
-      </div>
-    </div>
+    <ResourcePageLayout
+      title="Knowledge Bases"
+      resourceName="knowledge bases"
+      itemsCount={knowledgeBases.length}
+      isLoading={isLoading}
+      headerAction={
+        <Button onClick={handleCreate} size="sm" className="gap-2 cursor-pointer">
+          <PlusIcon className="w-4 h-4" /> Create Knowledge Base
+        </Button>
+      }
+    >
+      {knowledgeBases.map((knowledge) => (
+        <ResourceCard
+          key={knowledge.id}
+          icon={DatabaseIcon}
+          label={knowledge.label}
+          description=""
+          onDelete={() => handleDelete(knowledge.id)}
+          onEdit={() => router.push(`/knowledge-base/${knowledge.id}`)}
+          onRename={(newLabel) => handleRename(knowledge.id, newLabel)}
+        />
+      ))}
+    </ResourcePageLayout>
   );
 }

@@ -17,7 +17,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookIcon,
-  BotIcon, Component,
+  BotIcon,
   DatabaseIcon,
   FolderPlusIcon,
   LayoutDashboardIcon,
