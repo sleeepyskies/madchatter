@@ -10,50 +10,33 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar";
-import { HugeiconsIcon, IconSvgElement } from "@hugeicons/react";
-import {
-  BookOpen02Icon,
-  Brain03Icon,
-  CropIcon,
-  LayoutBottomIcon,
-  RoboticIcon,
-} from "@hugeicons/core-free-icons";
+  SidebarTrigger,
+  useSidebar,
+} from '@/components/ui/sidebar';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  BookIcon,
+  BotIcon, Component,
+  DatabaseIcon,
+  FolderPlusIcon,
+  LayoutDashboardIcon,
+  LucideIcon,
+  PanelBottomIcon,
+} from 'lucide-react';
 
 interface SidebarItem {
   title: string;
   url: string;
-  icon: IconSvgElement
+  icon: LucideIcon;
 }
 
 const items: SidebarItem[] = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutBottomIcon,
-  },
-  {
-    title: "Projects",
-    url: "/projects",
-    icon: CropIcon,
-  },
-  {
-    title: "Agents",
-    url: "/agents",
-    icon: RoboticIcon,
-  },
-  {
-    title: "Knowledge Bases",
-    url: "/knowledge-bases",
-    icon: Brain03Icon,
-  },
-  {
-    title: "Documentation",
-    url: "https://madchatter.pages.dev",
-    icon: BookOpen02Icon,
-  },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboardIcon},
+  { title: "Projects", url: "/projects", icon: FolderPlusIcon },
+  { title: "Agents", url: "/agents", icon: BotIcon },
+  { title: "Knowledge Bases", url: "/knowledge-bases", icon: DatabaseIcon },
+  { title: "Documentation", url: "https://madchatter.pages.dev", icon: BookIcon },
 ];
 
 interface SidebarLinkProps {
@@ -62,11 +45,13 @@ interface SidebarLinkProps {
 }
 
 function SidebarLink({item, isActive}: SidebarLinkProps) {
+  const Icon = item.icon;
+
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={isActive}>
         <Link href={item.url}>
-          <HugeiconsIcon icon={item.icon} strokeWidth={2}/>
+          <Icon className="w-4 h-4" strokeWidth={2} />
           <span>{item.title}</span>
         </Link>
       </SidebarMenuButton>
@@ -76,26 +61,28 @@ function SidebarLink({item, isActive}: SidebarLinkProps) {
 
 export function AdminSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const { open } = useSidebar();
 
   return (
     <Sidebar collapsible="icon" {...props}>
-
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              className="hover:bg-transparent active:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent"
-            >
-              {/* TODO: Logo goes here. */}
-              <div
-                className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2}/>
+            <div className={`flex h-12 w-full items-center gap-2 px-2 ${open ? "justify-between" : "justify-center"}`}>
+
+              <div className="flex items-center gap-2 overflow-hidden">
+                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <PanelBottomIcon/>
+                </div>
+                {open && (
+                  <div className="grid flex-1 text-left text-sm leading-tight animate-in fade-in duration-200">
+                    <span className="truncate font-semibold text-sidebar-foreground">Mad Chatter</span>
+                  </div>
+                )}
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Mad Chatter</span>
-              </div>
-            </SidebarMenuButton>
+
+              <SidebarTrigger className={`h-8 w-8 hover:bg-sidebar-accent shrink-0 ${!open ? "absolute" : ""}`} />
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -112,7 +99,6 @@ export function AdminSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarRail/>
-
     </Sidebar>
   );
 }

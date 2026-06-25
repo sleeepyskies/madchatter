@@ -1,22 +1,17 @@
 "use client";
 
-import {useEffect, useState} from "react";
-import {ProjectResponse, projectsApi} from "@madchatter/api/src/projects";
-import { useAdminHeader } from "@/providers/admin-header-provider";
-import { ResourceCard } from '@/components/reusable/resource-card';
-import { useRouter } from 'next/navigation';
-import { BotIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { chatApi } from '@madchatter/api/src/chat';
+import { useEffect, useState } from "react";
+import { ProjectResponse, projectsApi } from "@madchatter/api/src/projects";
+import { useRouter } from "next/navigation";
+import { BotIcon, PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { chatApi } from "@madchatter/api/src/chat";
+import { ResourcePageLayout } from '@/components/admin/resource-page-layout';
+import { ResourceCard } from '@/components/admin/resource-card';
 
 export default function Page() {
   const router = useRouter();
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
-  const { setTitle } = useAdminHeader();
-
-  useEffect(() => {
-    setTitle("Projects");
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,15 +27,25 @@ export default function Page() {
   };
 
   const handleEdit = (projectId: number) => {
-    router.push(`/project/${projectId}`)
-  }
+    router.push(`/project/${projectId}`);
+  };
 
   const handleRename = async (projectId: number, newLabel: string) => {
+    setProjects((prev) =>
+      prev.map((p) => (p.id === projectId ? { ...p, label: newLabel } : p))
+    );
     await projectsApi.updateProject(projectId, { label: newLabel });
-  }
+  };
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+    <ResourcePageLayout
+      title="All Projects"
+      headerAction={
+        <Button onClick={() => router.push("/project/create")} size="sm" className="gap-2 cursor-pointer">
+          <PlusIcon className="w-4 h-4" /> Create Project
+        </Button>
+      }
+    >
       <div className="grid auto-rows-min gap-4 md:grid-cols-3">
         {projects.map((project) => (
           <ResourceCard
@@ -63,7 +68,6 @@ export default function Page() {
           />
         ))}
       </div>
-
-    </div>
+    </ResourcePageLayout>
   );
 }

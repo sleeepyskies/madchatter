@@ -4,23 +4,14 @@ import { useEffect, useState } from "react";
 
 import { knowledgeApi, KnowledgeResponse } from "@madchatter/api/src/knowledge";
 import { KnowledgeCard } from "./components/knowledge-card";
-import { useAdminHeader } from "../../../providers/admin-header-provider";
 
 export default function Page() {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeResponse[]>([]);
-  const {setTitle} = useAdminHeader();
-
-  useEffect(() => {
-    setTitle("Knowledge Bases");
-  }, []);
 
   useEffect(() => {
     const fetch = async () => {
-      try {
-        setKnowledgeBases(await knowledgeApi.listKnowledge());
-      } catch (error) {
-        console.error("Could not fetch knowledge bases from backend:", error);
-      }
+      const knowledge = await knowledgeApi.listKnowledge();
+      setKnowledgeBases(knowledge);
     };
     fetch();
   }, []);
