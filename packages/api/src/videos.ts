@@ -30,8 +30,8 @@ export const videosApi = {
     formData.append("label", label);
     formData.append("description", description);
     formData.append("project_id", projectId.toString());
+    formData.append("includes_audio", includesAudio.toString());
     formData.append("file", file);
-    formData.append("includes_audio", file);
 
     return await api.post("/upload", { body: formData }).json();
   },

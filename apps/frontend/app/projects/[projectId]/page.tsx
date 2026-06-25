@@ -7,5 +7,5 @@ export default async function EditProjectPage({
 }) {
   const { projectId } = await params;
 
-  return <ProjectForm projectId={Number(projectId)} />; // Pass projectId to enter edit mode
+  return <ProjectForm projectId={Number(projectId)} />;
 }

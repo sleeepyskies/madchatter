@@ -5,11 +5,8 @@
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { KnowledgeBaseStep } from "@/components/project/agent/knowledge-base";
+import { KnowledgeBaseStep } from "./knowledge-base";
 import { VoiceSetting } from "./voice-setting";
-import { VideoSetting } from "./video-setting";
-import { VideoDraft } from "@/components/project/video/video-upload";
-import { VideoAssignments } from "@/components/project/agent/video-setting";
 import { KnowledgeResponse } from "@madchatter/api/src/knowledge";
 
 export interface AgentDraft {
@@ -21,7 +18,7 @@ export interface AgentDraft {
   knowledgeId: number | null;
 }
 
-interface AgentConfigurationProps {
+interface AgentStepProps {
   agent: AgentDraft;
   setAgent: React.Dispatch<React.SetStateAction<AgentDraft>>;
 
@@ -33,14 +30,14 @@ interface AgentConfigurationProps {
   knowledgeBases: KnowledgeResponse[];
 }
 
-export function AgentConfiguration({
+export function AgentStep({
   agent,
   setAgent,
   assignedVideos,
   onAssignedVideos,
   videos,
   knowledgeBases,
-}: AgentConfigurationProps) {
+}: AgentStepProps) {
   // Handle agent name and system prompt
   const handleChange = (field: "label" | "systemPrompt" | "knowledgeId", value: any) => {
     setAgent((prev) => ({
