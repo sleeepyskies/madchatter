@@ -23,6 +23,7 @@ export const videosApi = {
     label: string,
     description: string,
     projectId: number,
+    includesAudio: boolean,
     file: File,
   ): Promise<VideoResponse> => {
     const formData = new FormData();
@@ -30,6 +31,7 @@ export const videosApi = {
     formData.append("description", description);
     formData.append("project_id", projectId.toString());
     formData.append("file", file);
+    formData.append("includes_audio", file);
 
     return await api.post("/upload", { body: formData }).json();
   },
