@@ -1,12 +1,30 @@
 import { client } from "./client";
+import { VideoResponse } from "./videos";
 
 const api = client.extend((options) => ({
   prefix: `${options.prefix}/chat`,
 }));
 
-export interface ApplyProjectResponse {
-  message: string;
-  project_id: number;
+export type Mode = "video_only" | "video_and_tts" | "tts_only";
+
+export interface  ApplyProjectResponse{
+  projectId: number
+}
+export interface ChatRequest {
+  userText: string;
+}
+
+export interface ChatModeResponse {
+  mode: Mode;
+  videoId: number | null;
+  userText: string | null;
+}
+
+export interface VideoPreloadResponse {
+  idle_video: VideoResponse | null;
+  enter_video: VideoResponse | null;
+  exit_video: VideoResponse | null;
+  videos: VideoResponse[] | null;
 }
 
 export interface LatestReplyResponse {
@@ -18,18 +36,33 @@ export const chatApi = {
     return await api.post(`apply/${projectId}`).json();
   },
 
-  chat: async (file: File): Promise<Blob> => {
+  getChatMode: async (file: File): Promise<ChatModeResponse> => {
     const formData = new FormData();
     formData.append("file", file);
 
-    return await api
-      .post("", {
-        body: formData,
-      })
-      .blob();
+    return await api.post("mode", {
+      body: formData,
+    }).json()
+  },
+
+  streamChat: async (userText: string) => {
+    const res = await fetch("/chat/stream_chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_text: userText }),
+    });
+
+    if (!res.body) throw new Error("No stream body");
+
+    return res.body; // ReadableStream
   },
 
   getLatestReply: async (): Promise<LatestReplyResponse> => {
     return await api.get("latest_reply").json();
+  },
+  preloadVideos: async (): Promise<VideoPreloadResponse> => {
+    return await api.get("preload_videos").json();
   },
 };

@@ -61,6 +61,10 @@ class VideoService:
         videos = self.repository.list_all()
         return [map_db_to_response(video) for video in videos]
 
+    def list_videos_for_project(self, project_id: int) -> list[VideoResponse]:
+        videos = self.repository.list_for_project(project_id)
+        return [map_db_to_response(video) for video in videos]
+
     def get_video(self, video_id: int) -> VideoResponse:
         video = self.repository.get(video_id)
         return map_db_to_response(video)
