@@ -10,22 +10,26 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface ResourcePageLayoutProps {
   title: string;
   headerAction?: React.ReactNode;
   children: React.ReactNode;
+  itemsCount?: number;
+  resourceName?: string;
 }
 
 export function ResourcePageLayout({
                                      title,
                                      headerAction,
                                      children,
+                                     itemsCount,
+                                     resourceName = "resources",
                                    }: ResourcePageLayoutProps) {
+  const isEmpty = itemsCount === 0;
+
   return (
     <div className="flex flex-col flex-1 w-full">
-      {/* Structural Top Header Bar (Old AdminHeader logic, now inline) */}
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear border-b border-border/40">
         <div className="flex items-center gap-2 px-4 w-full justify-between">
           <div className="flex items-center gap-2">
@@ -50,14 +54,18 @@ export function ResourcePageLayout({
             </Breadcrumb>
           </div>
 
-          {/* Header Action Button sits up top next to breadcrumbs now */}
           {headerAction && <div className="shrink-0">{headerAction}</div>}
         </div>
       </header>
 
-      {/* Main Content Body */}
       <main className="flex-1 p-6 min-h-0">
-        {children}
+        {isEmpty ? (
+          <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
+            No {resourceName} found.
+          </div>
+        ) : (
+          children
+        )}
       </main>
     </div>
   );
