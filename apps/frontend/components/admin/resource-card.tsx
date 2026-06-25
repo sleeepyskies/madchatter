@@ -1,9 +1,12 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DeleteButton } from "@/components/reusable/buttons/delete-button";
 import { ComponentType } from "react";
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { PencilIcon } from "lucide-react";
 
 interface ResourceCardProps {
   icon: ComponentType<{ className?: string }>;
@@ -78,12 +81,15 @@ export function ResourceCard({
                 className="h-8 w-full p-0 bg-transparent border-0 border-b border-primary rounded-none shadow-none focus-visible:ring-0 focus-visible:border-primary font-semibold text-lg md:text-lg text-neutral-900 dark:text-neutral-100 leading-none"
               />
             ) : (
-              <span
+              <div
                 onClick={() => setIsEditing(true)}
-                className="cursor-pointer hover:underline decoration-dashed decoration-neutral-400 underline-offset-4 block truncate h-8 py-1.5 font-semibold text-lg text-neutral-900 dark:text-neutral-100 leading-none"
+                className="group/title flex items-center gap-2 cursor-pointer h-8 font-semibold text-lg text-neutral-900 dark:text-neutral-100"
               >
-                {label}
-              </span>
+                <span className="truncate hover:underline decoration-dashed decoration-neutral-400 underline-offset-4">
+                  {label}
+                </span>
+                <PencilIcon className="w-3.5 h-3.5 text-muted-foreground/40 transition-colors group-hover:text-muted-foreground/70 group-focus/title:text-primary shrink-0" />
+              </div>
             )}
           </CardTitle>
         </div>
