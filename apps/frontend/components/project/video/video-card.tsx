@@ -7,17 +7,25 @@ import { Button } from "@/components/ui/button";
 import { VideoResponse, videosApi } from "@madchatter/api/src/videos";
 import { VideoFormModal } from "./video-form";
 
+export interface VideoFormData {
+  id?: number;
+  label: string;
+  description: string;
+  includesAudio: boolean;
+}
+
 interface VideoCardProps {
+  projectId: number;
   video: VideoResponse;
   onDelete: (id: number) => void;
   onUpdate: (updated: VideoResponse) => void;
 }
 
-export function VideoCard({ video, onDelete, onUpdate }: VideoCardProps) {
+export function VideoCard({ video, onDelete, onUpdate, projectId }: VideoCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleEditSubmit = async (data: { label: string; description: string; includesAudio: boolean }) => {
+  const handleEditSubmit = async (data: VideoFormData) => {
     setIsUpdating(true);
     try {
       const res = await videosApi.updateVideo(video.id, {
@@ -25,12 +33,12 @@ export function VideoCard({ video, onDelete, onUpdate }: VideoCardProps) {
         description: data.description,
         includesAudio: data.includesAudio,
       });
-      onUpdate(res);
+      onUpdate({ ...video, ...res });
       setIsEditOpen(false);
       toast.success("Video updated.");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update video configuration");
+      toast.error("Failed to update video");
     } finally {
       setIsUpdating(false);
     }
@@ -39,12 +47,10 @@ export function VideoCard({ video, onDelete, onUpdate }: VideoCardProps) {
   return (
     <>
       <div className="flex items-center gap-4 p-3 rounded-xl border bg-card hover:shadow-sm transition-all">
-        {/* Tiny Video Thumbnail Preview */}
         <div className="relative h-14 aspect-video bg-black rounded-lg overflow-hidden shrink-0">
           <video src={video.downloadUrl} className="w-full h-full object-cover p-0" muted />
         </div>
 
-        {/* Info Layout */}
         <div className="flex-1 min-w-0 flex flex-col justify-center">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-foreground truncate">{video.label}</span>
@@ -54,18 +60,14 @@ export function VideoCard({ video, onDelete, onUpdate }: VideoCardProps) {
               <VolumeX className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
             )}
           </div>
-          <p className="text-xs text-muted-foreground truncate max-w-md">
-            {video.description || "No description provided."}
-          </p>
         </div>
 
-        {/* Action Controls */}
         <div className="flex items-center gap-1 shrink-0">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsEditOpen(true)}
-            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer"
           >
             <Edit2 className="h-4 w-4" />
           </Button>
@@ -73,7 +75,7 @@ export function VideoCard({ video, onDelete, onUpdate }: VideoCardProps) {
             variant="ghost"
             size="icon"
             onClick={() => onDelete(video.id)}
-            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -82,13 +84,15 @@ export function VideoCard({ video, onDelete, onUpdate }: VideoCardProps) {
 
       <VideoFormModal
         isOpen={isEditOpen}
+        projectId={projectId}
         onClose={() => setIsEditOpen(false)}
         isUploading={isUpdating}
-        onSubmit={handleEditSubmit}
-        initialValues={{
+        onSubmit={handleEditSubmit as any}
+        initialData={{
+          id: video.id,
           label: video.label,
           description: video.description,
-          includesAudio: video.includesAudio,
+          includesAudio: !!video.includesAudio,
         }}
       />
     </>

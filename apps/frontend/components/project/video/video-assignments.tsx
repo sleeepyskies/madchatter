@@ -37,6 +37,8 @@ export function VideoAssignments({
                                    assignments,
                                    onChange,
                                  }: VideoAssignmentsProps) {
+  const availableVideos = videos.filter((v) => !v.includesAudio);
+
   const handleAssignment = async (role: AssignmentKey, value: number | null) => {
     onChange({ ...assignments, [role]: value });
 
@@ -60,7 +62,7 @@ export function VideoAssignments({
             <div className="w-[160px]">
               <FilterableSelect
                 value={assignments[key]}
-                options={videos}
+                options={availableVideos}
                 onChange={(val) => handleAssignment(key, val)}
                 placeholder="Select video..."
                 allowNull

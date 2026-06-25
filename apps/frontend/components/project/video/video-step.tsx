@@ -14,7 +14,6 @@ export function VideoStep({ projectId }: { projectId: number }) {
   const [videos, setVideos] = useState<VideoResponse[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [assignments, setAssignments] = useState<Assignments>({
     idleVideoId: null,
     enterVideoId: null,
@@ -39,7 +38,35 @@ export function VideoStep({ projectId }: { projectId: number }) {
     fetch();
   }, [projectId]);
 
-  const handleCreateSubmit = async (data: { label: string; description: string; includesAudio: boolean; file?: File }) => {
+  useEffect(() => {
+    let hasChanged = false;
+    const newAssignments = { ...assignments };
+
+    (Object.keys(newAssignments) as Array<keyof Assignments>).forEach((key) => {
+      const assignedId = newAssignments[key];
+      if (assignedId) {
+        const video = videos.find((v) => v.id === assignedId);
+        if (video?.includesAudio) {
+          newAssignments[key] = null;
+          hasChanged = true;
+        }
+      }
+    });
+
+    if (hasChanged) {
+      setAssignments(newAssignments);
+      projectsApi.updateProject(projectId, newAssignments).catch((err) => {
+        console.error("Cleanup sync failed:", err);
+      });
+    }
+  }, [videos, assignments, projectId]);
+
+  const handleCreateSubmit = async (data: {
+    label: string;
+    description: string;
+    includesAudio: boolean;
+    file?: File
+  }) => {
     if (!data.file) {
       toast.error("Please select a video file.");
       return;
@@ -51,13 +78,13 @@ export function VideoStep({ projectId }: { projectId: number }) {
 
     setIsUploading(true);
     try {
-      const uploadedVideo = await videosApi.uploadVideo(
-        data.label,
-        data.description, // Passed the raw description directly
-        projectId,
-        data.includesAudio,
-        data.file
-      );
+      const uploadedVideo = await videosApi.uploadVideo({
+        label: data.label,
+        description: data.description,
+        projectId: projectId,
+        includesAudio: data.includesAudio,
+        file: data.file,
+      });
 
       setVideos((prev) => [...prev, uploadedVideo]);
       toast.success("Video uploaded.");
@@ -107,6 +134,7 @@ export function VideoStep({ projectId }: { projectId: number }) {
           {videos.map((video) => (
             <VideoCard
               key={video.id}
+              projectId={projectId}
               video={video}
               onDelete={handleDelete}
               onUpdate={(updated) => setVideos((prev) => prev.map((v) => (v.id === video.id ? updated : v)))}
@@ -125,6 +153,7 @@ export function VideoStep({ projectId }: { projectId: number }) {
         onClose={() => setIsModalOpen(false)}
         isUploading={isUploading}
         onSubmit={handleCreateSubmit}
+        projectId={projectId}
       />
     </div>
   );

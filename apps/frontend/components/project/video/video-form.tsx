@@ -16,27 +16,39 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CreateVideoRequest } from "@madchatter/api/src/videos";
 
 interface FormValues {
   label: string;
   description: string;
   includesAudio: boolean;
-  file: FileList;
+  file?: FileList;
 }
 
 interface VideoFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   isUploading: boolean;
-  onSubmit: (data: { label: string; description: string; includesAudio: boolean; file: File }) => Promise<void>;
+  projectId: number;
+  onSubmit: (data: CreateVideoRequest) => Promise<void>;
+  initialData?: {
+    id: number;
+    label: string;
+    description: string;
+    includesAudio: boolean;
+  };
 }
 
 export function VideoFormModal({
                                  isOpen,
                                  onClose,
                                  isUploading,
+                                 projectId,
                                  onSubmit,
+                                 initialData,
                                }: VideoFormModalProps) {
+  const isEdit = !!initialData;
+
   const {
     register,
     handleSubmit,
@@ -47,9 +59,9 @@ export function VideoFormModal({
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
-      label: "",
-      description: "",
-      includesAudio: false,
+      label: initialData?.label || "",
+      description: initialData?.description || "",
+      includesAudio: initialData?.includesAudio || false,
     },
   });
 
@@ -64,17 +76,22 @@ export function VideoFormModal({
   }, [fileWatch, hasFile, setValue]);
 
   React.useEffect(() => {
-    if (!isOpen) {
-      reset({ label: "", description: "", includesAudio: false });
+    if (isOpen) {
+      reset({
+        label: initialData?.label || "",
+        description: initialData?.description || "",
+        includesAudio: initialData?.includesAudio || false,
+      });
     }
-  }, [isOpen, reset]);
+  }, [isOpen, initialData, reset]);
 
   const onFormSubmit = (data: FormValues) => {
     onSubmit({
       label: data.label,
       description: data.description,
       includesAudio: data.includesAudio,
-      file: data.file[0],
+      projectId: projectId,
+      file: data.file?.[0] as File,
     });
   };
 
@@ -84,58 +101,47 @@ export function VideoFormModal({
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6 flex-1 flex flex-col justify-between">
           <div className="space-y-6">
             <DialogHeader>
-              <DialogTitle>Add New Video</DialogTitle>
+              <DialogTitle>{isEdit ? "Edit Video" : "Add New Video"}</DialogTitle>
               <DialogDescription>
-                Select and configure a video.
+                {isEdit ? "Update your video configuration." : "Select and configure a video."}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-5">
-              <div className="space-y-1.5">
-                <Label htmlFor="file" className="text-sm font-semibold text-foreground">VIDEO</Label>
-                <Input
-                  id="file"
-                  type="file"
-                  accept="video/*"
-                  className={errors.file ? "border-destructive focus-visible:ring-destructive" : ""}
-                  {...register("file", { required: "A video file is required" })}
-                />
-                {errors.file && (
-                  <p className="text-xs font-medium text-destructive">{errors.file.message}</p>
-                )}
-              </div>
+              {!isEdit && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="file" className="text-sm font-semibold text-foreground">VIDEO</Label>
+                  <Input
+                    id="file"
+                    type="file"
+                    accept="video/*"
+                    className={errors.file ? "border-destructive" : ""}
+                    {...register("file", { required: "A video file is required" })}
+                  />
+                  {errors.file && <p className="text-xs font-medium text-destructive">{errors.file.message}</p>}
+                </div>
+              )}
 
               <div className="flex items-center space-x-2 py-1">
                 <Controller
                   name="includesAudio"
                   control={control}
                   render={({ field }) => (
-                    <Checkbox
-                      id="includesAudio"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+                    <Checkbox id="includesAudio" checked={field.value} onCheckedChange={field.onChange} />
                   )}
                 />
-                <Label htmlFor="includesAudio" className="text-sm font-medium leading-none cursor-pointer select-none">
-                  Includes Audio
-                </Label>
+                <Label htmlFor="includesAudio" className="text-sm font-medium cursor-pointer">Includes Audio</Label>
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="label" className="text-sm font-semibold text-foreground">Title</Label>
                 <Input
                   id="label"
-                  {...register("label", {
-                    required: "Title is required",
-                    maxLength: { value: 150, message: "Title is too long" }
-                  })}
+                  {...register("label", { required: "Title is required", maxLength: 150 })}
                   placeholder="Enter title..."
-                  className={errors.label ? "border-destructive focus-visible:ring-destructive" : ""}
+                  className={errors.label ? "border-destructive" : ""}
                 />
-                {errors.label && (
-                  <p className="text-xs font-medium text-destructive">{errors.label.message}</p>
-                )}
+                {errors.label && <p className="text-xs font-medium text-destructive">{errors.label.message}</p>}
               </div>
 
               <div className="space-y-1.5">
@@ -144,22 +150,18 @@ export function VideoFormModal({
                   id="description"
                   {...register("description", { required: "Description is required" })}
                   placeholder="Enter Description..."
-                  className={`min-h-[200px] h-auto resize-y ${errors.description ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                  className={`min-h-[200px] ${errors.description ? "border-destructive" : ""}`}
                 />
-                {errors.description && (
-                  <p className="text-xs font-medium text-destructive">{errors.description.message}</p>
-                )}
+                {errors.description && <p className="text-xs font-medium text-destructive">{errors.description.message}</p>}
               </div>
             </div>
           </div>
 
-          <DialogFooter className="pt-4 border-t gap-2 sm:gap-0">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={isUploading}>
-              Cancel
-            </Button>
+          <DialogFooter className="pt-4 border-t gap-2">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={isUploading}>Cancel</Button>
             <Button type="submit" disabled={isUploading} className="gap-1.5">
               <Upload className="h-4 w-4" />
-              {isUploading ? "Uploading..." : "Save"}
+              {isUploading ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </form>
