@@ -62,7 +62,12 @@ export const knowledgeApi = {
     formData.append("label", label);
     formData.append("file", file);
 
-    return await api.patch(`${knowledgeId}/sources`, {body: formData}).json();
+    return await api.patch(`${knowledgeId}/sources`, {
+      body: formData,
+      headers: {
+        "Content-Type": undefined as any,
+      },
+    }).json();
   },
 
   removeSourceFromKnowledge: async (knowledgeId: number, sourceId: number): Promise<void> => {

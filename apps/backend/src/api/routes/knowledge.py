@@ -63,7 +63,6 @@ def add_source_to_knowledge(
         file: UploadFile = File(...),
         knowledge_service: KnowledgeService = Depends(get_knowledge_service),
 ):
-    # Pass variables into your service layer
     return knowledge_service.add_source_to_knowledge(knowledge_id, label, file)
 
 

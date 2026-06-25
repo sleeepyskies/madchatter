@@ -3,6 +3,7 @@ from pathlib import Path
 
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_ollama import OllamaEmbeddings
@@ -63,10 +64,12 @@ class KnowledgeBase:
             chunk_overlap=200,
         ).split_documents(initial_documents)
 
-        document_ids = [uuid.uuid4().hex for _ in range(len(chunked_documents))]
+        cleaned_documents = filter_complex_metadata(chunked_documents)
+
+        document_ids = [uuid.uuid4().hex for _ in range(len(cleaned_documents))]
 
         self.vector_store.add_documents(
-            documents=chunked_documents,
+            documents=cleaned_documents,
             ids=document_ids
         )
 
