@@ -53,7 +53,7 @@ def update_knowledge(
         request: UpdateKnowledgeRequest,
         knowledge_service: KnowledgeService = Depends(get_knowledge_service),
 ):
-    knowledge_service.update_knowledge(knowledge_id, request)
+    return knowledge_service.update_knowledge(knowledge_id, request)
 
 
 @router.patch("/{knowledge_id}/sources", response_model=KnowledgeSourceResponse)
