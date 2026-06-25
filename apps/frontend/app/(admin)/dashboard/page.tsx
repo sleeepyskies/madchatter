@@ -24,7 +24,7 @@ export default function Page() {
     label: string;
     description: string;
     icon: LucideIcon;
-    onClick: () => Promise<void>;
+    onCreateNew: () => Promise<void>;
   }
 
   const router = useRouter();
@@ -43,30 +43,16 @@ export default function Page() {
   };
 
   const createNewAgent = async () => {
+    /*
     // TODO(sky): create an empty agent?
-  /*
-    try {
-      setLoading(true);
-      const agent = await agentsApi.createAgent({ label: "New Agent" });
-      router.push(`/agent/${agent.id}`);
-    } catch (error) {
-      console.error("Failed to create agent:", error);
-    } finally {
-      setLoading(false);
-    }
-  */
+    const agent = await agentsApi.createAgent({ label: "New Agent" });
+    router.push(`/agent/${agent.id}`);
+    */
   };
 
   const createNewKnowledgeBase = async () => {
-    try {
-      setIsLoading(true);
-      const knowledge = await knowledgeApi.createKnowledge({ label: "New Knowledge Base" });
-      router.push(`/knowledge-base/${knowledge.id}`);
-    } catch (error) {
-      console.error("Failed to create knowledge base:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    const knowledge = await knowledgeApi.createKnowledge({label: "New Knowledge Base"});
+    router.push(`/knowledge-base/${knowledge.id}`);
   };
 
   const actionCards: ActionCard[] = [
@@ -75,21 +61,24 @@ export default function Page() {
       label: "Projects",
       description: "Piece together an agent, videos and a knowledge base.",
       icon: FolderPlusIcon,
-      onClick: createNewProject,
+      onCreateNew: createNewProject,
+      onClickCard: goToProjects,
     },
     {
       action: "agent",
       label: "Agents",
       description: "Configure a custom persona.",
       icon: BotIcon,
-      onClick: createNewAgent,
+      onCreateNew: createNewAgent,
+      onClickCard: goToAgents,
     },
     {
       action: "knowledge",
       label: "Knowledge Bases",
       description: "Upload documents to create a custom knowledge base.",
       icon: DatabaseIcon,
-      onClick: createNewKnowledgeBase,
+      onCreateNew: createNewKnowledgeBase,
+      onClickCard: goToKnowledge,
     },
   ];
 
@@ -136,7 +125,7 @@ export default function Page() {
 
               {/* Action trigger button */}
               <Button
-                onClick={card.onClick}
+                onClick={card.onCreateNew}
                 disabled={isLoading}
                 variant="secondary"
                 size="sm"
@@ -154,10 +143,10 @@ export default function Page() {
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 text-muted-foreground hover:text-foreground cursor-pointer"
+          className="text-muted-foreground hover:text-foreground cursor-pointer"
         >
           <EyeIcon/>
-          Open Viewer (TODO)
+          TODO(sky): Open Viewer
         </Button>
       </div>
     </div>
