@@ -1,4 +1,4 @@
-import ProjectForm from "@/components/project/project-form";
+import ProjectForm from "@/components/edit/project/project-form";
 
 export default async function EditProjectPage({
   params,
@@ -6,6 +6,5 @@ export default async function EditProjectPage({
   params: Promise<{ projectId: number }>;
 }) {
   const { projectId } = await params;
-
   return <ProjectForm projectId={Number(projectId)} />;
 }

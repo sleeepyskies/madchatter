@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PlusIcon, UserCheckIcon } from "lucide-react";
+import { PlusIcon, BotIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AgentResponse, agentsApi } from "@madchatter/api/src/agents";
 import { ResourcePageLayout } from "@/components/admin/resource-page-layout";
@@ -66,7 +66,7 @@ export default function AgentsAdminPage() {
       {agents.map((agent) => (
         <ResourceCard
           key={agent.id}
-          icon={UserCheckIcon}
+          icon={BotIcon}
           label={agent.label}
           description=""
           onDelete={() => handleDelete(agent.id)}

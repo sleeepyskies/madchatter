@@ -18,9 +18,9 @@ class AgentResponse(BaseSchema):
 
 class CreateAgentRequest(BaseSchema):
     label: str
-    system_prompt: str
-    language: Language
-    voice_model: str
+    system_prompt: str | None = None
+    language: Language | None = None
+    voice_model: str | None = None
 
 
 class UpdateAgentRequest(BaseSchema):
