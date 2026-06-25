@@ -73,7 +73,7 @@ export function DashboardCard({
   );
 }
 
-export default function Page() {
+export default function DashboardPage() {
   const router = useRouter();
 
   const createNewProject = async () => {
