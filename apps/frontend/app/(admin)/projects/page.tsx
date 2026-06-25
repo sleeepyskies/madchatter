@@ -2,9 +2,8 @@
 
 import {useEffect, useState} from "react";
 import {ProjectResponse, projectsApi} from "@madchatter/api/src/projects";
-
-import { ProjectCard } from "@/components/project-card";
-import { useAdminHeader } from "../../../providers/admin-header-provider";
+import { useAdminHeader } from "@/providers/admin-header-provider";
+import { ProjectCard } from "@/components/admin/project/project-card";
 
 export default function Page() {
   const [projects, setProjects] = useState<ProjectResponse[]>([]);

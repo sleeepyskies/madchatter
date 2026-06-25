@@ -1,23 +1,18 @@
-import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
-import {AdminSidebar} from "@/components/admin-sidebar";
-import {AdminHeader} from "@/components/admin-header";
-import { AdminHeaderProvider } from "../../providers/admin-header-provider";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import React from "react";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 
-export default function RootLayout({
+export default function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <AdminHeaderProvider>
-      <SidebarProvider>
-        <AdminSidebar />
-        <SidebarInset>
-          <AdminHeader/>
-          {children}
-        </SidebarInset>
-      </SidebarProvider>
-    </AdminHeaderProvider>
+    <SidebarProvider>
+      <AdminSidebar/>
+      <SidebarInset>
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
