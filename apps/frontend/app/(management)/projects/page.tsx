@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ProjectResponse, projectsApi } from "@madchatter/api/src/projects";
 import { useRouter } from "next/navigation";
-import { BotIcon, PlusIcon } from "lucide-react";
+import { FolderPlusIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { chatApi } from "@madchatter/api/src/chat";
 import { ResourcePageLayout } from '@/components/admin/resource-page-layout';
@@ -62,7 +62,7 @@ export default function ProjectsAdminPage() {
       {projects.map((project) => (
         <ResourceCard
           key={project.id}
-          icon={BotIcon}
+          icon={FolderPlusIcon}
           label={project.label}
           description=""
           onDelete={() => handleDelete(project.id)}

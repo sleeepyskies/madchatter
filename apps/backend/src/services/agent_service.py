@@ -17,9 +17,9 @@ class AgentService:
         agent = self.agent_repository.create(
             Agent(
                 label=request.label,
-                system_prompt=request.system_prompt,
-                language=request.language,
-                voice_model=request.voice_model,
+                system_prompt=request.system_prompt or "",
+                language=request.language or "en",
+                voice_model=request.voice_model or "todo",
             )
         )
         return AgentResponse.model_validate(agent)
@@ -34,7 +34,6 @@ class AgentService:
     def update_agent(self, agent_id: int, request: UpdateAgentRequest) -> AgentResponse:
         agent = self.agent_repository.update(agent_id, request)
         return AgentResponse.model_validate(agent)
-
 
     def delete_agent(self, agent_id: int) -> None:
         self.agent_repository.delete(agent_id)

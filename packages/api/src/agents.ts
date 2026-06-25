@@ -16,9 +16,9 @@ export interface AgentResponse {
 
 export interface CreateAgentRequest {
   label: string;
-  systemPrompt: string;
-  language: Language;
-  voiceModel: string;
+  systemPrompt?: string;
+  language?: Language;
+  voiceModel?: string;
 }
 
 export interface UpdateAgentRequest {
