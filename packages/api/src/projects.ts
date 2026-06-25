@@ -19,11 +19,11 @@ export interface ProjectResponse {
 
 export interface CreateProjectRequest {
   label: string;
-  agentId: number | null;
-  knowledgeId: number | null;
-  idleVideoId: number | null;
-  enterVideoId: number | null;
-  exitVideoId: number | null;
+  agentId?: number | null;
+  knowledgeId?: number | null;
+  idleVideoId?: number | null;
+  enterVideoId?: number | null;
+  exitVideoId?: number | null;
 }
 
 export interface UpdateProjectRequest {

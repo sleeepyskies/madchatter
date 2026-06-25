@@ -49,6 +49,7 @@ class VideoService:
                 description=request.description,
                 filename=unique_filename,
                 project_id=request.project_id,
+                includes_audio=request.includes_audio,
             )
             self.repository.create(video)
             return map_db_to_response(video)

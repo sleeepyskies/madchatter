@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Noto_Sans, Oxanium } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
-import ThemeProvider from "@/components/theme-provider";
-import {TooltipProvider} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import ThemeProvider from "@/providers/theme-provider";
 
-const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const notoSans = Noto_Sans({subsets: ["latin"], variable: "--font-sans"});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,8 +24,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children,
+                                   }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
@@ -40,14 +40,14 @@ export default function RootLayout({
         notoSans.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
-        <ThemeProvider>
-          <TooltipProvider delayDuration={0}>
-            {children}
-            <Toaster />
-          </TooltipProvider>
-        </ThemeProvider>
-      </body>
+    <body className="min-h-full flex flex-col">
+    <ThemeProvider>
+      <TooltipProvider delayDuration={0}>
+        {children}
+        <Toaster/>
+      </TooltipProvider>
+    </ThemeProvider>
+    </body>
     </html>
   );
 }

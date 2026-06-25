@@ -25,7 +25,7 @@ export interface CreateKnowledgeRequest {
 }
 
 export interface UpdateKnowledgeRequest {
-  label?: string;
+  label?: string | null;
 }
 
 export const knowledgeApi = {

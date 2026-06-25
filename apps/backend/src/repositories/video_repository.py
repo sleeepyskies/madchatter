@@ -38,6 +38,8 @@ class VideoRepository:
             video.label = new.label
         if new.description is not None:
             video.description = new.description
+        if new.includes_audio is not None:
+            video.includes_audio = new.includes_audio
 
         self.database.commit()
         self.database.refresh(video)

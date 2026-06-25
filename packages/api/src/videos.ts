@@ -12,6 +12,14 @@ export interface VideoResponse {
   downloadUrl: string;
 }
 
+export interface CreateVideoRequest {
+  label: string;
+  description: string;
+  projectId: number;
+  includesAudio: boolean;
+  file: File;
+}
+
 export interface UpdateVideoRequest {
   label?: string | null;
   description?: string | null;
@@ -19,16 +27,14 @@ export interface UpdateVideoRequest {
 }
 
 export const videosApi = {
-  uploadVideo: async (
-    label: string,
-    description: string,
-    projectId: number,
-    file: File,
-  ): Promise<VideoResponse> => {
+  uploadVideo: async (request: CreateVideoRequest): Promise<VideoResponse> => {
+    const { label, description, projectId, includesAudio, file } = request;
+
     const formData = new FormData();
     formData.append("label", label);
     formData.append("description", description);
     formData.append("project_id", projectId.toString());
+    formData.append("includes_audio", includesAudio.toString());
     formData.append("file", file);
 
     return await api.post("/upload", { body: formData }).json();
