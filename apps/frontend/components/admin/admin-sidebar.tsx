@@ -105,7 +105,7 @@ export function AdminSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu>
             {items.map((item) => {
               const isActive = pathname === item.url;
-              return (<SidebarLink item={item} isActive={isActive}/>);
+              return (<SidebarLink item={item} isActive={isActive} key={item.title}/>);
             })}
           </SidebarMenu>
         </SidebarGroup>

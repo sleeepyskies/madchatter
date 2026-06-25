@@ -29,15 +29,15 @@ interface DashboardCardProps {
 }
 
 export function DashboardCard({
-                                label,
-                                description,
-                                icon: Icon,
-                                onCreateNew,
-                                onClickCard,
-                              }: DashboardCardProps) {
+  label,
+  description,
+  icon: Icon,
+  onCreateNew,
+  onClickCard,
+}: DashboardCardProps) {
   return (
     <Card
-      className="flex flex-col justify-between p-5 rounded-xl transition-all duration-300 cursor-pointer hover:shadow-lg w-full"
+      className="flex flex-col justify-between p-5 rounded-xl transition-all duration-300 hover:shadow-lg w-full"
     >
       <div>
         <CardHeader className="p-0 mt-2 space-y-1">
