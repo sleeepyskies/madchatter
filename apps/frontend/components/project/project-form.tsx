@@ -7,7 +7,7 @@ import { StepIndicator } from "@/components/project/step-indicator";
 import { ProjectHeader } from "@/components/project/project-header";
 import { StepNavigation } from "@/components/project/step-navigation";
 import { VideoStep } from "./video/video-step";
-import { AgentStep } from "@/components/project/agent/agent-step";
+import { AgentStep } from "@/components/project/agent-step";
 
 const STEPS = [
   { id: 1, name: "Video Upload" },
