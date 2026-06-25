@@ -28,6 +28,11 @@ export interface UpdateAgentRequest {
   voiceModel?: string;
 }
 
+export interface VoiceModelResponse {
+  language: Language;
+  label: string;
+}
+
 export const agentsApi = {
   createAgent: async (request: CreateAgentRequest): Promise<AgentResponse> => {
     return await api.post("", {json: request}).json();
@@ -51,4 +56,8 @@ export const agentsApi = {
   deleteAgent: async (agentId: number): Promise<void> => {
     await api.delete(`${agentId}`);
   },
+
+  listVoiceModels: async (): Promise<VoiceModelResponse[]> => {
+    return await api.get('voice-models').json();
+  }
 };

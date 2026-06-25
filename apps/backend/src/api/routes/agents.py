@@ -2,12 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
 from api.dependencies import get_agent_service
-from models.agent import AgentResponse, CreateAgentRequest, UpdateAgentRequest
+from models.agent import AgentResponse, CreateAgentRequest, UpdateAgentRequest, VoiceModelResponse
 from services.agent_service import AgentService
 
 AGENT_PREFIX = "/agents"
 
 router = APIRouter(prefix=AGENT_PREFIX, tags=["agents"])
+
+
+@router.get("/voice-models", response_model=list[VoiceModelResponse])
+def get_voice_models(
+        agent_service: AgentService = Depends(get_agent_service),
+):
+    return agent_service.get_voice_models()
 
 
 @router.post("", response_model=AgentResponse)

@@ -28,3 +28,8 @@ class UpdateAgentRequest(BaseSchema):
     system_prompt: str | None = None
     language: Language | None = None
     voice_model: str | None = None
+
+
+class VoiceModelResponse(BaseSchema):
+    language: Language
+    label: str

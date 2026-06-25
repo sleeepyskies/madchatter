@@ -4,14 +4,16 @@ from loguru import logger
 from piper import PiperVoice
 from pathlib import Path
 
+from settings import Settings, settings
+
+
 class TextToSpeech:
     """
     A TextToSpeech class that uses the Piper TTS engine to convert text to speech. It loads a specified TTS model and provides a method to stream synthesized audio for given text input.
     """
-    def __init__(self, voice_model="de_DE-eva_k-x_low.onnx"):
-        self.backend_root = Path(__file__).resolve().parents[3]
-        self.static_dir = self.backend_root / "static"
-        self.model_path = str(self.static_dir / voice_model)
+    def __init__(self, voice_model="de/eva.onnx"):
+        self.voice_model_directory = settings.static_dir.join("voice-models")
+        self.model_path = str(self.voice_model_directory / voice_model)
         config_path = self.model_path + ".json"
         if not os.path.exists(self.model_path):
             logger.error(f"Error: Path doesn't exist {self.model_path}")

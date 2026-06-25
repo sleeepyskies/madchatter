@@ -2,9 +2,10 @@ from db.models.agents import Agent
 from models.agent import (
     AgentResponse,
     CreateAgentRequest,
-    UpdateAgentRequest,
+    UpdateAgentRequest, Language, VoiceModelResponse,
 )
 from repositories.agent_repository import AgentRepository
+from settings import settings
 
 
 class AgentService:
@@ -12,6 +13,7 @@ class AgentService:
 
     def __init__(self, agent_repository: AgentRepository):
         self.agent_repository = agent_repository
+        self.voice_models_directory = settings.static_dir.joinpath("voice-models")
 
     def create_agent(self, request: CreateAgentRequest) -> AgentResponse:
         agent = self.agent_repository.create(
@@ -37,3 +39,29 @@ class AgentService:
 
     def delete_agent(self, agent_id: int) -> None:
         self.agent_repository.delete(agent_id)
+
+
+    def get_voice_models(self) -> list[VoiceModelResponse]:
+        voice_models: list[VoiceModelResponse] = []
+
+        if not self.voice_models_directory.exists():
+            return voice_models
+
+        for lang_dir in self.voice_models_directory.iterdir():
+            if lang_dir.is_dir():
+                lang = lang_dir.name
+                if lang not in [l.value for l in Language]:
+                    continue
+
+                for model_file in lang_dir.glob("*.onnx"):
+                    config_file = model_file.with_suffix(model_file.suffix + ".json")
+
+                    if config_file.exists():
+                        voice_models.append(
+                            VoiceModelResponse(
+                                language=Language(lang),
+                                label=model_file.stem
+                            )
+                        )
+
+        return voice_models

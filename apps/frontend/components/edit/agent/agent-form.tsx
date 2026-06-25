@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import {
   agentsApi,
@@ -15,11 +15,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { debounce } from "next/dist/server/utils";
 
-const VOICE_MODELS = [
-  { id: 1, label: "alloy" },
-  { id: 2, label: "echo" },
-  { id: 3, label: "fable" },
-];
+interface VoiceModelOption {
+  id: number;
+  label: string;
+  language: Language;
+}
 
 const LANGUAGES: { id: number; label: Language }[] = [
   { id: 1, label: "en" },
@@ -29,15 +29,30 @@ const LANGUAGES: { id: number; label: Language }[] = [
 export default function AgentForm({ agentId }: { agentId: number }) {
   const [agent, setAgent] = useState<AgentResponse | null>(null);
   const [promptDraft, setPromptDraft] = useState("");
+  const allVoices = useRef<VoiceModelOption[]>([]);
 
   useEffect(() => {
-    agentsApi.getAgent(agentId)
-      .then((data) => {
-        setAgent(data);
-        setPromptDraft(data.systemPrompt);
+    Promise.all([
+      agentsApi.getAgent(agentId),
+      agentsApi.listVoiceModels()
+    ])
+      .then(([agentData, voices]) => {
+        setAgent(agentData);
+        setPromptDraft(agentData.systemPrompt);
+        allVoices.current = voices.map((v, index) => ({
+          id: index + 1,
+          label: v.label,
+          language: v.language
+        }));
       })
-      .catch(() => toast.error("Failed to load agent"));
+      .catch(() => toast.error("Failed to load agent data"));
   }, [agentId]);
+
+  // Derived state: Filter voices based on currently selected agent language
+  const availableVoices = useMemo(() => {
+    if (!agent?.language) return [];
+    return allVoices.current.filter(v => v.language === agent.language);
+  }, [agent?.language]);
 
   const debouncedUpdate = useCallback(
     debounce(async (updates: UpdateAgentRequest) => {
@@ -69,8 +84,8 @@ export default function AgentForm({ agentId }: { agentId: number }) {
             value={promptDraft}
             onChange={(e) => {
               const val = e.target.value;
-              setPromptDraft(val); // Instant UI update
-              debouncedUpdate({ systemPrompt: val }); // Async sync
+              setPromptDraft(val);
+              debouncedUpdate({ systemPrompt: val });
             }}
             className="min-h-[200px]"
           />
@@ -96,15 +111,15 @@ export default function AgentForm({ agentId }: { agentId: number }) {
           <div className="space-y-2">
             <Label>Voice Model</Label>
             <FilterableSelect
-              value={VOICE_MODELS.find(m => m.label === agent.voiceModel)?.id ?? null}
+              value={availableVoices.find(m => m.label === agent.voiceModel)?.id ?? null}
               onChange={(id) => {
-                const model = VOICE_MODELS.find(m => m.id === id)?.label;
+                const model = availableVoices.find(m => m.id === id)?.label;
                 if (model) {
                   setAgent(prev => prev ? {...prev, voiceModel: model} : null);
                   debouncedUpdate({ voiceModel: model });
                 }
               }}
-              options={VOICE_MODELS}
+              options={availableVoices}
               allowNull={false}
             />
           </div>
