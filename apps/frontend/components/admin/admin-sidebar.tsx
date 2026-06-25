@@ -68,20 +68,20 @@ export function AdminSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className={`flex h-12 w-full items-center gap-2 px-2 ${open ? "justify-between" : "justify-center"}`}>
+            <div className={`flex h-12 w-full items-center px-2 transition-all duration-200 ${open ? "justify-between" : "justify-center"}`}>
 
-              <div className="flex items-center gap-2 overflow-hidden">
+              <div className="flex items-center gap-2 overflow-hidden min-w-0">
                 <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <PanelBottomIcon/>
+                  <PanelBottomIcon className="w-4 h-4" />
                 </div>
                 {open && (
-                  <div className="grid flex-1 text-left text-sm leading-tight animate-in fade-in duration-200">
+                  <div className="grid flex-1 text-left text-sm leading-tight animate-in fade-in slide-in-from-left-2 duration-200">
                     <span className="truncate font-semibold text-sidebar-foreground">Mad Chatter</span>
                   </div>
                 )}
               </div>
 
-              <SidebarTrigger className={`h-8 w-8 hover:bg-sidebar-accent shrink-0 ${!open ? "absolute" : ""}`} />
+              <SidebarTrigger className="h-8 w-8 hover:bg-sidebar-accent shrink-0 animate-in fade-in duration-200" />
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
