@@ -37,6 +37,14 @@ def stream_chat(
 ):
     return chat_application_service.stream_chat(request.user_text)
 
+@router.post("/exit_chat", response_model=ChatModeResponse)
+def exit_chat(
+    chat_application_service: ChatApplicationService = Depends(
+        get_chat_application_service
+    ),
+):
+    return chat_application_service.exit_chat()
+
 @router.get("/latest_reply", response_model=LatestReplyResponse)
 def get_latest_reply(
     chat_application_service: ChatApplicationService = Depends(

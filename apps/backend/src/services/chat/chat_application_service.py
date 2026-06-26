@@ -72,6 +72,13 @@ class ChatApplicationService:
 
         return self.chat_service.stream_chat(user_text)
 
+    def exit_chat(self) -> ChatModeResponse:
+        """Exit the current chat session"""
+        if self.chat_service is None:
+            raise RuntimeError("No project applied")
+
+        return self.chat_service.exit_chat()
+
     def get_latest_reply(self) -> LatestReplyResponse:
         """Return the latest reply from the chat service."""
         if self.chat_service is None:

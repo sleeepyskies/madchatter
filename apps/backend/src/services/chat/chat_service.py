@@ -60,7 +60,8 @@ class ChatService:
             if self.state == "IDLE":
                 self.state = "CHAT"
 
-                return self._handle_enter_interaction(user_text)
+                if self.enter_video is not None:
+                    return self._handle_enter_interaction(user_text)
 
             # normal CHAT State
             return self._handle_chat(user_text)

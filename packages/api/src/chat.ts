@@ -59,6 +59,11 @@ export const chatApi = {
     return res.body; // ReadableStream
   },
 
+  exitChat: async (): Promise<ChatModeResponse> => {
+
+    return await api.post("exit_chat").json()
+  },
+
   getLatestReply: async (): Promise<LatestReplyResponse> => {
     return await api.get("latest_reply").json();
   },
