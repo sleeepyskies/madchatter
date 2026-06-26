@@ -9,13 +9,15 @@ import { StepNavigation } from "@/components/edit/project/step-navigation";
 import { VideoStep } from "./video/video-step";
 import { InlineEdit } from "@/components/reusable/inline-edit";
 import { AgentStep } from "@/components/edit/project/agent-step";
+import { useRouter } from "next/navigation";
 
 const STEPS = [
-  { id: 1, name: "Video Upload" },
-  { id: 2, name: "Agent Configuration" },
+  {id: 1, name: "Video Upload"},
+  {id: 2, name: "Agent Configuration"},
 ];
 
-export default function ProjectForm({ projectId }: { projectId: number }) {
+export default function ProjectForm({projectId}: { projectId: number }) {
+  const router = useRouter();
   const [name, setName] = useState("Loading...");
   const [currentStep, setCurrentStep] = useState<number>(1);
 
@@ -27,7 +29,7 @@ export default function ProjectForm({ projectId }: { projectId: number }) {
 
   const handleRename = async (newName: string) => {
     try {
-      await projectsApi.updateProject(projectId, { label: newName });
+      await projectsApi.updateProject(projectId, {label: newName});
       setName(newName);
       toast.success("Project renamed");
     } catch {
@@ -35,25 +37,40 @@ export default function ProjectForm({ projectId }: { projectId: number }) {
     }
   };
 
+  const handleNext = () => {
+    if (currentStep < STEPS.length) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      router.push("/projects");
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <EditResourceHeader>
-        <InlineEdit value={name} onSave={handleRename} />
+        <InlineEdit value={name} onSave={handleRename}/>
       </EditResourceHeader>
 
-      <main className="flex-1 overflow-y-auto p-6 md:p-10 max-w-5xl mx-auto w-full flex flex-col gap-8">
-        <StepIndicator steps={STEPS} currentStep={currentStep} />
+      <main
+        className="flex-1 overflow-y-auto p-6 md:p-10 max-w-5xl mx-auto w-full flex flex-col gap-8">
+        <StepIndicator steps={STEPS} currentStep={currentStep}/>
 
         <div className="flex flex-1 flex-col gap-6">
-          {currentStep === 1 && <VideoStep projectId={projectId} />}
-          {currentStep === 2 && <AgentStep projectId={projectId} />}
+          {currentStep === 1 && <VideoStep projectId={projectId}/>}
+          {currentStep === 2 && <AgentStep projectId={projectId}/>}
         </div>
 
         <StepNavigation
           currentStep={currentStep}
           totalSteps={STEPS.length}
-          onNext={() => currentStep < STEPS.length && setCurrentStep(currentStep + 1)}
-          onBack={() => currentStep > 1 && setCurrentStep(currentStep - 1)}
+          onNext={handleNext}
+          onBack={handleBack}
         />
       </main>
     </div>
