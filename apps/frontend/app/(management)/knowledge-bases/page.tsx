@@ -26,7 +26,7 @@ export default function KnowledgeAdminPage() {
   }, []);
 
   const handleCreate = async () => {
-    const knowledge = await knowledgeApi.createKnowledge({label: 'New Project'});
+    const knowledge = await knowledgeApi.createKnowledge({label: 'New Knowledge Base'});
     router.push(`/knowledge-bases/${knowledge.id}`);
   };
 
