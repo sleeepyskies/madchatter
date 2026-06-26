@@ -15,6 +15,6 @@ const baseUrl = new URL(`http://${address}:${port}/api`).toString();
 
 export const client = ky.create({
   prefix: baseUrl,
-  timeout: 10_000,
+  timeout: 100_000,
   retry: 1,
 });

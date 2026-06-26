@@ -6,7 +6,7 @@ import {
   agentsApi,
   AgentResponse,
   Language,
-  UpdateAgentRequest
+  UpdateAgentRequest,
 } from "@madchatter/api/src/agents";
 import { EditResourceHeader } from "@/components/edit/edit-resource-header";
 import { InlineEdit } from "@/components/reusable/inline-edit";
@@ -32,26 +32,25 @@ export default function AgentForm({ agentId }: { agentId: number }) {
   const allVoices = useRef<VoiceModelOption[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      agentsApi.getAgent(agentId),
-      agentsApi.listVoiceModels()
-    ])
+    Promise.all([agentsApi.getAgent(agentId), agentsApi.listVoiceModels()])
       .then(([agentData, voices]) => {
         setAgent(agentData);
         setPromptDraft(agentData.systemPrompt);
         allVoices.current = voices.map((v, index) => ({
           id: index + 1,
           label: v.label,
-          language: v.language
+          language: v.language,
         }));
       })
-      .catch(() => toast.error("Failed to load agent data"));
+      .catch(() =>
+        toast.error("Failed to load agent data", { position: "top-center" }),
+      );
   }, [agentId]);
 
   // Derived state: Filter voices based on currently selected agent language
   const availableVoices = useMemo(() => {
     if (!agent?.language) return [];
-    return allVoices.current.filter(v => v.language === agent.language);
+    return allVoices.current.filter((v) => v.language === agent.language);
   }, [agent?.language]);
 
   const debouncedUpdate = useCallback(
@@ -60,10 +59,10 @@ export default function AgentForm({ agentId }: { agentId: number }) {
         const updated = await agentsApi.updateAgent(agentId, updates);
         setAgent(updated);
       } catch {
-        toast.error("Failed to sync changes");
+        toast.error("Failed to sync changes", { position: "top-center" });
       }
     }, 500),
-    [agentId]
+    [agentId],
   );
 
   if (!agent) return null;
@@ -95,11 +94,15 @@ export default function AgentForm({ agentId }: { agentId: number }) {
           <div className="space-y-2">
             <Label>Language</Label>
             <FilterableSelect
-              value={LANGUAGES.find(l => l.label === agent.language)?.id ?? null}
+              value={
+                LANGUAGES.find((l) => l.label === agent.language)?.id ?? null
+              }
               onChange={(id) => {
-                const lang = LANGUAGES.find(l => l.id === id)?.label;
+                const lang = LANGUAGES.find((l) => l.id === id)?.label;
                 if (lang) {
-                  setAgent(prev => prev ? {...prev, language: lang} : null);
+                  setAgent((prev) =>
+                    prev ? { ...prev, language: lang } : null,
+                  );
                   debouncedUpdate({ language: lang });
                 }
               }}
@@ -111,11 +114,16 @@ export default function AgentForm({ agentId }: { agentId: number }) {
           <div className="space-y-2">
             <Label>Voice Model</Label>
             <FilterableSelect
-              value={availableVoices.find(m => m.label === agent.voiceModel)?.id ?? null}
+              value={
+                availableVoices.find((m) => m.label === agent.voiceModel)?.id ??
+                null
+              }
               onChange={(id) => {
-                const model = availableVoices.find(m => m.id === id)?.label;
+                const model = availableVoices.find((m) => m.id === id)?.label;
                 if (model) {
-                  setAgent(prev => prev ? {...prev, voiceModel: model} : null);
+                  setAgent((prev) =>
+                    prev ? { ...prev, voiceModel: model } : null,
+                  );
                   debouncedUpdate({ voiceModel: model });
                 }
               }}

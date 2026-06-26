@@ -13,9 +13,9 @@ interface DeleteButtonProps {
 }
 
 export function DeleteButton({
-   onConfirm,
-   variant = "icon",
-   label = "Delete",
+  onConfirm,
+  variant = "icon",
+  label = "Delete",
 }: DeleteButtonProps) {
   return (
     <DeleteDialog onConfirm={onConfirm}>
@@ -27,7 +27,11 @@ export function DeleteButton({
           <Trash2 className="h-5 w-5" />
         </button>
       ) : (
-        <Button variant="destructive" size="sm" className="cursor-pointer gap-2">
+        <Button
+          variant="destructive"
+          size="sm"
+          className="cursor-pointer gap-2"
+        >
           <Trash2 className="h-4 w-4" />
           {label}
         </Button>

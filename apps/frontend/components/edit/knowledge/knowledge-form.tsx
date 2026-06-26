@@ -4,12 +4,20 @@ import { useState, useEffect, useRef } from "react";
 import { Plus, Loader2, HardDrive } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { knowledgeApi, KnowledgeResponse, KnowledgeSourceResponse } from "@madchatter/api/src/knowledge";
+import {
+  knowledgeApi,
+  KnowledgeResponse,
+  KnowledgeSourceResponse,
+} from "@madchatter/api/src/knowledge";
 import { EditResourceHeader } from "@/components/edit/edit-resource-header";
 import { InlineEdit } from "@/components/reusable/inline-edit";
 import { SourceCard } from "./source-card";
 
-export default function KnowledgeForm({ knowledgeId }: { knowledgeId: number }) {
+export default function KnowledgeForm({
+  knowledgeId,
+}: {
+  knowledgeId: number;
+}) {
   const [knowledge, setKnowledge] = useState<KnowledgeResponse>();
   const [sources, setSources] = useState<KnowledgeSourceResponse[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -26,7 +34,9 @@ export default function KnowledgeForm({ knowledgeId }: { knowledgeId: number }) 
         setSources(s);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to load knowledge base.");
+        toast.error("Failed to load knowledge base.", {
+          position: "top-center",
+        });
       }
     }
     fetch();
@@ -35,10 +45,12 @@ export default function KnowledgeForm({ knowledgeId }: { knowledgeId: number }) 
   const handleRename = async (newName: string) => {
     try {
       await knowledgeApi.updateKnowledge(knowledgeId, { label: newName });
-      setKnowledge(prev => prev ? { ...prev, label: newName } : undefined);
-      toast.success("Knowledge base renamed");
+      setKnowledge((prev) => (prev ? { ...prev, label: newName } : undefined));
+      toast.success("Knowledge base renamed", { position: "top-center" });
     } catch {
-      toast.error("Failed to rename knowledge base");
+      toast.error("Failed to rename knowledge base", {
+        position: "top-center",
+      });
     }
   };
 
@@ -48,12 +60,16 @@ export default function KnowledgeForm({ knowledgeId }: { knowledgeId: number }) 
 
     setIsUploading(true);
     try {
-      const newSource = await knowledgeApi.addSourceToKnowledge(knowledgeId, file.name, file);
+      const newSource = await knowledgeApi.addSourceToKnowledge(
+        knowledgeId,
+        file.name,
+        file,
+      );
       setSources((prev) => [...prev, newSource]);
-      toast.success("Source uploaded");
+      toast.success("Source uploaded", { position: "top-center" });
     } catch (err) {
       console.error(err);
-      toast.error("Failed to upload file");
+      toast.error("Failed to upload file", { position: "top-center" });
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -64,10 +80,10 @@ export default function KnowledgeForm({ knowledgeId }: { knowledgeId: number }) 
     try {
       await knowledgeApi.removeSourceFromKnowledge(knowledgeId, sourceId);
       setSources((prev) => prev.filter((s) => s.id !== sourceId));
-      toast.success("Source removed");
+      toast.success("Source removed", { position: "top-center" });
     } catch (err) {
       console.error(err);
-      toast.error("Failed to remove source");
+      toast.error("Failed to remove source", { position: "top-center" });
     }
   };
 
@@ -89,7 +105,11 @@ export default function KnowledgeForm({ knowledgeId }: { knowledgeId: number }) 
               className="h-8 gap-1"
               disabled={isUploading}
             >
-              {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
               Add Source
             </Button>
           </div>

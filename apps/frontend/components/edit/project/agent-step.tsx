@@ -7,16 +7,16 @@ import { knowledgeApi, KnowledgeResponse } from "@madchatter/api/src/knowledge";
 import { projectsApi } from "@madchatter/api/src/projects";
 import { FilterableSelect } from "@/components/reusable/filterable-select";
 
-export function AgentStep({projectId}: { projectId: number }) {
+export function AgentStep({ projectId }: { projectId: number }) {
   const [agents, setAgents] = useState<AgentResponse[]>([]);
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [selection, setSelection] = useState<{
-    agentId: number | null,
-    knowledgeId: number | null
+    agentId: number | null;
+    knowledgeId: number | null;
   }>({
     agentId: null,
-    knowledgeId: null
+    knowledgeId: null,
   });
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function AgentStep({projectId}: { projectId: number }) {
           knowledgeId: project.knowledgeId ?? null,
         });
       } catch (err) {
-        toast.error("Failed to load data.");
+        toast.error("Failed to load data.", { position: "top-center" });
       } finally {
         setLoading(false);
       }
@@ -44,29 +44,33 @@ export function AgentStep({projectId}: { projectId: number }) {
     fetchData();
   }, [projectId]);
 
-  const updateProjectConfig = async (newAgentId: number | null, newKnowledgeId: number | null) => {
+  const updateProjectConfig = async (
+    newAgentId: number | null,
+    newKnowledgeId: number | null,
+  ) => {
     try {
       await projectsApi.updateProject(projectId, {
         agentId: newAgentId,
-        knowledgeId: newKnowledgeId
+        knowledgeId: newKnowledgeId,
       });
-      setSelection({agentId: newAgentId, knowledgeId: newKnowledgeId});
-      toast.success("Configuration updated.");
+      setSelection({ agentId: newAgentId, knowledgeId: newKnowledgeId });
+      toast.success("Configuration updated.", { position: "top-center" });
     } catch (err) {
-      toast.error("Failed to save configuration.");
+      toast.error("Failed to save configuration.", { position: "top-center" });
     }
   };
 
-  if (loading) return <div className="p-4 text-sm text-muted-foreground">Loading...</div>;
+  if (loading)
+    return <div className="p-4 text-sm text-muted-foreground">Loading...</div>;
 
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-foreground tracking-tight">Agent
-          Configuration</h3>
+        <h3 className="text-sm font-semibold text-foreground tracking-tight">
+          Agent Configuration
+        </h3>
 
         <div className="w-full rounded-xl border bg-muted/10 p-4 space-y-4">
-
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
             <span className="text-sm font-semibold text-foreground tracking-tight w-[140px]">
               Agent
@@ -74,8 +78,10 @@ export function AgentStep({projectId}: { projectId: number }) {
             <div className="w-full sm:w-[280px]">
               <FilterableSelect
                 value={selection.agentId}
-                onChange={(id) => updateProjectConfig(id, selection.knowledgeId)}
-                options={agents.map(a => ({id: a.id, label: a.label}))}
+                onChange={(id) =>
+                  updateProjectConfig(id, selection.knowledgeId)
+                }
+                options={agents.map((a) => ({ id: a.id, label: a.label }))}
                 placeholder="Select agent..."
                 allowNull={false}
               />
@@ -90,13 +96,15 @@ export function AgentStep({projectId}: { projectId: number }) {
               <FilterableSelect
                 value={selection.knowledgeId}
                 onChange={(id) => updateProjectConfig(selection.agentId, id)}
-                options={knowledgeBases.map(kb => ({id: kb.id, label: kb.label}))}
+                options={knowledgeBases.map((kb) => ({
+                  id: kb.id,
+                  label: kb.label,
+                }))}
                 placeholder="Select Knowledge Base..."
                 allowNull={true}
               />
             </div>
           </div>
-
         </div>
       </div>
     </div>

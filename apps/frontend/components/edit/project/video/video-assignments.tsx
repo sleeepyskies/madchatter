@@ -32,22 +32,27 @@ const ROLES: readonly RoleConfig[] = [
 ] as const;
 
 export function VideoAssignments({
-                                   projectId,
-                                   videos,
-                                   assignments,
-                                   onChange,
-                                 }: VideoAssignmentsProps) {
+  projectId,
+  videos,
+  assignments,
+  onChange,
+}: VideoAssignmentsProps) {
   const availableVideos = videos.filter((v) => !v.includesAudio);
 
-  const handleAssignment = async (role: AssignmentKey, value: number | null) => {
+  const handleAssignment = async (
+    role: AssignmentKey,
+    value: number | null,
+  ) => {
     onChange({ ...assignments, [role]: value });
 
     try {
       await projectsApi.updateProject(projectId, { [role]: value });
-      toast.success("Assignment updated");
+      toast.success("Assignment updated", { position: "top-center" });
     } catch (err) {
       console.error(err);
-      toast.error("Could not save video assignment.");
+      toast.error("Could not save video assignment.", {
+        position: "top-center",
+      });
     }
   };
 

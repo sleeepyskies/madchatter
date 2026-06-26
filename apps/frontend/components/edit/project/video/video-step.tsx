@@ -32,7 +32,9 @@ export function VideoStep({ projectId }: { projectId: number }) {
         });
       } catch (err) {
         console.error(err);
-        toast.error("Failed to load project elements.");
+        toast.error("Failed to load project elements.", {
+          position: "top-center",
+        });
       }
     }
     fetch();
@@ -65,14 +67,16 @@ export function VideoStep({ projectId }: { projectId: number }) {
     label: string;
     description: string;
     includesAudio: boolean;
-    file?: File
+    file?: File;
   }) => {
     if (!data.file) {
-      toast.error("Please select a video file.");
+      toast.error("Please select a video file.", { position: "top-center" });
       return;
     }
     if (!data.file.type.startsWith("video/")) {
-      toast.error("Please select a valid video file.");
+      toast.error("Please select a valid video file.", {
+        position: "top-center",
+      });
       return;
     }
 
@@ -87,11 +91,11 @@ export function VideoStep({ projectId }: { projectId: number }) {
       });
 
       setVideos((prev) => [...prev, uploadedVideo]);
-      toast.success("Video uploaded.");
+      toast.success("Video uploaded.", { position: "top-center" });
       setIsModalOpen(false);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to upload video.");
+      toast.error("Failed to upload video.", { position: "top-center" });
     } finally {
       setIsUploading(false);
     }
@@ -108,7 +112,7 @@ export function VideoStep({ projectId }: { projectId: number }) {
       }));
     } catch (err) {
       console.error(err);
-      toast.error("Failed to remove video.");
+      toast.error("Failed to remove video.", { position: "top-center" });
     }
   };
 
@@ -124,7 +128,11 @@ export function VideoStep({ projectId }: { projectId: number }) {
       <div className="space-y-2">
         <div className="flex items-center justify-between pb-2">
           <h3 className="text-sm font-semibold text-foreground">Video</h3>
-          <Button size="sm" onClick={() => setIsModalOpen(true)} className="h-8 gap-1">
+          <Button
+            size="sm"
+            onClick={() => setIsModalOpen(true)}
+            className="h-8 gap-1"
+          >
             <Plus className="h-4 w-4" />
             Add Video
           </Button>
@@ -137,7 +145,11 @@ export function VideoStep({ projectId }: { projectId: number }) {
               projectId={projectId}
               video={video}
               onDelete={handleDelete}
-              onUpdate={(updated) => setVideos((prev) => prev.map((v) => (v.id === video.id ? updated : v)))}
+              onUpdate={(updated) =>
+                setVideos((prev) =>
+                  prev.map((v) => (v.id === video.id ? updated : v)),
+                )
+              }
             />
           ))}
           {videos.length === 0 && (

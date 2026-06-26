@@ -21,7 +21,12 @@ interface VideoCardProps {
   onUpdate: (updated: VideoResponse) => void;
 }
 
-export function VideoCard({ video, onDelete, onUpdate, projectId }: VideoCardProps) {
+export function VideoCard({
+  video,
+  onDelete,
+  onUpdate,
+  projectId,
+}: VideoCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -35,10 +40,10 @@ export function VideoCard({ video, onDelete, onUpdate, projectId }: VideoCardPro
       });
       onUpdate({ ...video, ...res });
       setIsEditOpen(false);
-      toast.success("Video updated.");
+      toast.success("Video updated.", { position: "top-center" });
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update video");
+      toast.error("Failed to update video", { position: "top-center" });
     } finally {
       setIsUpdating(false);
     }
@@ -48,12 +53,18 @@ export function VideoCard({ video, onDelete, onUpdate, projectId }: VideoCardPro
     <>
       <div className="flex items-center gap-4 p-3 rounded-xl border bg-card hover:shadow-sm transition-all">
         <div className="relative h-14 aspect-video bg-black rounded-lg overflow-hidden shrink-0">
-          <video src={video.downloadUrl} className="w-full h-full object-cover p-0" muted />
+          <video
+            src={video.downloadUrl}
+            className="w-full h-full object-cover p-0"
+            muted
+          />
         </div>
 
         <div className="flex-1 min-w-0 flex flex-col justify-center">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-foreground truncate">{video.label}</span>
+            <span className="text-sm font-semibold text-foreground truncate">
+              {video.label}
+            </span>
             {video.includesAudio ? (
               <Volume2 className="h-3.5 w-3.5 text-primary shrink-0" />
             ) : (
