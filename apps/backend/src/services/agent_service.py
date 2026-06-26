@@ -13,7 +13,7 @@ class AgentService:
 
     def __init__(self, agent_repository: AgentRepository):
         self.agent_repository = agent_repository
-        self.voice_models_directory = settings.static_dir.joinpath("voice-models")
+        self.voice_model_directory = settings.static_dir / "voice-models"
 
     def create_agent(self, request: CreateAgentRequest) -> AgentResponse:
         agent = self.agent_repository.create(
@@ -44,10 +44,10 @@ class AgentService:
     def get_voice_models(self) -> list[VoiceModelResponse]:
         voice_models: list[VoiceModelResponse] = []
 
-        if not self.voice_models_directory.exists():
+        if not self.voice_model_directory.exists():
             return voice_models
 
-        for lang_dir in self.voice_models_directory.iterdir():
+        for lang_dir in self.voice_model_directory.iterdir():
             if lang_dir.is_dir():
                 lang = lang_dir.name
                 if lang not in [l.value for l in Language]:

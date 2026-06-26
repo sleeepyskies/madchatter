@@ -1,3 +1,4 @@
+from models.agent import Language
 from services.chat.chat_service import ChatService
 from services.chat.rag_module import RAG
 from services.chat.stt_module import SpeechToText
@@ -9,7 +10,7 @@ class ChatServiceFactory:
     """Factory class to create ChatService instances with the appropriate configurations"""
 
     @staticmethod
-    def create(language: str | None,
+    def create(language: Language | None,
                chroma_collection: str | None,
                voice_model: str | None,
                system_prompt: str | None,
@@ -27,7 +28,14 @@ class ChatServiceFactory:
 
         rag = RAG(chroma_collection=chroma_collection, system_prompt=system_prompt)
 
-        tts = TextToSpeech(voice_model=voice_model)
+        if voice_model is None:
+            raise Exception("Must create ChatService with valid voice_model")
+        if language is None:
+            raise Exception("Must create ChatService with valid language")
+        if videos is None:
+            raise Exception("Must create ChatService with valid videos")
+
+        tts = TextToSpeech(voice_model=voice_model, language=language)
 
         video_matcher = VideoMatcher(videos=videos)
 
