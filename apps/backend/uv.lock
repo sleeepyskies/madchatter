@@ -214,7 +214,6 @@ dependencies = [
     { name = "python-multipart" },
     { name = "sqlalchemy" },
     { name = "uvicorn" },
-    { name = "websockets" },
 ]
 
 [package.metadata]
@@ -236,7 +235,6 @@ requires-dist = [
     { name = "python-multipart", specifier = ">=0.0.29" },
     { name = "sqlalchemy", specifier = ">=2.0.49" },
     { name = "uvicorn", specifier = ">=0.46.0" },
-    { name = "websockets", specifier = ">=16.0" },
 ]
 
 [[package]]
