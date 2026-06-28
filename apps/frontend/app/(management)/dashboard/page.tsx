@@ -10,10 +10,10 @@ import {
   FolderPlusIcon,
   LucideIcon,
 } from 'lucide-react';
-import { projectsApi } from "@madchatter/api/src/projects";
-import { knowledgeApi } from "@madchatter/api/src/knowledge";
-import { agentsApi } from "@madchatter/api/src/agents";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from '@/components/ui/card';
+import { projectsApi } from "@/api/projects";
+import { knowledgeApi } from "@/api/knowledge";
+import { agentsApi } from "@/api/agents";
 
 interface DashboardCardProps {
   label: string;
@@ -23,13 +23,13 @@ interface DashboardCardProps {
   onClickCard: () => void;
 }
 
-export function DashboardCard({
-                                label,
-                                description,
-                                icon: Icon,
-                                onCreateNew,
-                                onClickCard,
-                              }: DashboardCardProps) {
+function DashboardCard({
+  label,
+  description,
+  icon: Icon,
+  onCreateNew,
+  onClickCard,
+}: DashboardCardProps) {
   return (
     <Card
       className="flex flex-col justify-between p-5 rounded-xl transition-all duration-300 hover:shadow-lg w-full"
@@ -38,7 +38,7 @@ export function DashboardCard({
         <CardHeader className="p-0 mt-2 space-y-1">
           <CardTitle
             className="flex items-center gap-2 font-semibold text-base text-neutral-900 dark:text-neutral-100">
-            <Icon className="w-5 h-5 text-neutral-500 dark:text-neutral-400"/>
+            <Icon className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
             <span>{label}</span>
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground leading-relaxed">
@@ -53,7 +53,7 @@ export function DashboardCard({
           variant="default"
           className="flex-1 min-w-0 gap-1.5 cursor-pointer text-xs justify-center px-2"
         >
-          <CirclePlusIcon className="w-3.5 h-3.5 shrink-0"/>
+          <CirclePlusIcon className="w-3.5 h-3.5 shrink-0" />
           <span className="truncate">Create New</span>
         </Button>
         <Button
@@ -62,7 +62,7 @@ export function DashboardCard({
           className="flex-1 min-w-0 gap-1.5 cursor-pointer text-xs justify-center px-2"
         >
           <span className="truncate">Manage</span>
-          <ArrowRightIcon className="w-3.5 h-3.5 shrink-0"/>
+          <ArrowRightIcon className="w-3.5 h-3.5 shrink-0" />
         </Button>
       </CardContent>
     </Card>
@@ -73,7 +73,7 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const createNewProject = async () => {
-    const project = await projectsApi.createProject({label: "New Project"});
+    const project = await projectsApi.createProject({ label: "New Project" });
     router.push(`/project/${project.id}`);
   };
 
@@ -88,7 +88,7 @@ export default function DashboardPage() {
   };
 
   const createNewKnowledgeBase = async () => {
-    const knowledge = await knowledgeApi.createKnowledge({label: "New Knowledge Base"});
+    const knowledge = await knowledgeApi.createKnowledge({ label: "New Knowledge Base" });
     router.push(`/knowledge-base/${knowledge.id}`);
   };
 

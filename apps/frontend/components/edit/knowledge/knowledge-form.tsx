@@ -1,17 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Plus, Loader2, HardDrive } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-  knowledgeApi,
-  KnowledgeResponse,
-  KnowledgeSourceResponse,
-} from "@madchatter/api/src/knowledge";
 import { EditResourceHeader } from "@/components/edit/edit-resource-header";
 import { InlineEdit } from "@/components/reusable/inline-edit";
 import { SourceCard } from "./source-card";
+import { knowledgeApi, KnowledgeResponse, KnowledgeSourceResponse } from "@/api/knowledge";
 
 export default function KnowledgeForm({
   knowledgeId,

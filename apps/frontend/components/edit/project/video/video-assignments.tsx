@@ -1,9 +1,9 @@
 "use client";
 
 import { toast } from "sonner";
-import { VideoResponse } from "@madchatter/api/src/videos";
-import { projectsApi } from "@madchatter/api/src/projects";
 import { FilterableSelect } from "@/components/reusable/filterable-select";
+import { VideoResponse } from "@/api/videos";
+import { projectsApi } from "@/api/projects";
 
 export interface Assignments {
   idleVideoId: number | null;

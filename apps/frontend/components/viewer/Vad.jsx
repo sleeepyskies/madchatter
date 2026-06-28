@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import { useMicVAD, utils } from "@ricky0123/vad-react";
 import VideoPlayer from "./VideoPlayer.jsx";

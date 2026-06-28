@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DatabaseIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { knowledgeApi, KnowledgeResponse } from "@madchatter/api/src/knowledge";
 import { ResourcePageLayout } from "@/components/admin/resource-page-layout";
 import { ResourceCard } from "@/components/admin/resource-card";
+import { knowledgeApi, KnowledgeResponse } from "@/api/knowledge";
 
 export default function KnowledgeAdminPage() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function KnowledgeAdminPage() {
   }, []);
 
   const handleCreate = async () => {
-    const knowledge = await knowledgeApi.createKnowledge({label: 'New Knowledge Base'});
+    const knowledge = await knowledgeApi.createKnowledge({ label: 'New Knowledge Base' });
     router.push(`/knowledge-bases/${knowledge.id}`);
   };
 
@@ -37,9 +37,9 @@ export default function KnowledgeAdminPage() {
 
   const handleRename = async (id: number, newLabel: string) => {
     setKnowledgeBases((prev) =>
-      prev.map((k) => (k.id === id ? {...k, label: newLabel} : k))
+      prev.map((k) => (k.id === id ? { ...k, label: newLabel } : k))
     );
-    await knowledgeApi.updateKnowledge(id, {label: newLabel});
+    await knowledgeApi.updateKnowledge(id, { label: newLabel });
   };
 
   const handleEdit = (knowledgeBaseId: number) => {
@@ -54,7 +54,7 @@ export default function KnowledgeAdminPage() {
       isLoading={isLoading}
       headerAction={
         <Button onClick={handleCreate} size="sm" className="gap-2 cursor-pointer">
-          <PlusIcon className="w-4 h-4"/> Create Knowledge Base
+          <PlusIcon className="w-4 h-4" /> Create Knowledge Base
         </Button>
       }
     >
