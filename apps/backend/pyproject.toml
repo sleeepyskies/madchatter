@@ -23,3 +23,14 @@ dependencies = [
   "faster-whisper>=1.2.1",
   "piper-tts>=1.4.2",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+indent-width = 4
+
+[tool.ruff.format]
+docstring-code-format = true
+line-ending = "lf"
+indent-style = "tab"
+quote-style = "double"
