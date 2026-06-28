@@ -30,3 +30,15 @@ class UpdateProjectRequest(BaseSchema):
     idle_video_id: int | None = None
     enter_video_id: int | None = None
     exit_video_id: int | None = None
+
+
+class ExportProjectResponse(BaseSchema):
+    pass
+
+
+class ImportProjectRequest(BaseSchema):
+    pass
+
+
+class ImportProjectResponse(BaseSchema):
+    id: int

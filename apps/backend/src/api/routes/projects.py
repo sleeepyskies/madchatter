@@ -47,3 +47,16 @@ def delete_project(
         project_service: ProjectService = Depends(get_project_service),
 ):
     project_service.delete_project(project_id)
+
+@router.get("/{project_id}/export", reponse_model=ExportProjectResponse)
+def export_project(
+        project_id: int,
+        project_service: ProjectService = Depends(get_project_service),
+):
+    return project_service.export_project(project_id)
+
+@router.post("/import", response_model=ImportProjectReponse)
+def import_project(
+        project_service: ProjectService = Depends(get_project_service),
+):
+    return project_service.import_project(ImportProjectRequest())
