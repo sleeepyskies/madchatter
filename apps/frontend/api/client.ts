@@ -1,15 +1,10 @@
 import ky from "ky";
 
-// todo(sky): not hardcode this, read from env always and throw on failure
-const address = process.env.ADDRESS ?? "127.0.0.1";
-const port = process.env.PORT ?? "8000";
+const address = process.env.NEXT_PUBLIC_SERVER_ADDRESS;
+const port = process.env.NEXT_PUBLIC_SERVER_PORT;
 
-if (!address) {
-  throw new Error("Can not init api, server address is undefined");
-}
-
-if (!port) {
-  throw new Error("Can not init api, server port is undefined");
+if (!address || !port) {
+  throw new Error("Could not read server port or address from environment.");
 }
 
 const baseUrl = new URL(`http://${address}:${port}/api`).toString();
