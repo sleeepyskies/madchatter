@@ -74,7 +74,7 @@ export default function DashboardPage() {
 
   const createNewProject = async () => {
     const project = await projectsApi.createProject({ label: "New Project" });
-    router.push(`/project/${project.id}`);
+    router.push(`/admin/project/${project.id}`);
   };
 
   const createNewAgent = async () => {
@@ -84,12 +84,12 @@ export default function DashboardPage() {
       language: "en",
       voiceModel: "nothing"
     });
-    router.push(`/agent/${agent.id}`);
+    router.push(`/admin/agent/${agent.id}`);
   };
 
   const createNewKnowledgeBase = async () => {
     const knowledge = await knowledgeApi.createKnowledge({ label: "New Knowledge Base" });
-    router.push(`/knowledge-base/${knowledge.id}`);
+    router.push(`/admin/knowledge-base/${knowledge.id}`);
   };
 
   const actionCards = [
@@ -98,21 +98,21 @@ export default function DashboardPage() {
       description: "Piece together an agent, videos and a knowledge base.",
       icon: FolderPlusIcon,
       onCreateNew: createNewProject,
-      onClickCard: () => router.push('/projects'),
+      onClickCard: () => router.push('/admin/projects'),
     },
     {
       label: "Agents",
       description: "Configure a custom persona.",
       icon: BotIcon,
       onCreateNew: createNewAgent,
-      onClickCard: () => router.push('/agents'),
+      onClickCard: () => router.push('/admin/agents'),
     },
     {
       label: "Knowledge Bases",
       description: "Upload documents to create a custom knowledge base.",
       icon: DatabaseIcon,
       onCreateNew: createNewKnowledgeBase,
-      onClickCard: () => router.push('/knowledge-bases'),
+      onClickCard: () => router.push('/admin/knowledge-bases'),
     },
   ];
 

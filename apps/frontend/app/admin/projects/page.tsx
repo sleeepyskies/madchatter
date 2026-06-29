@@ -34,7 +34,7 @@ export default function ProjectsAdminPage() {
 
   const handleCreate = async () => {
     const project = await projectsApi.createProject({ label: "New Project" });
-    router.push(`/projects/${project.id}`);
+    router.push(`/admin/projects/${project.id}`);
   };
 
   const handleDelete = async (projectId: number) => {
@@ -50,7 +50,7 @@ export default function ProjectsAdminPage() {
   };
 
   const handleEdit = (projectId: number) => {
-    router.push(`/projects/${projectId}`);
+    router.push(`/admin/projects/${projectId}`);
   };
 
   const handleApply = async (projectId: number) => {

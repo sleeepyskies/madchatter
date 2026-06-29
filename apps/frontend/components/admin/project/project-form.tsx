@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { EditResourceHeader } from "@/components/edit/edit-resource-header";
-import { StepIndicator } from "@/components/edit/project/step-indicator";
-import { StepNavigation } from "@/components/edit/project/step-navigation";
 import { VideoStep } from "./video/video-step";
 import { InlineEdit } from "@/components/reusable/inline-edit";
-import { AgentStep } from "@/components/edit/project/agent-step";
 import { useRouter } from "next/navigation";
 import { projectsApi } from "@/api/projects";
+import { EditResourceHeader } from "../edit-resource-header";
+import { StepIndicator } from "./step-indicator";
+import { StepNavigation } from "./step-navigation";
+import { AgentStep } from "./agent-step";
 
 const STEPS = [
   { id: 1, name: "Video Upload" },
@@ -42,7 +42,7 @@ export default function ProjectForm({ projectId }: { projectId: number }) {
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
     } else {
-      router.push("/projects");
+      router.push("/admin/projects");
     }
   };
 

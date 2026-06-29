@@ -27,7 +27,7 @@ export default function KnowledgeAdminPage() {
 
   const handleCreate = async () => {
     const knowledge = await knowledgeApi.createKnowledge({ label: 'New Knowledge Base' });
-    router.push(`/knowledge-bases/${knowledge.id}`);
+    router.push(`/admin/knowledge-bases/${knowledge.id}`);
   };
 
   const handleDelete = async (id: number) => {
@@ -43,7 +43,7 @@ export default function KnowledgeAdminPage() {
   };
 
   const handleEdit = (knowledgeBaseId: number) => {
-    router.push(`/knowledge-bases/${knowledgeBaseId}`)
+    router.push(`/admin/knowledge-bases/${knowledgeBaseId}`)
   }
 
   return (

@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { EditResourceHeader } from "@/components/edit/edit-resource-header";
 import { InlineEdit } from "@/components/reusable/inline-edit";
 import { SourceCard } from "./source-card";
 import { knowledgeApi, KnowledgeResponse, KnowledgeSourceResponse } from "@/api/knowledge";
+import { EditResourceHeader } from "../edit-resource-header";
 
 export default function KnowledgeForm({
   knowledgeId,

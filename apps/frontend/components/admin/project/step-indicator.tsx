@@ -19,13 +19,12 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
           <div key={step.id} className="relative flex flex-col items-center">
             <div className="flex items-center gap-2">
               <div
-                className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium border transition-colors ${
-                  isCompleted
-                    ? "bg-primary border-primary text-primary-foreground"
-                    : isActive
-                      ? "border-primary text-primary"
-                      : "border-muted bg-background text-muted-foreground"
-                }`}
+                className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium border transition-colors ${isCompleted
+                  ? "bg-primary border-primary text-primary-foreground"
+                  : isActive
+                    ? "border-primary text-primary"
+                    : "border-muted bg-background text-muted-foreground"
+                  }`}
               >
                 {isCompleted ? <Check className="h-4 w-4" /> : step.id}
               </div>
@@ -36,11 +35,8 @@ export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
               </span>
             </div>
 
-            {/* Line connector */}
             <div
-              className={`h-0.5 w-full rounded-full mt-3 transition-colors ${
-                step.id <= currentStep ? "bg-primary" : "bg-muted"
-              }`}
+              className={`h-0.5 w-full rounded-full mt-3 transition-colors ${step.id <= currentStep ? "bg-primary" : "bg-muted"}`}
             />
           </div>
         );

@@ -1,4 +1,4 @@
-import ProjectForm from "@/components/edit/project/project-form";
+import ProjectForm from "@/components/admin/project/project-form";
 
 export default async function EditProjectPage({
   params,
