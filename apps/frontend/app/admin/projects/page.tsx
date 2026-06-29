@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ProjectResponse, projectsApi } from "@madchatter/api/src/projects";
 import { useRouter } from "next/navigation";
 import { FolderPlusIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { chatApi } from "@madchatter/api/src/chat";
 import { ResourcePageLayout } from "@/components/admin/resource-page-layout";
 import { ResourceCard } from "@/components/admin/resource-card";
+import { ProjectResponse, projectsApi } from "@/api/projects";
+import { chatApi } from "@/api/chat";
 
 export default function ProjectsAdminPage() {
   type ProjectStatus = "idle" | "processing" | "active";

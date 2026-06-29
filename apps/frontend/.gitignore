@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# static files for VAD
+/public
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

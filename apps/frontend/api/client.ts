@@ -1,5 +1,6 @@
 import ky from "ky";
 
+// todo(sky): not hardcode this, read from env always and throw on failure
 const address = process.env.ADDRESS ?? "127.0.0.1";
 const port = process.env.PORT ?? "8000";
 
