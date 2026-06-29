@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Trash2, Volume2, VolumeX, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { VideoResponse, videosApi } from "@madchatter/api/src/videos";
 import { VideoFormModal } from "./video-form";
+import { VideoResponse, videosApi } from "@/api/videos";
 
 export interface VideoFormData {
   id?: number;
@@ -98,7 +98,7 @@ export function VideoCard({
         projectId={projectId}
         onClose={() => setIsEditOpen(false)}
         isUploading={isUpdating}
-        onSubmit={handleEditSubmit as any}
+        onSubmit={handleEditSubmit}
         initialData={{
           id: video.id,
           label: video.label,

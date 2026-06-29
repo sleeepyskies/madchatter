@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { AgentResponse, agentsApi } from "@madchatter/api/src/agents";
-import { knowledgeApi, KnowledgeResponse } from "@madchatter/api/src/knowledge";
-import { projectsApi } from "@madchatter/api/src/projects";
 import { FilterableSelect } from "@/components/reusable/filterable-select";
+import { AgentResponse, agentsApi } from "@/api/agents";
+import { knowledgeApi, KnowledgeResponse } from "@/api/knowledge";
+import { projectsApi } from "@/api/projects";
 
 export function AgentStep({ projectId }: { projectId: number }) {
   const [agents, setAgents] = useState<AgentResponse[]>([]);

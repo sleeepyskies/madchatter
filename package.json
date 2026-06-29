@@ -1,8 +1,0 @@
-{
-  "name": "madchatter",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
-}

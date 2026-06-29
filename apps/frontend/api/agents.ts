@@ -35,7 +35,7 @@ export interface VoiceModelResponse {
 
 export const agentsApi = {
   createAgent: async (request: CreateAgentRequest): Promise<AgentResponse> => {
-    return await api.post("", {json: request}).json();
+    return await api.post("", { json: request }).json();
   },
 
   listAgents: async (): Promise<AgentResponse[]> => {
@@ -50,7 +50,7 @@ export const agentsApi = {
     agentId: number,
     request: UpdateAgentRequest,
   ): Promise<AgentResponse> => {
-    return await api.patch(`${agentId}`, {json: request}).json();
+    return await api.patch(`${agentId}`, { json: request }).json();
   },
 
   deleteAgent: async (agentId: number): Promise<void> => {
