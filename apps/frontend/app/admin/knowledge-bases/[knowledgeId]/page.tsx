@@ -1,8 +1,8 @@
-import KnowledgeForm from "@/components/edit/knowledge/knowledge-form";
+import KnowledgeForm from "@/components/admin/knowledge/knowledge-form";
 
-export default async function EditKnowledgePage({params}: {
+export default async function EditKnowledgePage({ params }: {
   params: Promise<{ knowledgeId: number }>;
 }) {
-  const { knowledgeId} = await params;
+  const { knowledgeId } = await params;
   return <KnowledgeForm knowledgeId={Number(knowledgeId)} />;
 }
