@@ -1,4 +1,4 @@
-import AgentForm from "@/components/edit/agent/agent-form";
+import AgentForm from "@/components/admin/agent/agent-form";
 
 export default async function EditAgentPage({ params }: {
   params: Promise<{ agentId: number }>;
