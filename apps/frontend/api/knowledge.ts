@@ -30,7 +30,7 @@ export interface UpdateKnowledgeRequest {
 
 export const knowledgeApi = {
   createKnowledge: async (request: CreateKnowledgeRequest): Promise<KnowledgeResponse> => {
-    return await api.post("", {json: request}).json();
+    return await api.post("", { json: request }).json();
   },
 
   listKnowledge: async (): Promise<KnowledgeResponse[]> => {
@@ -50,7 +50,7 @@ export const knowledgeApi = {
   },
 
   updateKnowledge: async (knowledgeId: number, request: UpdateKnowledgeRequest): Promise<KnowledgeResponse> => {
-    return await api.patch(`${knowledgeId}`, {json: request}).json();
+    return await api.patch(`${knowledgeId}`, { json: request }).json();
   },
 
   addSourceToKnowledge: async (
@@ -75,6 +75,6 @@ export const knowledgeApi = {
   },
 
   updateSource: async (sourceId: number, request: UpdateKnowledgeSourceRequest): Promise<KnowledgeSourceResponse> => {
-    return await api.patch(`/sources/${sourceId}`, {json: request}).json();
+    return await api.patch(`/sources/${sourceId}`, { json: request }).json();
   }
 };

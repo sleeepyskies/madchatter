@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CreateVideoRequest } from "@madchatter/api/src/videos";
+import { CreateVideoRequest } from "@/api/videos";
 
 interface FormValues {
   label: string;
@@ -40,13 +40,13 @@ interface VideoFormModalProps {
 }
 
 export function VideoFormModal({
-                                 isOpen,
-                                 onClose,
-                                 isUploading,
-                                 projectId,
-                                 onSubmit,
-                                 initialData,
-                               }: VideoFormModalProps) {
+  isOpen,
+  onClose,
+  isUploading,
+  projectId,
+  onSubmit,
+  initialData,
+}: VideoFormModalProps) {
   const isEdit = !!initialData;
 
   const {

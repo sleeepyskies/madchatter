@@ -2,7 +2,7 @@
 
 import { FileText, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { KnowledgeSourceResponse } from "@madchatter/api/src/knowledge";
+import { KnowledgeSourceResponse } from "@/api/knowledge";
 
 interface SourceCardProps {
   source: KnowledgeSourceResponse;

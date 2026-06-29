@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon, BotIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AgentResponse, agentsApi } from "@madchatter/api/src/agents";
 import { ResourcePageLayout } from "@/components/admin/resource-page-layout";
 import { ResourceCard } from "@/components/admin/resource-card";
+import { AgentResponse, agentsApi } from "@/api/agents";
 
 export default function AgentsAdminPage() {
   const router = useRouter();
@@ -42,9 +42,9 @@ export default function AgentsAdminPage() {
 
   const handleRename = async (id: number, newLabel: string) => {
     setAgents((prev) =>
-      prev.map((agent) => (agent.id === id ? {...agent, label: newLabel} : agent))
+      prev.map((agent) => (agent.id === id ? { ...agent, label: newLabel } : agent))
     );
-    await agentsApi.updateAgent(id, {label: newLabel});
+    await agentsApi.updateAgent(id, { label: newLabel });
   };
 
   const handleEdit = (agentId: number) => {
@@ -59,7 +59,7 @@ export default function AgentsAdminPage() {
       isLoading={isLoading}
       headerAction={
         <Button onClick={handleCreate} size="sm" className="gap-2 cursor-pointer">
-          <PlusIcon className="w-4 h-4"/> Create Agent
+          <PlusIcon className="w-4 h-4" /> Create Agent
         </Button>
       }
     >

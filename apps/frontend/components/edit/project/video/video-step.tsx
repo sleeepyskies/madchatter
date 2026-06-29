@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { videosApi, VideoResponse } from "@madchatter/api/src/videos";
-import { projectsApi } from "@madchatter/api/src/projects";
 import { VideoAssignments, Assignments } from "./video-assignments";
 import { VideoCard } from "./video-card";
 import { VideoFormModal } from "./video-form";
+import { projectsApi } from "@/api/projects";
+import { VideoResponse, videosApi } from "@/api/videos";
 
 export function VideoStep({ projectId }: { projectId: number }) {
   const [videos, setVideos] = useState<VideoResponse[]>([]);

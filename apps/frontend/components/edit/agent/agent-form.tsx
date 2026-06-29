@@ -2,18 +2,13 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { toast } from "sonner";
-import {
-  agentsApi,
-  AgentResponse,
-  Language,
-  UpdateAgentRequest,
-} from "@madchatter/api/src/agents";
 import { EditResourceHeader } from "@/components/edit/edit-resource-header";
 import { InlineEdit } from "@/components/reusable/inline-edit";
 import { FilterableSelect } from "@/components/reusable/filterable-select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { debounce } from "next/dist/server/utils";
+import { AgentResponse, agentsApi, Language, UpdateAgentRequest } from "@/api/agents";
 
 interface VoiceModelOption {
   id: number;

@@ -32,10 +32,10 @@ interface SidebarItem {
 }
 
 const items: SidebarItem[] = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboardIcon},
-  { title: "Projects", url: "/projects", icon: FolderPlusIcon },
-  { title: "Agents", url: "/agents", icon: BotIcon },
-  { title: "Knowledge Bases", url: "/knowledge-bases", icon: DatabaseIcon },
+  { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboardIcon},
+  { title: "Projects", url: "/admin/projects", icon: FolderPlusIcon },
+  { title: "Agents", url: "/admin/agents", icon: BotIcon },
+  { title: "Knowledge Bases", url: "/admin/knowledge-bases", icon: DatabaseIcon },
   { title: "Documentation", url: "https://madchatter.pages.dev", icon: BookIcon },
 ];
 

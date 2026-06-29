@@ -7,7 +7,7 @@ const api = client.extend((options) => ({
 
 export type Mode = "video_only" | "video_and_tts" | "tts_only";
 
-export interface  ApplyProjectResponse{
+export interface ApplyProjectResponse {
   projectId: number
 }
 export interface ChatRequest {

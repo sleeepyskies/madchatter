@@ -36,6 +36,7 @@ yarn-error.log*
 # vercel
 .vercel
 
+# static files for VAD
 /public
 
 # typescript
