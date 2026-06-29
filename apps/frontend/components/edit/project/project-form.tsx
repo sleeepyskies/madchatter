@@ -42,7 +42,7 @@ export default function ProjectForm({ projectId }: { projectId: number }) {
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
     } else {
-      router.push("/projects");
+      router.push("/admin/projects");
     }
   };
 
