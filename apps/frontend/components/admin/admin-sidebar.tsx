@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
+import logo from "@/src/img/logo.png";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +14,7 @@ import {
   SidebarRail,
   SidebarTrigger,
   useSidebar,
-} from '@/components/ui/sidebar';
+} from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -23,7 +25,7 @@ import {
   LayoutDashboardIcon,
   LucideIcon,
   PanelBottomIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface SidebarItem {
   title: string;
@@ -32,11 +34,19 @@ interface SidebarItem {
 }
 
 const items: SidebarItem[] = [
-  { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboardIcon},
+  { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboardIcon },
   { title: "Projects", url: "/admin/projects", icon: FolderPlusIcon },
   { title: "Agents", url: "/admin/agents", icon: BotIcon },
-  { title: "Knowledge Bases", url: "/admin/knowledge-bases", icon: DatabaseIcon },
-  { title: "Documentation", url: "https://madchatter.pages.dev", icon: BookIcon },
+  {
+    title: "Knowledge Bases",
+    url: "/admin/knowledge-bases",
+    icon: DatabaseIcon,
+  },
+  {
+    title: "Documentation",
+    url: "https://madchatter.pages.dev",
+    icon: BookIcon,
+  },
 ];
 
 interface SidebarLinkProps {
@@ -44,7 +54,7 @@ interface SidebarLinkProps {
   isActive: boolean;
 }
 
-function SidebarLink({item, isActive}: SidebarLinkProps) {
+function SidebarLink({ item, isActive }: SidebarLinkProps) {
   const Icon = item.icon;
 
   return (
@@ -59,7 +69,9 @@ function SidebarLink({item, isActive}: SidebarLinkProps) {
   );
 }
 
-export function AdminSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
+export function AdminSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { open } = useSidebar();
 
@@ -68,15 +80,19 @@ export function AdminSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className={`flex h-12 w-full items-center px-2 transition-all duration-200 ${open ? "justify-between" : "justify-center"}`}>
-
+            <div
+              className={`flex h-12 w-full items-center px-2 transition-all duration-200 ${open ? "justify-between" : "justify-center"}`}
+            >
               <div className="flex items-center gap-2 overflow-hidden min-w-0">
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <PanelBottomIcon className="w-4 h-4" />
-                </div>
+                {/* <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"> */}
+                {/* <PanelBottomIcon className="w-4 h-4" /> */}
+                <Image src={logo} alt="logo" className="w-9 h-9" />
+                {/* </div> */}
                 {open && (
-                  <div className="grid flex-1 text-left text-sm leading-tight animate-in fade-in slide-in-from-left-2 duration-200">
-                    <span className="truncate font-semibold text-sidebar-foreground">Mad Chatter</span>
+                  <div className="grid flex-1 text-left text-base leading-tight animate-in fade-in slide-in-from-left-2 duration-200">
+                    <span className="truncate font-semibold text-sidebar-foreground">
+                      Mad Chatter
+                    </span>
                   </div>
                 )}
               </div>
@@ -92,13 +108,15 @@ export function AdminSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu>
             {items.map((item) => {
               const isActive = pathname === item.url;
-              return (<SidebarLink item={item} isActive={isActive} key={item.title}/>);
+              return (
+                <SidebarLink item={item} isActive={isActive} key={item.title} />
+              );
             })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarRail/>
+      <SidebarRail />
     </Sidebar>
   );
 }
