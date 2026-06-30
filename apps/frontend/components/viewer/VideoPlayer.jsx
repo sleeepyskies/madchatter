@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-export default function VideoPlayer({ videoUrl, className = "" }) {
+export default function VideoPlayer({ videoUrl, className = "", onEnded, onPlaying, loop = false }) {
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -19,10 +19,12 @@ export default function VideoPlayer({ videoUrl, className = "" }) {
         src={videoUrl}
         autoPlay
         muted
-        loop
+        loop={loop}
         playsInline
         style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
         onError={(e) => console.error("Video error:", e)}
+        onEnded={onEnded}
+        onPlaying={onPlaying}
       />
     </div>
   );

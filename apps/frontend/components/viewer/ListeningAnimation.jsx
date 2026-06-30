@@ -85,7 +85,7 @@ export default function ListeningAnimation({ isActive = false }) {
   }
 
   return (
-    <div style={{ textAlign: "center", padding: "20px 0" }}>
+    <div style={{ textAlign: "center" }}>
       <div
         ref={containerRef}
         style={{
@@ -93,7 +93,7 @@ export default function ListeningAnimation({ isActive = false }) {
           alignItems: "center",
           justifyContent: "center",
           gap: "6px",
-          height: "100px",
+          height: "40px",
         }}
       >
         {Array(9)
