@@ -7,7 +7,12 @@ import { FilterableSelect } from "@/components/reusable/filterable-select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { debounce } from "next/dist/server/utils";
-import { AgentResponse, agentsApi, Language, UpdateAgentRequest } from "@/api/agents";
+import {
+  AgentResponse,
+  agentsApi,
+  Language,
+  UpdateAgentRequest,
+} from "@/api/agents";
 import { EditResourceHeader } from "../edit-resource-header";
 
 interface VoiceModelOption {
@@ -81,7 +86,7 @@ export default function AgentForm({ agentId }: { agentId: number }) {
               setPromptDraft(val);
               debouncedUpdate({ systemPrompt: val });
             }}
-            className="min-h-[200px]"
+            className="min-h-[200px] rounded-xl bg-muted/30 border-0 px-4 py-3 shadow-none focus-visible:ring-1"
           />
         </div>
 
