@@ -95,6 +95,12 @@ class KnowledgeService:
             download_url=create_download_url(source.filename)
         ) for source in self.knowledge_source.list_by_collection(knowledge_id)]
 
+    def list_knowledge_source_filenames_for_knowledge(
+            self,
+            knowledge_id: int
+    ) -> list[Path]:
+        return [Path(settings.files_dir / source.filename).absolute() for source in self.knowledge_source.list_by_collection(knowledge_id)]
+
     def delete_knowledge(self, knowledge_id: int) -> None:
         """Deletes a whole knowledge base along with any related data."""
 

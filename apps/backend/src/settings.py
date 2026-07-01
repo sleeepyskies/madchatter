@@ -57,14 +57,17 @@ class Settings(BaseSettings):
     api_prefix: str = "/api"
     """API prefix for all API endpoints."""
 
-    run_dir: Path = Path("./run")
+    run_dir: Path = Path("./run").absolute()
     """Path to the runtime directory. Used for persistence of data."""
 
-    files_dir: Path = run_dir / "files"
-    """Directory reserved for saving files to disk. This includes videos and source knowledge file."""
+    tmp_dir: Path = Path("./tmp").absolute()
+    """Path to the tmp directory. Used for temporary persistence of data. Do not trust any files here will remain."""
 
-    static_dir: Path = Path("./static")
+    static_dir: Path = Path("./static").absolute()
     """Directory reserved for saving static files to serve."""
+
+    files_dir: Path = Path(run_dir / "files").absolute()
+    """Directory reserved for saving files to disk. This includes videos and source knowledge file."""
 
 
 settings = Settings()

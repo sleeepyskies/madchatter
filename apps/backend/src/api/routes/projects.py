@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, BackgroundTasks
 from starlette import status
+from starlette.responses import FileResponse
 
 from api.dependencies import get_project_service
 from models.project import ProjectResponse, CreateProjectRequest, UpdateProjectRequest
@@ -48,12 +49,20 @@ def delete_project(
 ):
     project_service.delete_project(project_id)
 
-@router.get("/{project_id}/export", reponse_model=ExportProjectResponse)
+@router.get("/{project_id}/export")
 def export_project(
         project_id: int,
+        background_tasks: BackgroundTasks,
         project_service: ProjectService = Depends(get_project_service),
 ):
-    return project_service.export_project(project_id)
+    export = project_service.create_export(project_id)
+    background_tasks.add_task(project_service.cleanup_export, export.path)
+    return FileResponse(
+        path=export.path,
+        status_code=status.HTTP_200_OK,
+        media_type='application/zip',
+        filename=export.name,
+    )
 
 @router.post("/import", response_model=ImportProjectReponse)
 def import_project(

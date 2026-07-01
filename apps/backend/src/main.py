@@ -19,6 +19,7 @@ def setup_environment():
     """Makes sure all required directories exist on disk before starting."""
     logger.debug("Setting up environment.")
     settings.run_dir.mkdir(parents=True, exist_ok=True)
+    settings.tmp_dir.mkdir(parents=True, exist_ok=True)
     settings.static_dir.mkdir(parents=True, exist_ok=True)
     settings.files_dir.mkdir(parents=True, exist_ok=True)
 
