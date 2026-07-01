@@ -4,7 +4,7 @@ from starlette.responses import FileResponse
 
 from api.dependencies import get_project_service
 from models.project import ProjectResponse, CreateProjectRequest, UpdateProjectRequest
-from services.project_service import ProjectService
+from services.project.project_service import ProjectService
 
 PROJECT_PREFIX = "/projects"
 
@@ -56,16 +56,10 @@ def export_project(
         project_service: ProjectService = Depends(get_project_service),
 ):
     export = project_service.create_export(project_id)
-    background_tasks.add_task(project_service.cleanup_export, export.path)
+    background_tasks.add_task(project_service.cleanup_export, project_id)
     return FileResponse(
-        path=export.path,
+        path=export.zipped_path,
         status_code=status.HTTP_200_OK,
         media_type='application/zip',
-        filename=export.name,
+        filename=export.project_label,
     )
-
-@router.post("/import", response_model=ImportProjectReponse)
-def import_project(
-        project_service: ProjectService = Depends(get_project_service),
-):
-    return project_service.import_project(ImportProjectRequest())

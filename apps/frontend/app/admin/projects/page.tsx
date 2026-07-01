@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FolderPlusIcon, PlusIcon } from "lucide-react";
+import { FolderPlusIcon, PlusIcon, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ResourcePageLayout } from "@/components/admin/resource-page-layout";
@@ -111,22 +111,28 @@ export default function ProjectsAdminPage() {
             onEdit={() => handleEdit(project.id)}
             onRename={(newLabel: string) => handleRename(project.id, newLabel)}
             extraButtons={
+            [
+              <Button key={1} onClick={() => projectsApi.exportProject(project.id)} variant="ghost">
+                <Upload/>
+              </Button>,
               <Button
-                size="sm"
-                disabled={isProjectProcessing || status === "processing"}
-                onClick={() => handleApply(project.id)}
-                className={
-                  status === "active"
-                    ? "bg-green-600 hover:bg-green-600"
-                    : status === "processing"
-                      ? "opacity-60"
-                      : ""
-                }
+                  key={2}
+                  size="sm"
+                  disabled={isProjectProcessing || status === "processing"}
+                  onClick={() => handleApply(project.id)}
+                  className={
+                    status === "active"
+                        ? "bg-green-600 hover:bg-green-600"
+                        : status === "processing"
+                            ? "opacity-60"
+                            : ""
+                  }
               >
                 {status === "idle" && "Apply"}
                 {status === "processing" && "Applying..."}
                 {status === "active" && "Active"}
               </Button>
+            ]
             }
           />
         );

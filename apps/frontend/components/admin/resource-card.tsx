@@ -13,7 +13,7 @@ interface ResourceCardProps {
   onDelete: () => Promise<void>;
   onEdit: () => void;
   onRename: (newLabel: string) => Promise<void>;
-  extraButtons?: React.ReactNode;
+  extraButtons?: React.ReactNode[];
 }
 
 export function ResourceCard({

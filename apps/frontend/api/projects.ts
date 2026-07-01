@@ -60,4 +60,21 @@ export const projectsApi = {
   deleteProject: async (projectId: number): Promise<void> => {
     await api.delete(`${projectId}`);
   },
+
+  exportProject: async (projectId: number): Promise<void> => {
+    const res = await api.get(`${projectId}/export`);
+
+    const blob = await res.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `project-${projectId}.zip`;
+    document.body.appendChild(a);
+    a.click();
+
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  },
 };

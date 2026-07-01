@@ -10,7 +10,7 @@ from repositories.vector_collection_repository import VectorCollectionRepository
 from repositories.video_repository import VideoRepository
 from services.agent_service import AgentService
 from services.knowledge_service import KnowledgeService
-from services.project_service import ProjectService
+from services.project.project_service import ProjectService
 from services.video_service import VideoService
 from services.chat.chat_service_factory import ChatServiceFactory
 from services.chat.chat_application_service import ChatApplicationService
