@@ -180,9 +180,9 @@ class KnowledgeService:
 		self.file_handler.delete_file(source.filename)
 		self.knowledge_source.delete(source.id)
 
-	def fetch_knowledge_base(self, knowledge_id: int) -> KnowledgeBase:
+	def fetch_knowledge_base(self, knowledge_id: int) -> str:
 		collection = self.vector_collection.get(knowledge_id)
-		return KnowledgeBase(collection.chroma_collection)
+		return collection.chroma_collection
 
 	def update_source(self, source_id: int, request: UpdateKnowledgeSourceRequest) -> KnowledgeSourceResponse:
 		source = self.knowledge_source.update(source_id, request)
