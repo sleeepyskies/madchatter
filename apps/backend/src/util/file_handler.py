@@ -1,6 +1,7 @@
 import pathlib
 import shutil
 from pathlib import Path
+from typing import BinaryIO
 
 from fastapi import UploadFile
 
@@ -37,25 +38,14 @@ class FileHandler:
 
         shutil.rmtree(self.create_path(dirname))
 
-    def save_file(self, file: UploadFile, filename: str | None = None) -> Path:
+    def save_file(self, file: BinaryIO, filename: str) -> Path:
         """
-        Saves a new file to the directory. Can optionally provide a filename override.
-        Note that the filename should include the extension.
+        Saves a new file to the directory.
         """
-
-        final_name = filename or file.filename
-
-        if not final_name:
-            raise InvalidArgumentException(
-                f"No filename provided, cannot save to disk at {self.directory}"
-            )
-
-        file_path = self.create_path(final_name)
-
+        file_path = self.create_path(filename)
         with open(file_path, "wb") as dest:
             while content := file.file.read(1024 * 1024):
                 dest.write(content)
-
         return file_path
 
     def delete_file(self, filename: str) -> None:

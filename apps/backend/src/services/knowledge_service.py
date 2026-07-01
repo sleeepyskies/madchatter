@@ -1,6 +1,7 @@
 import uuid
 from io import BufferedReader
 from pathlib import Path
+from typing import BinaryIO
 
 from fastapi import UploadFile
 
@@ -22,10 +23,10 @@ from util.download_url import create_download_url
 from util.file_handler import FileHandler
 
 
-def create_unique_filename(file: UploadFile) -> str:
-	if not file.filename:
-		raise InvalidArgumentException("File must have a filename in order to identify the file extension.")
-	ext = Path(file.filename).suffix
+def create_unique_filename(filename: str) -> str:
+	if not filename:
+		raise InvalidArgumentException("File must have a name to identify the extension.")
+	ext = Path(filename).suffix
 	return f"{uuid.uuid4().hex}{ext}"
 
 
@@ -136,20 +137,13 @@ class KnowledgeService:
 			label: str,
 			file: UploadFile | BufferedReader,
 	) -> KnowledgeSourceResponse:
-		"""Adds a new source to the knowledge base."""
-
 		collection = self.vector_collection.get(knowledge_id)
 
-		if isinstance(file, UploadFile):
-			upload_file = file
-		else:
-			upload_file = UploadFile(
-				filename=getattr(file, "name", "source"),
-				file=file,
-			)
+		stream = file.file if isinstance(file, UploadFile) else file
+		original_name = getattr(file, "filename", getattr(file, "name", "source"))
+		unique_filename = create_unique_filename(original_name)
 
-		filename = create_unique_filename(upload_file)
-		path = self.file_handler.save_file(upload_file, filename)
+		path = self.file_handler.save_file(stream, unique_filename)
 
 		knowledge_base = KnowledgeBase(collection.chroma_collection)
 		documents = knowledge_base.add_file(path)
@@ -158,7 +152,7 @@ class KnowledgeService:
 			KnowledgeSource(
 				label=label,
 				vector_collection_id=collection.id,
-				filename=filename,
+				filename=unique_filename,
 				documents=documents,
 			)
 		)
@@ -166,7 +160,7 @@ class KnowledgeService:
 		return KnowledgeSourceResponse(
 			id=source.id,
 			label=source.label,
-			download_url=create_download_url(filename),
+			download_url=create_download_url(unique_filename),
 		)
 
 	def remove_source_from_knowledge(self, knowledge_id: int, source_id: int) -> None:
