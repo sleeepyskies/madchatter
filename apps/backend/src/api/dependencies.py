@@ -55,7 +55,8 @@ def get_project_service(db: DBSession) -> ProjectService:
     video_repository = VideoRepository(db)
     agent_service = get_agent_service(db)
     knowledge_service = get_knowledge_service(db)
-    return ProjectService(project_repository, video_repository, agent_service, knowledge_service)
+    video_service = get_video_service(db)
+    return ProjectService(project_repository, video_repository, video_service, agent_service, knowledge_service)
 
 
 def get_agent_service(db: DBSession) -> AgentService:

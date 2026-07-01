@@ -12,6 +12,7 @@ from services.agent_service import AgentService
 from services.knowledge_service import KnowledgeService
 from services.project.project_export_service import ProjectExport, ProjectExportService
 from services.project.project_import_service import ProjectImportService
+from services.video_service import VideoService
 from settings import settings
 from util.download_url import create_download_url
 from util.file_handler import FileHandler
@@ -35,6 +36,7 @@ class ProjectService:
 		self,
 		project_repository: ProjectRepository,
 		video_repository: VideoRepository,
+		video_service: VideoService,
 		agent_service: AgentService,
 		knowledge_service: KnowledgeService,
 	):
@@ -44,7 +46,7 @@ class ProjectService:
 		self.knowledge_service = knowledge_service
 		self.file_handler = FileHandler(settings.files_dir)
 		self.export_service = ProjectExportService(project_repository, video_repository, knowledge_service, agent_service)
-		self.import_service = ProjectImportService(project_repository, agent_service, video_repository, knowledge_service)
+		self.import_service = ProjectImportService(project_repository, agent_service, video_service, knowledge_service)
 
 	def create_project(self, request: CreateProjectRequest) -> ProjectResponse:
 		project = self.project_repository.create(
