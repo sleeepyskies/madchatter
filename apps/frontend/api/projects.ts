@@ -77,4 +77,13 @@ export const projectsApi = {
     a.remove();
     window.URL.revokeObjectURL(url);
   },
+
+  importProject: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return await api.post("import", {
+      body: formData,
+    });
+  },
 };

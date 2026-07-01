@@ -17,14 +17,14 @@ interface ResourceCardProps {
 }
 
 export function ResourceCard({
-                               icon: Icon,
-                               label,
-                               description,
-                               onDelete,
-                               onEdit,
-                               onRename,
-                               extraButtons,
-                             }: ResourceCardProps) {
+  icon: Icon,
+  label,
+  description,
+  onDelete,
+  onEdit,
+  onRename,
+  extraButtons,
+}: ResourceCardProps) {
   return (
     <Card className="group relative min-h-[192px] rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50 flex flex-col justify-between">
       <CardHeader className="p-0 flex flex-row items-center justify-between gap-3 space-y-0">

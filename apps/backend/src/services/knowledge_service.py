@@ -1,4 +1,5 @@
 import uuid
+from io import BufferedReader
 from pathlib import Path
 
 from fastapi import UploadFile
@@ -100,6 +101,12 @@ class KnowledgeService:
 			for source in self.knowledge_source.list_by_collection(knowledge_id)
 		]
 
+	def list_knowledge_source_db_for_knowledge(self, knowledge_id: int) -> list[KnowledgeSource]:
+		return [
+			self.knowledge_source.get(source.id)
+			for source in self.knowledge_source.list_by_collection(knowledge_id)
+		]
+
 	def delete_knowledge(self, knowledge_id: int) -> None:
 		"""Deletes a whole knowledge base along with any related data."""
 
@@ -123,21 +130,30 @@ class KnowledgeService:
 		self.vector_collection.update(knowledge_id, request)
 		return self.get_knowledge(knowledge_id)
 
-	def add_source_to_knowledge(self, knowledge_id: int, label: str, file: UploadFile) -> KnowledgeSourceResponse:
+	def add_source_to_knowledge(
+			self,
+			knowledge_id: int,
+			label: str,
+			file: UploadFile | BufferedReader,
+	) -> KnowledgeSourceResponse:
 		"""Adds a new source to the knowledge base."""
 
-		# ensures the collection exists
 		collection = self.vector_collection.get(knowledge_id)
 
-		# save file to disk
-		filename = create_unique_filename(file)
-		path = self.file_handler.save_file(file, filename)
+		if isinstance(file, UploadFile):
+			upload_file = file
+		else:
+			upload_file = UploadFile(
+				filename=getattr(file, "name", "source"),
+				file=file,
+			)
 
-		# insert into actual chroma db collection
+		filename = create_unique_filename(upload_file)
+		path = self.file_handler.save_file(upload_file, filename)
+
 		knowledge_base = KnowledgeBase(collection.chroma_collection)
 		documents = knowledge_base.add_file(path)
 
-		# save reference to our sql db
 		source = self.knowledge_source.create(
 			KnowledgeSource(
 				label=label,

@@ -120,6 +120,8 @@ class ProjectExportService:
         project = self.project_repository.get(project_id)
         agent = self.agent_service.get_agent(project_id) if (project.agent_id is not None) else None
         videos = self.video_repository.list_for_project(project_id)
+        sources = self.knowledge_service.list_knowledge_source_db_for_knowledge(project.vector_collection_id) if project.vector_collection_id is not None else []
+        knowledge = self.knowledge_service.get_knowledge(project.vector_collection_id) if project.vector_collection_id is not None else None
 
         agent_data = None
         if agent is not None:
@@ -131,19 +133,26 @@ class ProjectExportService:
             }
 
         return {
-            "project_name": project.label,
-            "idle_video_index": 1,
-            "enter_video_index": 1,
-            "exit_video_index": 1,
+            "label": project.label,
+            "idle_video_id": project.idle_video_id,
+            "enter_video_id": project.enter_video_id,
+            "exit_video_id": project.exit_video_id,
             "agent": agent_data,
+            "knowledge_label": knowledge.label if knowledge is not None else None,
+            "knowledge_sources": [
+                {
+                    "label": source.label,
+                    "filename": source.filename,
+                } for source in sources
+            ],
             "videos": [
                 {
                     "id": v.id,
                     "label": v.label,
                     "description": v.description,
                     "filename": v.filename,
-                }
-                for v in videos
+                    "includes_audio": v.includes_audio,
+                } for v in videos
             ],
         }
 

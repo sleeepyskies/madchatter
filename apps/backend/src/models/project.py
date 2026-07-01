@@ -41,4 +41,4 @@ class ImportProjectRequest(BaseSchema):
 
 
 class ImportProjectResponse(BaseSchema):
-    id: int
+    project_id: int

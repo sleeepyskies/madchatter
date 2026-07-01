@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends, BackgroundTasks, UploadFile, File
 from starlette import status
 from starlette.responses import FileResponse
 
 from api.dependencies import get_project_service
-from models.project import ProjectResponse, CreateProjectRequest, UpdateProjectRequest
+from models.project import ProjectResponse, CreateProjectRequest, UpdateProjectRequest, ImportProjectResponse
 from services.project.project_service import ProjectService
 
 PROJECT_PREFIX = "/projects"
@@ -63,3 +63,10 @@ def export_project(
         media_type='application/zip',
         filename=export.project_label,
     )
+
+@router.post("/import")
+def import_project(
+        file: UploadFile = File(...),
+        project_service: ProjectService = Depends(get_project_service),
+) -> ImportProjectResponse:
+    return project_service.import_project(file)

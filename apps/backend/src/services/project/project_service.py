@@ -1,6 +1,9 @@
+from fastapi import UploadFile
+
 from db.models.projects import Project
 from db.models.videos import Video
-from models.project import CreateProjectRequest, ProjectResponse, UpdateProjectRequest
+from models.project import CreateProjectRequest, ProjectResponse, UpdateProjectRequest, ImportProjectRequest, \
+	ImportProjectResponse
 from models.videos import VideoResponse
 from repositories.knowledge_base_repository import KnowledgeBase
 from repositories.project_repository import ProjectRepository
@@ -8,6 +11,7 @@ from repositories.video_repository import VideoRepository
 from services.agent_service import AgentService
 from services.knowledge_service import KnowledgeService
 from services.project.project_export_service import ProjectExport, ProjectExportService
+from services.project.project_import_service import ProjectImportService
 from settings import settings
 from util.download_url import create_download_url
 from util.file_handler import FileHandler
@@ -40,6 +44,7 @@ class ProjectService:
 		self.knowledge_service = knowledge_service
 		self.file_handler = FileHandler(settings.files_dir)
 		self.export_service = ProjectExportService(project_repository, video_repository, knowledge_service, agent_service)
+		self.import_service = ProjectImportService(project_repository, agent_service, video_repository, knowledge_service)
 
 	def create_project(self, request: CreateProjectRequest) -> ProjectResponse:
 		project = self.project_repository.create(
@@ -110,3 +115,5 @@ class ProjectService:
 	def cleanup_export(self, project_id: int) -> None:
 		return self.export_service.cleanup_export(project_id)
 
+	def import_project(self, file: UploadFile) -> ImportProjectResponse:
+		return self.import_service.import_package(file)
