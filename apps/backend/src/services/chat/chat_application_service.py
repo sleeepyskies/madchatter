@@ -1,5 +1,5 @@
 from services.chat.chat_service import ChatService
-from services.project_service import ProjectService
+from services.project.project_service import ProjectService
 from services.video_service import VideoService
 from services.chat.chat_service_factory import ChatServiceFactory
 from services.agent_service import AgentService

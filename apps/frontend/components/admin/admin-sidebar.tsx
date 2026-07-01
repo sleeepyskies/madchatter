@@ -22,9 +22,9 @@ import {
   BotIcon,
   DatabaseIcon,
   FolderPlusIcon,
+  ImportIcon,
   LayoutDashboardIcon,
   LucideIcon,
-  PanelBottomIcon,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -37,16 +37,9 @@ const items: SidebarItem[] = [
   { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboardIcon },
   { title: "Projects", url: "/admin/projects", icon: FolderPlusIcon },
   { title: "Agents", url: "/admin/agents", icon: BotIcon },
-  {
-    title: "Knowledge Bases",
-    url: "/admin/knowledge-bases",
-    icon: DatabaseIcon,
-  },
-  {
-    title: "Documentation",
-    url: "https://madchatter.pages.dev",
-    icon: BookIcon,
-  },
+  { title: "Knowledge Bases", url: "/admin/knowledge-bases", icon: DatabaseIcon },
+  { title: "Import", url: "/admin/import", icon: ImportIcon },
+  { title: "Documentation", url: "https://madchatter.pages.dev", icon: BookIcon },
 ];
 
 interface SidebarLinkProps {

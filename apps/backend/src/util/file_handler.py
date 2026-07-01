@@ -1,3 +1,5 @@
+import pathlib
+import shutil
 from pathlib import Path
 
 from fastapi import UploadFile
@@ -21,7 +23,19 @@ class FileHandler:
         Creates a filepath suiting the provided filename.
         Note that the filename should include the extension.
         """
-        return self.directory / filename
+        return Path(self.directory / filename).absolute()
+
+    def create_dir(self, dirname: str) -> Path:
+        """Creates a new directory relative to the root directory, and returns the path."""
+
+        path = self.create_path(dirname)
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    def delete_dir(self, dirname: str) -> None:
+        """Deletes a directory and all of its contents."""
+
+        shutil.rmtree(self.create_path(dirname))
 
     def save_file(self, file: UploadFile, filename: str | None = None) -> Path:
         """

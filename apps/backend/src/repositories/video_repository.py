@@ -24,6 +24,15 @@ class VideoRepository:
             raise ResourceNotFoundException("Videos", video_id)
         return video
 
+    def get_by_filename(self, filename: str) -> Video:
+        statement = select(Video).where(Video.filename == filename)
+        video = self.database.scalar(statement)
+
+        if not video:
+            raise ResourceNotFoundException("Video", -1)
+
+        return video
+
     def list_all(self) -> list[Video]:
         return list(self.database.scalars(select(Video)).all())
 

@@ -10,7 +10,7 @@ from repositories.vector_collection_repository import VectorCollectionRepository
 from repositories.video_repository import VideoRepository
 from services.agent_service import AgentService
 from services.knowledge_service import KnowledgeService
-from services.project_service import ProjectService
+from services.project.project_service import ProjectService
 from services.video_service import VideoService
 from services.chat.chat_service_factory import ChatServiceFactory
 from services.chat.chat_application_service import ChatApplicationService
@@ -55,7 +55,8 @@ def get_project_service(db: DBSession) -> ProjectService:
     video_repository = VideoRepository(db)
     agent_service = get_agent_service(db)
     knowledge_service = get_knowledge_service(db)
-    return ProjectService(project_repository, video_repository, agent_service, knowledge_service)
+    video_service = get_video_service(db)
+    return ProjectService(project_repository, video_repository, video_service, agent_service, knowledge_service)
 
 
 def get_agent_service(db: DBSession) -> AgentService:
