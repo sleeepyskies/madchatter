@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    "dev": "next dev",
+    "build": "node scripts/copy-assets.js && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -15,6 +15,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "dotenv": "^17.4.2",
+    "glob": "^13.0.6",
     "ky": "^2.0.2",
     "lucide-react": "^1.21.0",
     "next": "16.2.6",

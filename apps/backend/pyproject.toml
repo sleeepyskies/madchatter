@@ -34,3 +34,7 @@ docstring-code-format = true
 line-ending = "lf"
 indent-style = "tab"
 quote-style = "double"
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"

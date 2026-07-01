@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FolderPlusIcon, PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ResourcePageLayout } from "@/components/admin/resource-page-layout";
 import { ResourceCard } from "@/components/admin/resource-card";
@@ -67,11 +68,15 @@ export default function ProjectsAdminPage() {
         ...prev,
         [projectId]: "active",
       }));
+      window.open("/viewer", "_blank");
     } catch (e) {
       setProjectStatus((prev) => ({
         ...prev,
         [projectId]: "idle",
       }));
+      toast.error("Failed to apply: configuration is incomplete.", {
+        position: "top-center",
+      });
     } finally {
       setIsProjectProcessing(false);
     }

@@ -1,4 +1,4 @@
-import { client } from "./client";
+import { client, serverOrigin } from "./client";
 import { VideoResponse } from "./videos";
 
 const api = client.extend((options) => ({
@@ -46,12 +46,12 @@ export const chatApi = {
   },
 
   streamChat: async (userText: string) => {
-    const res = await fetch("/chat/stream_chat", {
+    const res = await fetch(`${serverOrigin}/api/chat/stream_chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ user_text: userText }),
+      body: JSON.stringify({ userText }),
     });
 
     if (!res.body) throw new Error("No stream body");

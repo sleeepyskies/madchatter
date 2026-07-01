@@ -5,93 +5,38 @@ import { useMicVAD, utils } from "@ricky0123/vad-react";
 import VideoPlayer from "./VideoPlayer.jsx";
 import ListeningAnimation from "./ListeningAnimation.jsx";
 import SubtitlePanel from "./SubtitlePanel.jsx";
+import { chatApi } from "../../api/chat";
+
+const INACTIVITY_TIMEOUT = 60000;
 
 export default function Vad() {
   const [activeSubtitle, setActiveSubtitle] = useState({ text: "", role: "" });
   const [state, setState] = useState("LISTEN"); // LISTEN | THINKING | SPEAKING
   const [showWaveform, setShowWaveform] = useState(true);
   const [videos, setVideos] = useState([]);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [currentVideoUrl, setCurrentVideoUrl] = useState("");
+  const [isVideoLooping, setIsVideoLooping] = useState(true);
 
   const audioCtxRef = useRef(null);
   const nextStartTimeRef = useRef(0);
   const audioQueueRef = useRef(new Set());
   const waveformTimerRef = useRef(null);
+  const inactivityTimerRef = useRef(null);
+  const idleVideoUrlRef = useRef("");
+  const exitVideoUrlRef = useRef("");
+  const audioDoneRef = useRef(false);
+  const videoDoneRef = useRef(false);
+  const lastReplyRef = useRef("");
+  const sessionActiveRef = useRef(false);
 
   const initAudioContext = () => {
-    if (!audioCtxRef.current) {
+    if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
       audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
       nextStartTimeRef.current = audioCtxRef.current.currentTime;
     } else if (audioCtxRef.current.state === "suspended") {
       audioCtxRef.current.resume();
     }
   };
-
-  useEffect(() => {
-    const fetchProject = async () => {
-      const fallbackVideos = [
-        {
-          id: 1,
-          label: "Default Avatar",
-          filename: "avatar.mp4",
-          description: "Static avatar video for development",
-          fileUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
-        },
-      ];
-
-      try {
-        const res = await fetch("http://127.0.0.1:8000/api/projects");
-        if (!res.ok) throw new Error(`Project fetch failed: ${res.status}`);
-
-        const projects = await res.json();
-        if (!Array.isArray(projects) || projects.length === 0) {
-          setVideos(fallbackVideos);
-          setCurrentVideoIndex(0);
-          setCurrentVideoUrl(fallbackVideos[0].fileUrl);
-          return;
-        }
-
-        const project = projects[0];
-        const projectVideos =
-          project.videos?.map((video) => ({
-            ...video,
-            fileUrl: `http://127.0.0.1:8000/files/${video.filename}`,
-          })) ?? [];
-
-        setVideos(projectVideos);
-
-        if (project.idleVideo?.filename) {
-          setCurrentVideoUrl(`http://127.0.0.1:8000/files/${project.idleVideo.filename}`);
-          const idleIndex = projectVideos.findIndex((v) => v.id === project.idleVideo.id);
-          setCurrentVideoIndex(idleIndex !== -1 ? idleIndex : 0);
-        } else if (projectVideos.length > 0) {
-          setCurrentVideoIndex(0);
-          setCurrentVideoUrl(projectVideos[0].fileUrl);
-        } else {
-          setVideos(fallbackVideos);
-          setCurrentVideoIndex(0);
-          setCurrentVideoUrl(fallbackVideos[0].fileUrl);
-        }
-      } catch (err) {
-        console.error("Failed to fetch project videos:", err);
-        setVideos(fallbackVideos);
-        setCurrentVideoIndex(0);
-        setCurrentVideoUrl(fallbackVideos[0].fileUrl);
-      }
-    };
-
-    fetchProject();
-  }, []);
-
-  useEffect(() => {
-    if (!vad) return;
-    if (state === "LISTEN") {
-      vad.start();
-    } else {
-      vad.pause();
-    }
-  }, [state]);
 
   const playPCMBuffer = (int16Array) => {
     const audioCtx = audioCtxRef.current;
@@ -135,21 +80,110 @@ export default function Vad() {
     source.onended = () => {
       audioQueueRef.current.delete(source);
       if (audioQueueRef.current.size === 0) {
-        setState("LISTEN");
-
-        // Hide waveform immediately, subtitle fades out over 1.5s,
-        // then show waveform after subtitle is gone
+        audioDoneRef.current = true;
         setShowWaveform(false);
-        setActiveSubtitle({ text: "", role: "" }); // triggers SubtitlePanel fade-out (0.4s)
-
         clearTimeout(waveformTimerRef.current);
         waveformTimerRef.current = setTimeout(() => {
           setShowWaveform(true);
         }, 1500);
+        tryEndPlayback();
       }
     };
   };
 
+  const tryEndPlayback = () => {
+    if (audioDoneRef.current && videoDoneRef.current) {
+      audioDoneRef.current = false;
+      videoDoneRef.current = false;
+      setActiveSubtitle({ text: "", role: "" });
+      // Wait for subtitle fade-out (400ms) before showing listening UI
+      setTimeout(() => {
+        setShowWaveform(true);
+        setState("LISTEN");
+      }, 400);
+    }
+  };
+
+  const handleVideoEnded = () => {
+    videoDoneRef.current = true;
+    if (idleVideoUrlRef.current) {
+      setCurrentVideoUrl(idleVideoUrlRef.current);
+      setIsVideoLooping(true);
+    }
+    tryEndPlayback();
+  };
+
+  const handleInactivityTimeout = async () => {
+    setState("THINKING");
+    setShowWaveform(false);
+    audioDoneRef.current = true;
+    videoDoneRef.current = false;
+
+    try {
+      await chatApi.exitChat();
+    } catch (err) {
+      console.error("Exit chat failed:", err);
+    }
+
+    sessionActiveRef.current = false;
+
+    if (exitVideoUrlRef.current) {
+      setIsVideoLooping(false);
+      setCurrentVideoUrl(exitVideoUrlRef.current);
+    } else {
+      setCurrentVideoUrl(idleVideoUrlRef.current);
+      setIsVideoLooping(true);
+      setState("LISTEN");
+      setShowWaveform(true);
+    }
+  };
+
+  const findVideoUrl = (videoId) => {
+    if (!videoId) return null;
+    const video = videos.find((v) => v.id === videoId);
+    return video?.downloadUrl ?? null;
+  };
+
+  const streamAndPlayAudio = async (reader) => {
+    let leftover = new Uint8Array(0);
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const combined = new Uint8Array(leftover.length + value.length);
+      combined.set(leftover);
+      combined.set(value, leftover.length);
+
+      const playable = combined.length - (combined.length % 2);
+      leftover = combined.slice(playable);
+
+      if (playable > 0) {
+        const clean = combined.buffer.slice(0, playable);
+        const int16 = new Int16Array(clean);
+        playPCMBuffer(int16);
+      }
+    }
+  };
+
+  const streamWithReply = async (userText) => {
+    const body = await chatApi.streamChat(userText);
+    const reader = body.getReader();
+
+    await streamAndPlayAudio(reader);
+
+    try {
+      const replyData = await chatApi.getLatestReply();
+
+      if (replyData?.reply) {
+        lastReplyRef.current = replyData.reply;
+        setActiveSubtitle({ text: replyData.reply, role: "agent" });
+      }
+    } catch (err) {
+      console.log("Fetch reply failed.", err);
+    }
+  };
+
+  // ─── VAD hook must come before any effect that references `vad` in deps ───
   const vad = useMicVAD({
     model: "v5",
     baseAssetPath: "/",
@@ -158,85 +192,103 @@ export default function Vad() {
     onSpeechEnd: async (audioData) => {
       if (state !== "LISTEN") return;
 
-      setState("THINKING");
-      setShowWaveform(false);
-      setActiveSubtitle({ text: "", role: "" });
-      clearTimeout(waveformTimerRef.current);
-
+      clearTimeout(inactivityTimerRef.current);
       initAudioContext();
 
       try {
         const wavBuffer = utils.encodeWAV(audioData);
         const blob = new Blob([wavBuffer], { type: "audio/wav" });
+        const file = new File([blob], "input.wav", { type: "audio/wav" });
 
-        const form = new FormData();
-        form.append("file", blob, "input.wav");
+        setState("THINKING");
+        setShowWaveform(false);
+        setActiveSubtitle({ text: "", role: "" });
 
-        const res = await fetch("http://127.0.0.1:8000/api/chat", {
-          method: "POST",
-          body: form,
-        });
+        const modeResponse = await chatApi.getChatMode(file);
+        const { mode, videoId, userText } = modeResponse;
+        sessionActiveRef.current = true;
 
-        if (!res.ok) throw new Error("Server error");
-
-        const xUserText = res.headers.get("X-User-Text");
-        if (xUserText) {
-          setActiveSubtitle({
-            text: decodeURIComponent(escape(xUserText)),
-            role: "user",
-          });
+        if (userText) {
+          setActiveSubtitle({ text: userText, role: "user" });
         }
 
-        setState("SPEAKING");
+        audioDoneRef.current = false;
+        videoDoneRef.current = false;
 
-        const reader = res.body.getReader();
-        let leftover = new Uint8Array(0);
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const combined = new Uint8Array(leftover.length + value.length);
-          combined.set(leftover);
-          combined.set(value, leftover.length);
-
-          const playable = combined.length - (combined.length % 2);
-          leftover = combined.slice(playable);
-
-          if (playable > 0) {
-            const clean = combined.buffer.slice(0, playable);
-            const int16 = new Int16Array(clean);
-            playPCMBuffer(int16);
-          }
+        const videoUrl = (mode !== "tts_only" && videoId) ? findVideoUrl(videoId) : null;
+        if (videoUrl) {
+          setIsVideoLooping(false);
+          setCurrentVideoUrl(videoUrl);
+        } else {
+          videoDoneRef.current = true;
         }
 
-        const replyRes = await fetch("http://127.0.0.1:8000/api/chat/latest_reply");
-        const replyData = await replyRes.json();
-
-        setActiveSubtitle({ text: replyData.reply, role: "agent" });
-
-        if (replyData.suggested_video_id) {
-          const videoIndex = videos.findIndex((v) => v.id === replyData.suggested_video_id);
-          if (videoIndex !== -1) {
-            setCurrentVideoIndex(videoIndex);
-            setCurrentVideoUrl(videos[videoIndex].fileUrl);
+        if (mode === "video_only" || !userText) {
+          audioDoneRef.current = true;
+          tryEndPlayback();
+        } else {
+          setState("SPEAKING");
+          try {
+            await streamWithReply(userText);
+          } catch (err) {
+            console.error("Stream chat failed:", err);
+            audioDoneRef.current = true;
           }
         }
       } catch (err) {
-        console.error(err);
+        console.error("Chat error:", err);
         setState("LISTEN");
         setActiveSubtitle({ text: "", role: "" });
         setShowWaveform(true);
+        setCurrentVideoUrl(idleVideoUrlRef.current);
+        setIsVideoLooping(true);
       }
     },
   });
+
+  // ─── Effects ────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    chatApi.preloadVideos()
+      .then((data) => {
+        const allVideos = data.videos ?? [];
+        setVideos(allVideos);
+        exitVideoUrlRef.current = data.exitVideo?.downloadUrl ?? "";
+
+        const idleUrl = data.idleVideo?.downloadUrl ?? allVideos[0]?.downloadUrl;
+        if (idleUrl) {
+          idleVideoUrlRef.current = idleUrl;
+          setCurrentVideoUrl(idleUrl);
+          setIsVideoLooping(true);
+        }
+      })
+      .catch((err) => console.error("Failed to preload videos:", err));
+  }, []);
+
+  useEffect(() => {
+    if (!vad) return;
+    if (state === "LISTEN") {
+      vad.start();
+    } else {
+      vad.pause();
+    }
+  }, [state]);
 
   useEffect(() => {
     if (vad && state === "LISTEN") {
       initAudioContext();
       vad.start();
     }
-  }, [vad]);
+  }, [vad, state]);
+
+  useEffect(() => {
+    if (state === "LISTEN" && sessionActiveRef.current) {
+      inactivityTimerRef.current = setTimeout(handleInactivityTimeout, INACTIVITY_TIMEOUT);
+    } else {
+      clearTimeout(inactivityTimerRef.current);
+    }
+    return () => clearTimeout(inactivityTimerRef.current);
+  }, [state]);
 
   const statusLabel =
     state === "THINKING" ? "Thinking" :
@@ -245,7 +297,13 @@ export default function Vad() {
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh", margin: 0, padding: 0, overflow: "hidden", backgroundColor: "black" }}>
-      <VideoPlayer videoUrl={currentVideoUrl} />
+      {currentVideoUrl && (
+        <VideoPlayer
+          videoUrl={currentVideoUrl}
+          loop={isVideoLooping}
+          onEnded={handleVideoEnded}
+        />
+      )}
 
       <div style={{
         position: "absolute",
@@ -257,26 +315,15 @@ export default function Vad() {
         padding: "24px",
         pointerEvents: "none",
       }}>
-        <SubtitlePanel
-          text={activeSubtitle.text}
-          role={activeSubtitle.role}
-          style={{
-            pointerEvents: "auto",
-            width: "100%",
-            maxWidth: "1080px",
-          }}
-        />
-
         <div style={{
-          marginTop: "16px",
           pointerEvents: "auto",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: "6px",
-          minHeight: "140px", // prevent layout shift when waveform appears/disappears
           justifyContent: "flex-end",
         }}>
+          <ListeningAnimation isActive={showWaveform && state === "LISTEN"} />
           {statusLabel ? (
             <span style={{
               fontSize: "12px",
@@ -288,8 +335,18 @@ export default function Vad() {
               {statusLabel}
             </span>
           ) : null}
-          <ListeningAnimation isActive={showWaveform && state === "LISTEN"} />
         </div>
+
+        <SubtitlePanel
+          text={activeSubtitle.text}
+          role={activeSubtitle.role}
+          style={{
+            pointerEvents: "auto",
+            width: "100%",
+            maxWidth: "1080px",
+            marginTop: "16px",
+          }}
+        />
       </div>
     </div>
   );

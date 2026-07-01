@@ -41,6 +41,8 @@ export default function SubtitlePanel({ text, role, style = {} }) {
         opacity,
         transition: "opacity 0.4s ease",
         minHeight: "60px",
+        maxHeight: "35vh",
+        overflowY: "auto",
         display: "flex",
         alignItems: "flex-end",
       }}
@@ -49,31 +51,42 @@ export default function SubtitlePanel({ text, role, style = {} }) {
         <div style={{
           display: "flex",
           flexDirection: "column",
-          gap: "4px",
+          gap: "6px",
           width: "100%",
+          minHeight: 0,
+          flex: "none",
         }}>
           <span style={{
+            flexShrink: 0,
             fontSize: "11px",
             fontWeight: 500,
             letterSpacing: "0.07em",
             textTransform: "uppercase",
             color: isAgent ? "rgba(248,113,113,0.8)" : "rgba(96,165,250,0.8)",
-            textShadow: "0 0 4px rgba(0,0,0,0.8)",
-            paddingLeft: "2px",
+            padding: "4px 6px",
+            background: "rgba(0,0,0,0.95)",
+            borderRadius: "4px",
+            alignSelf: "flex-start",
           }}>
             {isAgent ? "Agent" : "You"}
           </span>
-          <p style={{
-            margin: 0,
-            fontSize: "16px",
-            lineHeight: 1.6,
-            color: isAgent ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.75)",
-            fontWeight: isAgent ? 400 : 300,
-            fontFamily: "sans-serif",
-            textShadow: "0 0 4px rgba(0,0,0,0.85)",
+          <div style={{
+            overflowY: "auto",
+            maxHeight: "25vh",
+            paddingLeft: "6px",
           }}>
-            {displayed.text}
-          </p>
+            <p style={{
+              margin: 0,
+              fontSize: "16px",
+              lineHeight: 1.6,
+              color: isAgent ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.75)",
+              fontWeight: isAgent ? 400 : 300,
+              fontFamily: "sans-serif",
+              textShadow: "0 0 4px rgba(0,0,0,0.85)",
+            }}>
+              {displayed.text}
+            </p>
+          </div>
         </div>
       )}
     </div>
