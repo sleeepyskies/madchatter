@@ -5,7 +5,6 @@ import { useMicVAD, utils } from "@ricky0123/vad-react";
 import VideoPlayer from "./VideoPlayer.jsx";
 import ListeningAnimation from "./ListeningAnimation.jsx";
 import SubtitlePanel from "./SubtitlePanel.jsx";
-import { projectsApi } from "../../api/projects";
 import { chatApi } from "../../api/chat";
 
 const INACTIVITY_TIMEOUT = 60000;
@@ -250,56 +249,20 @@ export default function Vad() {
   // ─── Effects ────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    const fetchProject = async () => {
-      const fallbackVideos = [
-        {
-          id: 1,
-          label: "Default Avatar",
-          description: "Static avatar video for development",
-          downloadUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4",
-        },
-      ];
+    chatApi.preloadVideos()
+      .then((data) => {
+        const allVideos = data.videos ?? [];
+        setVideos(allVideos);
+        exitVideoUrlRef.current = data.exitVideo?.downloadUrl ?? "";
 
-      try {
-        const projects = await projectsApi.listProjects();
-        if (!Array.isArray(projects) || projects.length === 0) {
-          setVideos(fallbackVideos);
-          idleVideoUrlRef.current = fallbackVideos[0].downloadUrl;
-          setCurrentVideoUrl(fallbackVideos[0].downloadUrl);
-          setIsVideoLooping(true);
-          return;
-        }
-
-        const project = projects[0];
-        const projectVideos = project.videos ?? [];
-
-        setVideos(projectVideos);
-        exitVideoUrlRef.current = project.exitVideo?.downloadUrl ?? "";
-
-        if (project.idleVideo?.downloadUrl) {
-          idleVideoUrlRef.current = project.idleVideo.downloadUrl;
-          setCurrentVideoUrl(project.idleVideo.downloadUrl);
-          setIsVideoLooping(true);
-        } else if (projectVideos.length > 0) {
-          idleVideoUrlRef.current = projectVideos[0].downloadUrl;
-          setCurrentVideoUrl(projectVideos[0].downloadUrl);
-          setIsVideoLooping(true);
-        } else {
-          setVideos(fallbackVideos);
-          idleVideoUrlRef.current = fallbackVideos[0].downloadUrl;
-          setCurrentVideoUrl(fallbackVideos[0].downloadUrl);
+        const idleUrl = data.idleVideo?.downloadUrl ?? allVideos[0]?.downloadUrl;
+        if (idleUrl) {
+          idleVideoUrlRef.current = idleUrl;
+          setCurrentVideoUrl(idleUrl);
           setIsVideoLooping(true);
         }
-      } catch (err) {
-        console.error("Failed to fetch project videos:", err);
-        setVideos(fallbackVideos);
-        idleVideoUrlRef.current = fallbackVideos[0].downloadUrl;
-        setCurrentVideoUrl(fallbackVideos[0].downloadUrl);
-        setIsVideoLooping(true);
-      }
-    };
-
-    fetchProject();
+      })
+      .catch((err) => console.error("Failed to preload videos:", err));
   }, []);
 
   useEffect(() => {
