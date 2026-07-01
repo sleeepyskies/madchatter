@@ -230,51 +230,24 @@ export default function Vad() {
         audioDoneRef.current = false;
         videoDoneRef.current = false;
 
-        if (mode === "video_only") {
-          audioDoneRef.current = true;
-          const videoUrl = findVideoUrl(videoId);
-          if (videoUrl) {
-            setIsVideoLooping(false);
-            setCurrentVideoUrl(videoUrl);
-          } else {
-            videoDoneRef.current = true;
-            tryEndPlayback();
-          }
-        } else if (mode === "video_and_tts") {
-          const videoUrl = videoId ? findVideoUrl(videoId) : null;
-          if (videoUrl) {
-            setIsVideoLooping(false);
-            setCurrentVideoUrl(videoUrl);
-          } else {
-            videoDoneRef.current = true;
-          }
-
-          if (userText) {
-            setState("SPEAKING");
-            try {
-              await streamWithReply(userText);
-            } catch (err) {
-              console.error("Stream chat failed:", err);
-              audioDoneRef.current = true;
-            }
-          } else {
-            audioDoneRef.current = true;
-            tryEndPlayback();
-          }
-        } else if (mode === "tts_only") {
+        const videoUrl = (mode !== "tts_only" && videoId) ? findVideoUrl(videoId) : null;
+        if (videoUrl) {
+          setIsVideoLooping(false);
+          setCurrentVideoUrl(videoUrl);
+        } else {
           videoDoneRef.current = true;
+        }
 
-          if (userText) {
-            setState("SPEAKING");
-            try {
-              await streamWithReply(userText);
-            } catch (err) {
-              console.error("Stream chat failed:", err);
-              audioDoneRef.current = true;
-            }
-          } else {
+        if (mode === "video_only" || !userText) {
+          audioDoneRef.current = true;
+          tryEndPlayback();
+        } else {
+          setState("SPEAKING");
+          try {
+            await streamWithReply(userText);
+          } catch (err) {
+            console.error("Stream chat failed:", err);
             audioDoneRef.current = true;
-            tryEndPlayback();
           }
         }
       } catch (err) {
