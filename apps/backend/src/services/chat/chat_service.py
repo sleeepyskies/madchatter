@@ -189,13 +189,13 @@ class ChatService:
         """Buffers the streaming text output and yields it in chunks based on punctuation or length for more natural TTS processing."""
         buffer = ""
         full_reply = ""
-        punctuations = ('.', '?', '!', ',', ';', '。', '？', '！', '，', '；', '\n')
+        punctuations = ('.', '?', '!', ';', '。', '？', '！', '，', '；', '\n')
 
         for text_chunk in stream:
             full_reply += text_chunk
             buffer += text_chunk
 
-            if any(p in buffer for p in punctuations) or len(buffer) >= 80:
+            if any(p in buffer for p in punctuations) or len(buffer) >= 150:
                 yield buffer
                 buffer = ""
 

@@ -31,7 +31,9 @@ export default function Vad() {
 
   const initAudioContext = () => {
     if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
-      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      audioCtxRef.current = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
       nextStartTimeRef.current = audioCtxRef.current.currentTime;
     } else if (audioCtxRef.current.state === "suspended") {
       audioCtxRef.current.resume();
@@ -42,26 +44,14 @@ export default function Vad() {
     const audioCtx = audioCtxRef.current;
     if (!audioCtx) return;
 
-    const MODEL_SAMPLE_RATE = 16000;
-    const TARGET_SAMPLE_RATE = audioCtx.sampleRate;
-
+    // 1. PCM -> float
     const float32 = new Float32Array(int16Array.length);
     for (let i = 0; i < int16Array.length; i++) {
       float32[i] = int16Array[i] / 32768;
     }
 
-    const ratio = MODEL_SAMPLE_RATE / TARGET_SAMPLE_RATE;
-    const resampled = new Float32Array(Math.round(int16Array.length / ratio));
-    for (let i = 0; i < resampled.length; i++) {
-      const src = i * ratio;
-      const i0 = Math.floor(src);
-      const i1 = Math.min(i0 + 1, int16Array.length - 1);
-      const w = src - i0;
-      resampled[i] = float32[i0] * (1 - w) + float32[i1] * w;
-    }
-
-    const buffer = audioCtx.createBuffer(1, resampled.length, TARGET_SAMPLE_RATE);
-    buffer.getChannelData(0).set(resampled);
+    const buffer = audioCtx.createBuffer(1, float32.length, 22050);
+    buffer.getChannelData(0).set(float32);
 
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
@@ -215,7 +205,8 @@ export default function Vad() {
         audioDoneRef.current = false;
         videoDoneRef.current = false;
 
-        const videoUrl = (mode !== "tts_only" && videoId) ? findVideoUrl(videoId) : null;
+        const videoUrl =
+          mode !== "tts_only" && videoId ? findVideoUrl(videoId) : null;
         if (videoUrl) {
           setIsVideoLooping(false);
           setCurrentVideoUrl(videoUrl);
@@ -249,13 +240,15 @@ export default function Vad() {
   // ─── Effects ────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    chatApi.preloadVideos()
+    chatApi
+      .preloadVideos()
       .then((data) => {
         const allVideos = data.videos ?? [];
         setVideos(allVideos);
         exitVideoUrlRef.current = data.exitVideo?.downloadUrl ?? "";
 
-        const idleUrl = data.idleVideo?.downloadUrl ?? allVideos[0]?.downloadUrl;
+        const idleUrl =
+          data.idleVideo?.downloadUrl ?? allVideos[0]?.downloadUrl;
         if (idleUrl) {
           idleVideoUrlRef.current = idleUrl;
           setCurrentVideoUrl(idleUrl);
@@ -283,7 +276,10 @@ export default function Vad() {
 
   useEffect(() => {
     if (state === "LISTEN" && sessionActiveRef.current) {
-      inactivityTimerRef.current = setTimeout(handleInactivityTimeout, INACTIVITY_TIMEOUT);
+      inactivityTimerRef.current = setTimeout(
+        handleInactivityTimeout,
+        INACTIVITY_TIMEOUT,
+      );
     } else {
       clearTimeout(inactivityTimerRef.current);
     }
@@ -291,12 +287,26 @@ export default function Vad() {
   }, [state]);
 
   const statusLabel =
-    state === "THINKING" ? "Thinking" :
-    state === "SPEAKING" ? "Speaking" :
-    showWaveform ? "Listening" : "";
+    state === "THINKING"
+      ? "Thinking"
+      : state === "SPEAKING"
+        ? "Speaking"
+        : showWaveform
+          ? "Listening"
+          : "";
 
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh", margin: 0, padding: 0, overflow: "hidden", backgroundColor: "black" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        padding: 0,
+        overflow: "hidden",
+        backgroundColor: "black",
+      }}
+    >
       {currentVideoUrl && (
         <VideoPlayer
           videoUrl={currentVideoUrl}
@@ -305,33 +315,39 @@ export default function Vad() {
         />
       )}
 
-      <div style={{
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-        alignItems: "center",
-        padding: "24px",
-        pointerEvents: "none",
-      }}>
-        <div style={{
-          pointerEvents: "auto",
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          gap: "6px",
           justifyContent: "flex-end",
-        }}>
+          alignItems: "center",
+          padding: "24px",
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            pointerEvents: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "6px",
+            justifyContent: "flex-end",
+          }}
+        >
           <ListeningAnimation isActive={showWaveform && state === "LISTEN"} />
           {statusLabel ? (
-            <span style={{
-              fontSize: "12px",
-              fontWeight: 500,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.55)",
-            }}>
+            <span
+              style={{
+                fontSize: "12px",
+                fontWeight: 500,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.55)",
+              }}
+            >
               {statusLabel}
             </span>
           ) : null}
