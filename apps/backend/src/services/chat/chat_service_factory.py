@@ -21,9 +21,9 @@ class ChatServiceFactory:
 
         stt = SpeechToText(
             model_size="base",
-            language=language,
+            language=language.value,
             device="cpu",
-            compute_type="int8"
+            compute_type="int8",
         )
 
         rag = RAG(chroma_collection=chroma_collection, system_prompt=system_prompt)
