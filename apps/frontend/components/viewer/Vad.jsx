@@ -28,9 +28,10 @@ export default function Vad() {
   const audioDoneRef = useRef(false);
   const videoDoneRef = useRef(false);
   const lastReplyRef = useRef("");
+  const sessionActiveRef = useRef(false);
 
   const initAudioContext = () => {
-    if (!audioCtxRef.current) {
+    if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
       audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
       nextStartTimeRef.current = audioCtxRef.current.currentTime;
     } else if (audioCtxRef.current.state === "suspended") {
@@ -95,7 +96,12 @@ export default function Vad() {
     if (audioDoneRef.current && videoDoneRef.current) {
       audioDoneRef.current = false;
       videoDoneRef.current = false;
-      setState("LISTEN");
+      setActiveSubtitle({ text: "", role: "" });
+      // Wait for subtitle fade-out (400ms) before showing listening UI
+      setTimeout(() => {
+        setShowWaveform(true);
+        setState("LISTEN");
+      }, 400);
     }
   };
 
@@ -109,6 +115,8 @@ export default function Vad() {
   };
 
   const handleInactivityTimeout = async () => {
+    setState("THINKING");
+    setShowWaveform(false);
     audioDoneRef.current = true;
     videoDoneRef.current = false;
 
@@ -117,6 +125,8 @@ export default function Vad() {
     } catch (err) {
       console.error("Exit chat failed:", err);
     }
+
+    sessionActiveRef.current = false;
 
     if (exitVideoUrlRef.current) {
       setIsVideoLooping(false);
@@ -157,46 +167,21 @@ export default function Vad() {
   };
 
   const streamWithReply = async (userText) => {
-    // Snapshot the current reply before this interaction starts
-    const prevReply = lastReplyRef.current;
-
     const body = await chatApi.streamChat(userText);
     const reader = body.getReader();
 
-    let replyFound = false;
+    await streamAndPlayAudio(reader);
 
-    const playPromise = streamAndPlayAudio(reader);
+    try {
+      const replyData = await chatApi.getLatestReply();
 
-    const pollPromise = (async () => {
-      while (!replyFound) {
-        await new Promise((r) => setTimeout(r, 200));
-        try {
-          const replyData = await chatApi.getLatestReply();
-          if (replyData?.reply && replyData.reply !== prevReply) {
-            lastReplyRef.current = replyData.reply;
-            setActiveSubtitle({ text: replyData.reply, role: "agent" });
-            replyFound = true;
-          }
-        } catch {}
+      if (replyData?.reply) {
+        lastReplyRef.current = replyData.reply;
+        setActiveSubtitle({ text: replyData.reply, role: "agent" });
       }
-    })();
-
-    await playPromise;
-
-    for (let i = 0; !replyFound && i < 15; i++) {
-      await new Promise((r) => setTimeout(r, 200));
-      try {
-        const replyData = await chatApi.getLatestReply();
-        if (replyData?.reply && replyData.reply !== prevReply) {
-          lastReplyRef.current = replyData.reply;
-          setActiveSubtitle({ text: replyData.reply, role: "agent" });
-          replyFound = true;
-        }
-      } catch {}
+    } catch (err) {
+      console.log("Fetch reply failed.", err);
     }
-
-    replyFound = true;
-    await pollPromise;
   };
 
   // ─── VAD hook must come before any effect that references `vad` in deps ───
@@ -222,6 +207,7 @@ export default function Vad() {
 
         const modeResponse = await chatApi.getChatMode(file);
         const { mode, videoId, userText } = modeResponse;
+        sessionActiveRef.current = true;
 
         if (userText) {
           setActiveSubtitle({ text: userText, role: "user" });
@@ -330,10 +316,10 @@ export default function Vad() {
       initAudioContext();
       vad.start();
     }
-  }, [vad]);
+  }, [vad, state]);
 
   useEffect(() => {
-    if (state === "LISTEN") {
+    if (state === "LISTEN" && sessionActiveRef.current) {
       inactivityTimerRef.current = setTimeout(handleInactivityTimeout, INACTIVITY_TIMEOUT);
     } else {
       clearTimeout(inactivityTimerRef.current);
