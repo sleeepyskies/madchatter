@@ -43,9 +43,13 @@ class FileHandler:
         Saves a new file to the directory.
         """
         file_path = self.create_path(filename)
+
+        src = file.file if hasattr(file, "file") else file
+
         with open(file_path, "wb") as dest:
-            while content := file.file.read(1024 * 1024):
-                dest.write(content)
+            while chunk := src.read(1024 * 1024):
+                dest.write(chunk)
+
         return file_path
 
     def delete_file(self, filename: str) -> None:

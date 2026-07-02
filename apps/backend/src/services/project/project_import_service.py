@@ -36,14 +36,10 @@ class ProjectImportService:
         self.video_service = video_service
         self.knowledge_service = knowledge_service
 
-    # -------------------------
-    # PUBLIC API
-    # -------------------------
     def import_package(self, file: UploadFile) -> ImportProjectResponse:
         metadata = self._read_metadata_from_zip(file)
         project = self._create_project(metadata)
 
-        # scratch dir is scoped to the new project's id: tmp/{project_id}/
         scratch_dir = self.file_handler.create_dir(str(project.id))
         created_video_ids: list[int] = []
         knowledge_id: Optional[int] = None
@@ -69,12 +65,8 @@ class ProjectImportService:
             raise
 
         finally:
-            # always clean up every extracted file, success or failure
             self.file_handler.delete_dir(str(project.id))
 
-    # -------------------------
-    # CORE
-    # -------------------------
     def _create_project(self, metadata: dict) -> Project:
         return self.project_repository.create(
             Project(label=metadata.get("label"))
@@ -95,9 +87,6 @@ class ProjectImportService:
         )
         project.agent_id = created.id
 
-    # -------------------------
-    # VIDEOS (delegated to VideoService — it owns uuid naming + storage + rollback)
-    # -------------------------
     def _load_videos(self, metadata: dict, project: Project, files_dir: Path) -> list[int]:
         id_map: dict[int, int] = {}  # old video id -> new video id
         created_ids: list[int] = []
@@ -144,9 +133,6 @@ class ProjectImportService:
             headers=Headers({"content-type": content_type or "application/octet-stream"}),
         )
 
-    # -------------------------
-    # KNOWLEDGE (delegated to KnowledgeService the same way)
-    # -------------------------
     def _load_knowledge(self, metadata: dict, project: Project, files_dir: Path) -> Optional[int]:
         label = metadata.get("knowledge_label")
         if not label:
@@ -172,9 +158,6 @@ class ProjectImportService:
         project.vector_collection_id = knowledge.id
         return knowledge.id
 
-    # -------------------------
-    # SYNC
-    # -------------------------
     def _sync_project(self, project: Project) -> None:
         self.project_repository.update(
             project.id,
@@ -188,9 +171,6 @@ class ProjectImportService:
             ),
         )
 
-    # -------------------------
-    # ROLLBACK
-    # -------------------------
     def _rollback(self, project: Project, video_ids: list[int], knowledge_id: Optional[int]) -> None:
         for video_id in video_ids:
             try:
@@ -209,9 +189,6 @@ class ProjectImportService:
         except Exception:
             logger.exception(f"Failed to roll back project {project.id}")
 
-    # -------------------------
-    # UTILS
-    # -------------------------
     def _read_metadata_from_zip(self, file: UploadFile) -> dict:
         with zipfile.ZipFile(file.file) as z:
             with z.open("metadata.json") as f:
