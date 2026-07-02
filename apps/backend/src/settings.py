@@ -9,7 +9,7 @@ from sqlalchemy.orm import base
 def get_base_directory() -> Path:
 	if getattr(sys, "frozen", False):
 		return Path(sys.executable).resolve().parent
-	return Path(__file__).resolve().parent
+	return Path(__file__).resolve().parent.parent
 
 
 base_directory = get_base_directory()
