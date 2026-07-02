@@ -14,7 +14,7 @@ from starlette.responses import JSONResponse
 
 from api.api_exception import APIException, ApiErrorResponse
 from api.routes import video_router, project_router, agent_router, knowledge_router, chat_router
-from settings import settings
+from settings import settings, Env
 
 # configure app and state
 app = FastAPI(
@@ -108,6 +108,9 @@ def find_server_port(preferred: int) -> int:
     Attempts to find a suitable server port.
     If the preferred port is taken, the OS will decide which port to run on.
     """
+    if settings.env == Env.DEV:
+        return settings.server_port
+
     for port in (preferred, 0):
         with socket.socket() as s:
             try:

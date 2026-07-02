@@ -20,7 +20,6 @@ class Env(StrEnum):
 
 	DEV = "DEV"
 	PROD = "PROD"
-	TEST = "TEST"
 
 
 class LogLevel(StrEnum):
