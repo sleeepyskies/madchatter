@@ -1,7 +1,18 @@
 from enum import StrEnum
 from pathlib import Path
+import sys
 
 from pydantic_settings import SettingsConfigDict, BaseSettings
+from sqlalchemy.orm import base
+
+
+def get_base_directory() -> Path:
+	if getattr(sys, "frozen", False):
+		return Path(sys.executable).resolve().parent
+	return Path(__file__).resolve().parent
+
+
+base_directory = get_base_directory()
 
 
 class Env(StrEnum):
@@ -59,17 +70,25 @@ class Settings(BaseSettings):
 	api_prefix: str = "/api"
 	"""API prefix for all API endpoints."""
 
-	run_dir: Path = Path("./run").absolute()
-	"""Path to the runtime directory. Used for persistence of data."""
+	@property
+	def run_dir(self) -> Path:
+		"""Path to the runtime directory. Used for persistence of data."""
+		return (base_directory / "run").absolute()
 
-	tmp_dir: Path = Path(run_dir / "tmp").absolute()
-	"""Path to the tmp directory. Used for temporary persistence of data. Do not trust any files here will remain."""
+	@property
+	def tmp_dir(self) -> Path:
+		"""Path to the tmp directory. Used for temporary persistence of data. Do not trust any files here will remain."""
+		return Path(self.run_dir / "tmp").absolute()
 
-	static_dir: Path = Path("./static").absolute()
-	"""Directory reserved for saving static files to serve."""
+	@property
+	def static_dir(self) -> Path:
+		"""Directory reserved for saving static files to serve."""
+		return (base_directory / "static").absolute()
 
-	files_dir: Path = Path(run_dir / "files").absolute()
-	"""Directory reserved for saving files to disk. This includes videos and source knowledge file."""
+	@property
+	def files_dir(self) -> Path:
+		"""Directory reserved for saving files to disk. This includes videos and source knowledge file."""
+		return Path(self.run_dir / "files").absolute()
 
 
 settings = Settings()
