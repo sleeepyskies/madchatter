@@ -17,10 +17,12 @@ class SpeechToText:
     def transcribe(self, audio_path):
         segments, info = self.model.transcribe(
             audio_path,
-            beam_size=1,
+            beam_size=3,
             temperature=0.0,
             vad_filter=True,
-            language=self.language)
+            language=self.language,
+            initial_prompt="Important terms: HBKsaar, HBK Saar, Saarland, Saarbrücken"
+        )
 
         text_list = [segment.text for segment in segments]
         return "".join(text_list).strip()
