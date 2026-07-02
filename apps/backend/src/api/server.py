@@ -1,3 +1,5 @@
+import socket
+
 import uvicorn
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,8 +18,8 @@ from settings import settings
 
 # configure app and state
 app = FastAPI(
-	title="MadChatter",
-	summary="Backend server for the MadChatter application.",
+    title="MadChatter",
+    summary="Backend server for the MadChatter application.",
 )
 
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
@@ -27,12 +29,12 @@ app.state.SessionLocal = None
 app.state.engine = None
 
 app.add_middleware(
-	CORSMiddleware,
-	allow_origins=["*"],
-	allow_credentials=True,
-	allow_methods=["*"],
-	allow_headers=["*"],
-	expose_headers=["X-User-Text"],  # Show user input text
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["X-User-Text"],  # Show user input text
 )
 
 router = APIRouter(prefix=settings.api_prefix)
@@ -48,73 +50,96 @@ router.include_router(chat_router)
 # exception handler
 @app.exception_handler(APIException)
 async def api_exception_handler(request: Request, exception: APIException) -> JSONResponse:
-	logger.error(exception)
+    logger.error(exception)
 
-	return ApiErrorResponse(
-		code=exception.status_code,
-		error_type=exception.error_type,
-		path=request.url.path,
-		message=exception.message,
-		detail=exception.detail,
-	)
+    return ApiErrorResponse(
+        code=exception.status_code,
+        error_type=exception.error_type,
+        path=request.url.path,
+        message=exception.message,
+        detail=exception.detail,
+    )
 
 
 @app.exception_handler(IntegrityError)
 async def integrity_error_handler(request: Request, exception: IntegrityError):
-	logger.error(exception)
+    logger.error(exception)
 
-	msg = str(exception.orig)
-	detail = ""
-	if "FOREIGN KEY" in msg:
-		detail = "The resource referenced through a foreign key does not exist."
-	elif "UNIQUE" in msg:
-		detail = "A resource with this unique value already exists."
-	elif "NOT NULL" in msg:
-		detail = "A required field was missing or left empty."
+    msg = str(exception.orig)
+    detail = ""
+    if "FOREIGN KEY" in msg:
+        detail = "The resource referenced through a foreign key does not exist."
+    elif "UNIQUE" in msg:
+        detail = "A resource with this unique value already exists."
+    elif "NOT NULL" in msg:
+        detail = "A required field was missing or left empty."
 
-	return ApiErrorResponse(
-		code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-		error_type="ValidationError",
-		path=request.url.path,
-		message="Database integrity was violated.",
-		detail=detail,
-	)
+    return ApiErrorResponse(
+        code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        error_type="ValidationError",
+        path=request.url.path,
+        message="Database integrity was violated.",
+        detail=detail,
+    )
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-	logger.exception("Unhandled exception encountered during request processing")
+    logger.exception("Unhandled exception encountered during request processing")
 
-	exception_type = type(exc).__name__
-	exception_message = str(exc)
+    exception_type = type(exc).__name__
+    exception_message = str(exc)
 
-	return ApiErrorResponse(
-		code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-		error_type=exception_type,
-		path=request.url.path,
-		message=exception_message,
-		detail=exception_message,
-	)
+    return ApiErrorResponse(
+        code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        error_type=exception_type,
+        path=request.url.path,
+        message=exception_message,
+        detail=exception_message,
+    )
 
 
 # connect main router containing all nested routers to app
 app.include_router(router)
 
 
+def find_server_port(preferred: int) -> int:
+    """
+    Attempts to find a suitable server port.
+    If the preferred port is taken, the OS will decide which port to run on.
+    """
+    for port in (preferred, 0):
+        with socket.socket() as s:
+            try:
+                s.bind((settings.server_address, port))
+                return s.getsockname()[1]
+            except OSError:
+                pass
+
+
+
 def start_server(engine: Engine, SessionLocal: sessionmaker):
-	"""
-	Starts the server and injects any dependencies into the application context.
+    """
+    Starts the server and injects any dependencies into the application context.
 
-	:param engine: database engine.
-	:param SessionLocal: DB session factory.
-	:return: None
-	"""
-	app.state.engine = engine
-	app.state.SessionLocal = SessionLocal
+    :param engine: database engine.
+    :param SessionLocal: DB session factory.
+    :return: None
+    """
+    app.state.engine = engine
+    app.state.SessionLocal = SessionLocal
 
-	uvicorn.run(
-		"api.server:app",
-		host=settings.server_address,
-		port=settings.server_port,
-		log_config=None,
-	)
+    port = find_server_port(settings.server_port)
+    if port != settings.server_port:
+        logger.warning(f"Could not use the preferred port. OS chose port ${port} to run on.")
+
+    uvicorn.run(
+        "api.server:app",
+        host=settings.server_address,
+        port=port,
+        log_config=None,
+    )
+
+    # import webbrowser
+    # webbrowser.open(settings.url_string)
+
