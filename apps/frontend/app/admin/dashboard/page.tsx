@@ -9,6 +9,7 @@ import {
   DatabaseIcon,
   FolderPlusIcon,
   LucideIcon,
+  EyeIcon,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from '@/components/ui/card';
 import { projectsApi } from "@/api/projects";
@@ -131,6 +132,25 @@ export default function DashboardPage() {
         {actionCards.map((card) => (
           <DashboardCard key={card.label} {...card} />
         ))}
+      </div>
+      <div className="mt-6 flex justify-center">
+        <Card
+          onClick={() => router.push("/viewer")}
+          className="w-fit px-5 py-3 rounded-xl transition-all duration-300 hover:shadow-lg cursor-pointer"
+        >
+          <div className="flex items-center gap-3">
+            <EyeIcon className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0" />
+
+            <div className="flex flex-col leading-tight">
+              <span className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
+                Viewer
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Open the viewer with the applied project
+              </span>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   );
