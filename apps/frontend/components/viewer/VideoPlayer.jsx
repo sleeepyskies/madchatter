@@ -18,7 +18,6 @@ export default function VideoPlayer({ videoUrl, className = "", onEnded, onPlayi
         ref={videoRef}
         src={videoUrl}
         autoPlay
-        muted
         loop={loop}
         playsInline
         style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
