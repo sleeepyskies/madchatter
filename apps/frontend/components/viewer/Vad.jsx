@@ -150,6 +150,7 @@ export default function Vad() {
       if (playable > 0) {
         const clean = combined.buffer.slice(0, playable);
         const int16 = new Int16Array(clean);
+        setState("SPEAKING");
         playPCMBuffer(int16);
       }
     }
@@ -190,12 +191,14 @@ export default function Vad() {
         const blob = new Blob([wavBuffer], { type: "audio/wav" });
         const file = new File([blob], "input.wav", { type: "audio/wav" });
 
-        setState("THINKING");
         setShowWaveform(false);
         setActiveSubtitle({ text: "", role: "" });
 
         const modeResponse = await chatApi.getChatMode(file);
+
         const { mode, videoId, userText } = modeResponse;
+
+        setState("THINKING");
         sessionActiveRef.current = true;
 
         if (userText) {
@@ -218,7 +221,6 @@ export default function Vad() {
           audioDoneRef.current = true;
           tryEndPlayback();
         } else {
-          setState("SPEAKING");
           try {
             await streamWithReply(userText);
           } catch (err) {
