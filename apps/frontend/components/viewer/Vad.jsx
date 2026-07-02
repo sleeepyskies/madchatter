@@ -16,6 +16,7 @@ export default function Vad() {
   const [videos, setVideos] = useState([]);
   const [currentVideoUrl, setCurrentVideoUrl] = useState("");
   const [isVideoLooping, setIsVideoLooping] = useState(true);
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
 
   const audioCtxRef = useRef(null);
   const nextStartTimeRef = useRef(0);
@@ -99,6 +100,7 @@ export default function Vad() {
     if (idleVideoUrlRef.current) {
       setCurrentVideoUrl(idleVideoUrlRef.current);
       setIsVideoLooping(true);
+      setIsVideoMuted(true);
     }
     tryEndPlayback();
   };
@@ -119,10 +121,12 @@ export default function Vad() {
 
     if (exitVideoUrlRef.current) {
       setIsVideoLooping(false);
+      setIsVideoMuted(true);
       setCurrentVideoUrl(exitVideoUrlRef.current);
     } else {
       setCurrentVideoUrl(idleVideoUrlRef.current);
       setIsVideoLooping(true);
+      setIsVideoMuted(true);
       setState("LISTEN");
       setShowWaveform(true);
     }
@@ -214,6 +218,7 @@ export default function Vad() {
           mode !== "tts_only" && videoId ? findVideoUrl(videoId) : null;
         if (videoUrl) {
           setIsVideoLooping(false);
+          setIsVideoMuted(mode !== "video_only");
           setCurrentVideoUrl(videoUrl);
         } else {
           videoDoneRef.current = true;
@@ -237,6 +242,7 @@ export default function Vad() {
         setShowWaveform(true);
         setCurrentVideoUrl(idleVideoUrlRef.current);
         setIsVideoLooping(true);
+        setIsVideoMuted(true);
       }
     },
   });
@@ -257,6 +263,7 @@ export default function Vad() {
           idleVideoUrlRef.current = idleUrl;
           setCurrentVideoUrl(idleUrl);
           setIsVideoLooping(true);
+          setIsVideoMuted(true);
         }
       })
       .catch((err) => console.error("Failed to preload videos:", err));
@@ -315,6 +322,7 @@ export default function Vad() {
         <VideoPlayer
           videoUrl={currentVideoUrl}
           loop={isVideoLooping}
+          muted={isVideoMuted}
           onEnded={handleVideoEnded}
         />
       )}
