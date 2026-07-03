@@ -25,6 +25,7 @@ class ChatApplicationService:
         self.chat_factory = chat_factory
         self.agent_service = agent_service
         self.knowledge_service = knowledge_service
+        self.current_project_id = None
 
     def apply_project(self, project_id: int) -> ApplyProjectResponse:
         """Initializes the chat service based on the project's configuration, including the agent and knowledge base."""
@@ -50,9 +51,16 @@ class ChatApplicationService:
         }
 
         self.chat_service = self.chat_factory.create(**config)
+        self.current_project_id = project_id
 
         return ApplyProjectResponse(
             project_id=project_id
+        )
+
+    def get_current_project(self) -> ApplyProjectResponse:
+        """Returns the ID of the currently applied project"""
+        return ApplyProjectResponse(
+            project_id=self.current_project_id
         )
 
     def get_chat_mode(self, file: UploadFile) -> ChatModeResponse:

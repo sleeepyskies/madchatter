@@ -11,25 +11,33 @@ import { ProjectResponse, projectsApi } from "@/api/projects";
 import { chatApi } from "@/api/chat";
 
 export default function ProjectsAdminPage() {
-  type ProjectStatus = "idle" | "processing" | "active";
-
   const router = useRouter();
   const [projects, setProjects] = useState<ProjectResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [projectStatus, setProjectStatus] = useState<
-    Record<number, ProjectStatus>
-  >({});
-  const [isProjectProcessing, setIsProjectProcessing] = useState(false);
+
+  const [activeProjectId, setActiveProjectId] = useState<number | null>(null);
+  const [processingProjectId, setProcessingProjectId] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await projectsApi.listProjects();
-        setProjects(data);
+        const [projectList, currentProject] = await Promise.all([
+          projectsApi.listProjects(),
+          chatApi.currentProject(),
+        ]);
+
+        setProjects(projectList);
+
+        if (currentProject?.projectId) {
+          setActiveProjectId(currentProject.projectId);
+        }
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
@@ -55,30 +63,20 @@ export default function ProjectsAdminPage() {
   };
 
   const handleApply = async (projectId: number) => {
-    setIsProjectProcessing(true);
-    setProjectStatus((prev) => ({
-      ...prev,
-      [projectId]: "processing",
-    }));
+    setProcessingProjectId(projectId);
 
     try {
       await chatApi.applyProject(projectId);
 
-      setProjectStatus((prev) => ({
-        ...prev,
-        [projectId]: "active",
-      }));
+      setActiveProjectId(projectId);
+
       window.open("/viewer", "_blank");
     } catch (e) {
-      setProjectStatus((prev) => ({
-        ...prev,
-        [projectId]: "idle",
-      }));
       toast.error("Failed to apply: configuration is incomplete.", {
         position: "top-center",
       });
     } finally {
-      setIsProjectProcessing(false);
+      setProcessingProjectId(null);
     }
   };
 
@@ -99,7 +97,13 @@ export default function ProjectsAdminPage() {
       }
     >
       {projects.map((project) => {
-        const status = projectStatus[project.id] ?? "idle";
+        const isProcessing = processingProjectId === project.id;
+        const isActive = activeProjectId === project.id;
+
+        let status: "idle" | "processing" | "active" = "idle";
+
+        if (isProcessing) status = "processing";
+        else if (isActive) status = "active";
 
         return (
           <ResourceCard
@@ -110,30 +114,33 @@ export default function ProjectsAdminPage() {
             onDelete={() => handleDelete(project.id)}
             onEdit={() => handleEdit(project.id)}
             onRename={(newLabel: string) => handleRename(project.id, newLabel)}
-            extraButtons={
-              [
-                <Button key={1} onClick={() => projectsApi.exportProject(project.id)} variant="ghost">
-                  <Download />
-                </Button>,
-                <Button
-                  key={2}
-                  size="sm"
-                  disabled={isProjectProcessing || status === "processing"}
-                  onClick={() => handleApply(project.id)}
-                  className={
-                    status === "active"
-                      ? "bg-green-600 hover:bg-green-600"
-                      : status === "processing"
-                        ? "opacity-60"
-                        : ""
-                  }
-                >
-                  {status === "idle" && "Apply"}
-                  {status === "processing" && "Applying..."}
-                  {status === "active" && "Active"}
-                </Button>
-              ]
-            }
+            extraButtons={[
+              <Button
+                key="export"
+                onClick={() => projectsApi.exportProject(project.id)}
+                variant="ghost"
+              >
+                <Download />
+              </Button>,
+
+              <Button
+                key="apply"
+                size="sm"
+                disabled={processingProjectId !== null}
+                onClick={() => handleApply(project.id)}
+                className={
+                  status === "active"
+                    ? "bg-green-600 hover:bg-green-600"
+                    : status === "processing"
+                      ? "opacity-60"
+                      : ""
+                }
+              >
+                {status === "idle" && "Apply"}
+                {status === "processing" && "Applying..."}
+                {status === "active" && "Active"}
+              </Button>,
+            ]}
           />
         );
       })}

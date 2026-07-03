@@ -17,6 +17,11 @@ def apply_project(
 ):
 	return chat_application_service.apply_project(project_id)
 
+@router.get("/current_project", response_model=ApplyProjectResponse)
+def current_project(
+	chat_application_service: ChatApplicationService = Depends(get_chat_application_service),
+):
+	return chat_application_service.get_current_project()
 
 @router.post("/mode", response_model=ChatModeResponse)
 def get_chat_mode(

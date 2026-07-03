@@ -8,7 +8,7 @@ class Mode(str, Enum):
     tts_only = "tts_only"
 
 class ApplyProjectResponse(BaseSchema):
-    project_id: int
+    project_id: int | None = None
 
 class ChatRequest(BaseSchema):
     user_text: str

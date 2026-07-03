@@ -36,6 +36,10 @@ export const chatApi = {
     return await api.post(`apply/${projectId}`).json();
   },
 
+  currentProject: async (): Promise<ApplyProjectResponse> => {
+    return await api.get("current_project").json();
+  },
+
   getChatMode: async (file: File): Promise<ChatModeResponse> => {
     const formData = new FormData();
     formData.append("file", file);
