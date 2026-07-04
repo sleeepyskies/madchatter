@@ -137,7 +137,7 @@ export default function ProjectsAdminPage() {
                 }
               >
                 {status === "idle" && "Apply"}
-                {status === "processing" && "Applying..."}
+                {status === "processing" && "Initializing..."}
                 {status === "active" && "Active"}
               </Button>,
             ]}

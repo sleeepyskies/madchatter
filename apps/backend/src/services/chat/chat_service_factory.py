@@ -20,7 +20,7 @@ class ChatServiceFactory:
                exit_video: VideoResponse | None) -> ChatService:
 
         stt = SpeechToText(
-            model_size="base",
+            model_size="small",
             language=language.value,
             device="cpu",
             compute_type="int8",

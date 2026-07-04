@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,11 +11,19 @@ import {
   FolderPlusIcon,
   LucideIcon,
   EyeIcon,
-} from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from '@/components/ui/card';
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { projectsApi } from "@/api/projects";
 import { knowledgeApi } from "@/api/knowledge";
 import { agentsApi } from "@/api/agents";
+import { chatApi } from "@/api/chat";
 
 interface DashboardCardProps {
   label: string;
@@ -32,13 +41,10 @@ function DashboardCard({
   onClickCard,
 }: DashboardCardProps) {
   return (
-    <Card
-      className="flex flex-col justify-between p-5 rounded-xl transition-all duration-300 hover:shadow-lg w-full"
-    >
+    <Card className="flex flex-col justify-between p-5 rounded-xl transition-all duration-300 hover:shadow-lg w-full">
       <div>
         <CardHeader className="p-0 mt-2 space-y-1">
-          <CardTitle
-            className="flex items-center gap-2 font-semibold text-base text-neutral-900 dark:text-neutral-100">
+          <CardTitle className="flex items-center gap-2 font-semibold text-base text-neutral-900 dark:text-neutral-100">
             <Icon className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
             <span>{label}</span>
           </CardTitle>
@@ -73,6 +79,18 @@ function DashboardCard({
 export default function DashboardPage() {
   const router = useRouter();
 
+  const [isActiveProject, setIsActiveProject] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const currentProject = await chatApi.currentProject();
+      if (currentProject?.projectId) {
+        setIsActiveProject(true);
+      }
+    };
+    fetchData();
+  }, []);
+
   const createNewProject = async () => {
     const project = await projectsApi.createProject({ label: "New Project" });
     router.push(`/admin/projects/${project.id}`);
@@ -83,13 +101,15 @@ export default function DashboardPage() {
       label: "New Agent",
       systemPrompt: "",
       language: "en",
-      voiceModel: "nothing"
+      voiceModel: "nothing",
     });
     router.push(`/admin/agents/${agent.id}`);
   };
 
   const createNewKnowledgeBase = async () => {
-    const knowledge = await knowledgeApi.createKnowledge({ label: "New Knowledge Base" });
+    const knowledge = await knowledgeApi.createKnowledge({
+      label: "New Knowledge Base",
+    });
     router.push(`/admin/knowledge-bases/${knowledge.id}`);
   };
 
@@ -99,21 +119,21 @@ export default function DashboardPage() {
       description: "Piece together an agent, videos and a knowledge base.",
       icon: FolderPlusIcon,
       onCreateNew: createNewProject,
-      onClickCard: () => router.push('/admin/projects'),
+      onClickCard: () => router.push("/admin/projects"),
     },
     {
       label: "Agents",
       description: "Configure a custom persona.",
       icon: BotIcon,
       onCreateNew: createNewAgent,
-      onClickCard: () => router.push('/admin/agents'),
+      onClickCard: () => router.push("/admin/agents"),
     },
     {
       label: "Knowledge Bases",
       description: "Upload documents to create a custom knowledge base.",
       icon: DatabaseIcon,
       onCreateNew: createNewKnowledgeBase,
-      onClickCard: () => router.push('/admin/knowledge-bases'),
+      onClickCard: () => router.push("/admin/knowledge-bases"),
     },
   ];
 
@@ -135,7 +155,13 @@ export default function DashboardPage() {
       </div>
       <div className="mt-6 flex justify-center">
         <Card
-          onClick={() => router.push("/viewer")}
+          onClick={() => {
+            if (isActiveProject) {
+              router.push("/viewer");
+            } else {
+              toast.error("No active project", { position: "top-center" });
+            }
+          }}
           className="w-fit px-5 py-3 rounded-xl transition-all duration-300 hover:shadow-lg cursor-pointer"
         >
           <div className="flex items-center gap-3">

@@ -17,7 +17,7 @@ class VideoMatcher:
             return
 
         # Precompute the normalized embedding matrix for the video descriptions.
-        video_embeddings = np.array([self.embeddings.embed_query(f"{video.label}\n{video.description or ''}") for video in self.videos])
+        video_embeddings = np.array([self.embeddings.embed_query(video.description or '') for video in self.videos])
         self.video_matrix = video_embeddings / np.linalg.norm(video_embeddings, axis=1, keepdims=True)
 
     def match_video(self, query: str):
@@ -29,12 +29,12 @@ class VideoMatcher:
         query_embedding = np.array(self.embeddings.embed_query(query))
         query_norm = query_embedding / np.linalg.norm(query_embedding)
 
-        similarities = np.dot(self.video_matrix, query_norm)
+        similarities = self.video_matrix @ query_norm
         best_index = np.argmax(similarities)
         best_score = similarities[best_index]
 
         # Set a threshold for relevance.
-        if best_score < 0.6:
+        if best_score < 0.7:
             return None
 
         return self.videos[best_index]
