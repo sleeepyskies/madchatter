@@ -4,7 +4,7 @@ class SpeechToText:
     """
     A class for performing speech-to-text transcription using the WhisperModel from the faster_whisper library.
     """
-    def __init__(self, model_size="base", device="cpu", language="en", compute_type="int8"):
+    def __init__(self, model_size="base", device="cpu", language="en", compute_type="int8", terms=None):
         """
         Initializes the SpeechToText class with the specified model size, device, and compute type.
         
@@ -14,6 +14,8 @@ class SpeechToText:
         """
         self.model = WhisperModel(model_size, device=device, cpu_threads=4, num_workers=2,compute_type=compute_type)
         self.language = language
+        self.terms = terms
+
     def transcribe(self, audio_path):
         segments, info = self.model.transcribe(
             audio_path,
@@ -21,7 +23,7 @@ class SpeechToText:
             temperature=0.0,
             vad_filter=True,
             language=self.language,
-            initial_prompt="Important terms: HBKsaar, HBK Saar, Saarland, Saarbrücken"
+            initial_prompt=self.terms
         )
 
         text_list = [segment.text for segment in segments]

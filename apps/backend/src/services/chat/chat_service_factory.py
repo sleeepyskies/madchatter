@@ -17,13 +17,21 @@ class ChatServiceFactory:
                videos: list[VideoResponse] | None,
                idle_video: VideoResponse | None,
                enter_video: VideoResponse | None,
-               exit_video: VideoResponse | None) -> ChatService:
+               exit_video: VideoResponse | None,
+               terms: str | None) -> ChatService:
+
+        stt_terms = (
+            f"This audio may contain the following names and terms: {terms}"
+            if terms
+            else None
+        )
 
         stt = SpeechToText(
-            model_size="small",
+            model_size="medium",
             language=language.value,
             device="cpu",
             compute_type="int8",
+            terms=stt_terms
         )
 
         rag = RAG(chroma_collection=chroma_collection, system_prompt=system_prompt)

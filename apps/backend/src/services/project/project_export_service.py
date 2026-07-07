@@ -137,6 +137,7 @@ class ProjectExportService:
             "idle_video_id": project.idle_video_id,
             "enter_video_id": project.enter_video_id,
             "exit_video_id": project.exit_video_id,
+            "terms": project.terms,
             "agent": agent_data,
             "knowledge_label": knowledge.label if knowledge is not None else None,
             "knowledge_sources": [

@@ -50,3 +50,6 @@ class Project(Base):
         nullable=True,
     )
     """Optional video that can be set to play when the user exits interacting with the agent."""
+
+    terms: Mapped[str] = mapped_column(nullable=True)
+    """Optional speech recognition terms used to improve STT accuracy."""

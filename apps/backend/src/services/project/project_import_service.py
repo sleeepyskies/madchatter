@@ -69,7 +69,10 @@ class ProjectImportService:
 
     def _create_project(self, metadata: dict) -> Project:
         return self.project_repository.create(
-            Project(label=metadata.get("label"))
+            Project(
+                label=metadata.get("label"),
+                terms=metadata.get("terms")
+            )
         )
 
     def _load_agent(self, metadata: dict, project: Project) -> None:
@@ -168,6 +171,7 @@ class ProjectImportService:
                 idle_video_id=project.idle_video_id,
                 enter_video_id=project.enter_video_id,
                 exit_video_id=project.exit_video_id,
+                terms=project.terms
             ),
         )
 

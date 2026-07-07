@@ -47,6 +47,8 @@ class ProjectRepository:
 			project.enter_video_id = new.enter_video_id
 		if new.exit_video_id is not None:
 			project.exit_video_id = new.exit_video_id
+		if new.terms is not None:
+			project.terms = new.terms
 
 		self.database.commit()
 		return project

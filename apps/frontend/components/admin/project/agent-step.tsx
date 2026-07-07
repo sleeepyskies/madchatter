@@ -18,6 +18,7 @@ export function AgentStep({ projectId }: { projectId: number }) {
     agentId: null,
     knowledgeId: null,
   });
+  const [terms, setTerms] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -34,6 +35,7 @@ export function AgentStep({ projectId }: { projectId: number }) {
           agentId: project.agent?.id ?? null,
           knowledgeId: project.knowledgeId ?? null,
         });
+        setTerms(project.terms ?? "");
       } catch (err) {
         toast.error("Failed to load data.", { position: "top-center" });
       } finally {
@@ -52,11 +54,30 @@ export function AgentStep({ projectId }: { projectId: number }) {
       await projectsApi.updateProject(projectId, {
         agentId: newAgentId,
         knowledgeId: newKnowledgeId,
+        terms,
       });
       setSelection({ agentId: newAgentId, knowledgeId: newKnowledgeId });
       toast.success("Configuration updated.", { position: "top-center" });
     } catch (err) {
       toast.error("Failed to save configuration.", { position: "top-center" });
+    }
+  };
+
+  const updateTerms = async (newTerms: string) => {
+    try {
+      await projectsApi.updateProject(projectId, {
+        terms: newTerms,
+      });
+
+      setTerms(newTerms);
+
+      // toast.success("Configuration updated.", {
+      //   position: "top-center",
+      // });
+    } catch {
+      toast.error("Failed to save configuration.", {
+        position: "top-center",
+      });
     }
   };
 
@@ -102,6 +123,22 @@ export function AgentStep({ projectId }: { projectId: number }) {
                 }))}
                 placeholder="Select Knowledge Base..."
                 allowNull={true}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+            <span className="text-sm font-semibold text-foreground tracking-tight w-[140px]">
+              Terms
+            </span>
+
+            <div className="w-full sm:w-[280px]">
+              <textarea
+                value={terms}
+                onChange={(e) => setTerms(e.target.value)}
+                onBlur={() => updateTerms(terms)}
+                placeholder="Enter custom speech recognition terms..."
+                className="w-full min-h-[80px] rounded-md border bg-background px-3 py-2 text-sm"
               />
             </div>
           </div>

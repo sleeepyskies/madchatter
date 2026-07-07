@@ -12,6 +12,7 @@ class ProjectResponse(BaseSchema):
     idle_video: VideoResponse | None
     enter_video: VideoResponse | None
     exit_video: VideoResponse | None
+    terms: str | None
 
 
 class CreateProjectRequest(BaseSchema):
@@ -21,6 +22,7 @@ class CreateProjectRequest(BaseSchema):
     idle_video_id: int | None = None
     enter_video_id: int | None = None
     exit_video_id: int | None = None
+    terms: str | None = None
 
 
 class UpdateProjectRequest(BaseSchema):
@@ -30,6 +32,8 @@ class UpdateProjectRequest(BaseSchema):
     idle_video_id: int | None = None
     enter_video_id: int | None = None
     exit_video_id: int | None = None
+    terms: str | None = None
+
 
 
 class ExportProjectResponse(BaseSchema):

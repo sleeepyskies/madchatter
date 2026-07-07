@@ -57,6 +57,7 @@ class ProjectService:
 				idle_video_id=request.idle_video_id,
 				enter_video_id=request.enter_video_id,
 				exit_video_id=request.exit_video_id,
+				terms=request.terms
 			)
 		)
 
@@ -86,6 +87,7 @@ class ProjectService:
 			idle_video=idle_video,
 			enter_video=enter_video,
 			exit_video=exit_video,
+			terms=project.terms
 		)
 
 	def list_projects(self) -> list[ProjectResponse]:

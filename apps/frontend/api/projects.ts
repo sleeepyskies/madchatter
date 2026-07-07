@@ -15,6 +15,7 @@ export interface ProjectResponse {
   idleVideo: VideoResponse | null;
   enterVideo: VideoResponse | null;
   exitVideo: VideoResponse | null;
+  terms: string | null;
 }
 
 export interface CreateProjectRequest {
@@ -24,6 +25,7 @@ export interface CreateProjectRequest {
   idleVideoId?: number | null;
   enterVideoId?: number | null;
   exitVideoId?: number | null;
+  terms?: string | null;
 }
 
 export interface UpdateProjectRequest {
@@ -33,6 +35,7 @@ export interface UpdateProjectRequest {
   idleVideoId?: number | null;
   enterVideoId?: number | null;
   exitVideoId?: number | null;
+  terms?: string | null;
 }
 
 export const projectsApi = {
