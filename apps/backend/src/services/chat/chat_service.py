@@ -66,10 +66,6 @@ class ChatService:
             # normal CHAT State
             return self._handle_chat(user_text)
 
-        except Exception as e:
-            logger.error(f"Error: {e} ")
-            raise
-
         finally:
             if temp_input_path and os.path.exists(temp_input_path):
                 os.remove(temp_input_path)

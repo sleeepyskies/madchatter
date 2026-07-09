@@ -38,7 +38,7 @@ class APIException(Exception):
     :param detail: Human-readable error detail.
     """
 
-    def __init__(self, status_code: int, error_type: str, message: str, detail: str):
+    def __init__(self, status_code: int, error_type: str, message: str, detail: str | None = None):
         self.status_code = status_code
         self.error_type = error_type
         self.message = message
@@ -87,3 +87,17 @@ class InvalidArgumentException(APIException):
             message="An invalid function argument was passed",
             detail=detail,
         )
+
+
+class NoProjectAppliedException(APIException):
+    """
+    Exception raised when there is no applied project.
+    """
+
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_409_CONFLICT,
+            error_type="NO_PROJECT_APPLIED",
+            message="There is no project applied.",
+        )
+

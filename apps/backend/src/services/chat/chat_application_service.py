@@ -1,3 +1,4 @@
+from api.api_exception import NoProjectAppliedException
 from services.chat.chat_service import ChatService
 from services.project.project_service import ProjectService
 from services.video_service import VideoService
@@ -71,28 +72,28 @@ class ChatApplicationService:
         Includes: video_only, video_and_tts, only_tts
         """
         if self.chat_service is None:
-            raise RuntimeError("No project applied")
+            raise NoProjectAppliedException()
 
         return self.chat_service.analyze_mode(file)
 
     def stream_chat(self, user_text: str) -> StreamingResponse:
         """Stream chat process: LLM + TTS"""
         if self.chat_service is None:
-            raise RuntimeError("No project applied")
+            raise NoProjectAppliedException()
 
         return self.chat_service.stream_chat(user_text)
 
     def exit_chat(self) -> ChatModeResponse:
         """Exit the current chat session"""
         if self.chat_service is None:
-            raise RuntimeError("No project applied")
+            raise NoProjectAppliedException()
 
         return self.chat_service.exit_chat()
 
     def get_latest_reply(self) -> LatestReplyResponse:
         """Return the latest reply from the chat service."""
         if self.chat_service is None:
-            raise RuntimeError("No project applied")
+            raise NoProjectAppliedException()
 
         return LatestReplyResponse(
             reply=self.chat_service.latest_reply
@@ -101,7 +102,7 @@ class ChatApplicationService:
     def get_all_videos(self) -> VideoPreloadResponse:
         """Return all videos for preload"""
         if not self.chat_service:
-            raise RuntimeError("No project applied")
+            raise NoProjectAppliedException()
 
         return VideoPreloadResponse(
             idle_video=self.chat_service.idle_video,
