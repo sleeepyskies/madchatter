@@ -6,9 +6,8 @@ from sqlalchemy import pool
 from alembic import context
 
 from src.db.base import Base
-from src.settings import load_settings
+from src.settings import settings
 
-settings = load_settings()
 DATABASE_URL = settings.database_url
 
 # this is the Alembic Config object, which provides
