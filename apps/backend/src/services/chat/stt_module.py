@@ -12,7 +12,7 @@ class SpeechToText:
         :param device: The device to run the model on (e.g., "cpu", "cuda").
         :param compute_type: The compute type for the model (e.g., "int8", "float16"). This can help optimize performance on certain hardware.
         """
-        self.model = WhisperModel(model_size, device="cuda", cpu_threads=4, num_workers=2,compute_type=compute_type)
+        self.model = WhisperModel(model_size, device=device, cpu_threads=4, num_workers=2,compute_type=compute_type)
         self.language = language
         self.terms = terms
 
