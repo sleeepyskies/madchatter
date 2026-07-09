@@ -50,15 +50,13 @@ export const chatApi = {
   },
 
   streamChat: async (userText: string) => {
-    const res = await fetch(`${serverOrigin}/api/chat/stream_chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userText }),
+    const res = await api.post("chat/stream_chat", {
+      json: { userText },
     });
 
-    if (!res.body) throw new Error("No stream body");
+    if (!res.body) {
+      throw new Error("No stream body");
+    }
 
     return res.body; // ReadableStream
   },

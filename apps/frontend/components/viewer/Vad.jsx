@@ -5,7 +5,7 @@ import { useMicVAD, utils } from "@ricky0123/vad-react";
 import VideoPlayer from "./VideoPlayer.jsx";
 import ListeningAnimation from "./ListeningAnimation.jsx";
 import SubtitlePanel from "./SubtitlePanel.jsx";
-import { chatApi } from "../../api/chat";
+import { chatApi } from "@/api/chat";
 
 const INACTIVITY_TIMEOUT = 60000;
 
