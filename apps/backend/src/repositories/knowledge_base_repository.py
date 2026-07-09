@@ -26,7 +26,7 @@ class KnowledgeBase:
         a new collection will be created on disk. Otherwise, the existing collection will be referenced.
         :param collection_name: Name of the collection.
         """
-        self.embeddings = OllamaEmbeddings(model="nomic-embed-text")
+        self.embeddings = OllamaEmbeddings(model="jina/jina-embeddings-v2-base-de")
         self.collection_name = collection_name
         if settings.vector_db_url:
             self.persist_directory = settings.vector_db_url.replace("chroma:///", "")

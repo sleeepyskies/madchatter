@@ -7,7 +7,7 @@ class VideoMatcher:
 
     def __init__(self, videos:list[VideoResponse]):
         self.videos = videos
-        self.embeddings = OllamaEmbeddings(model="nomic-embed-text")
+        self.embeddings = OllamaEmbeddings(model="jina/jina-embeddings-v2-base-de")
         self.video_matrix = None
         self._build_video_matrix()
 
@@ -30,11 +30,22 @@ class VideoMatcher:
         query_norm = query_embedding / np.linalg.norm(query_embedding)
 
         similarities = self.video_matrix @ query_norm
+
+        results = sorted(
+            zip(self.videos, similarities),
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+        print("\nSimilarity ranking:")
+        for video, score in results:
+            print(f"{score:.4f}  {video.label}")
+
         best_index = np.argmax(similarities)
         best_score = similarities[best_index]
 
         # Set a threshold for relevance.
-        if best_score < 0.7:
+        if best_score < 0.8:
             return None
 
         return self.videos[best_index]

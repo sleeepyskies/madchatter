@@ -97,7 +97,7 @@ class ChatService:
 
         return ChatModeResponse(
             mode=Mode.video_only,
-            video_id=self.exit_video.id
+            video_id=self.exit_video.id if self.exit_video else None
         )
 
     def _handle_enter_interaction(self, user_text) -> ChatModeResponse:
