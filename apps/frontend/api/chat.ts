@@ -49,9 +49,9 @@ export const chatApi = {
     }).json()
   },
 
-  streamChat: async (userText: string) => {
-    const res = await api.post("chat/stream_chat", {
-      json: { userText },
+  streamChat: async (request: ChatRequest) => {
+    const res = await api.post("stream_chat", {
+      json: request,
     });
 
     if (!res.body) {

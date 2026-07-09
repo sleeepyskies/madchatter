@@ -163,7 +163,7 @@ export default function Vad() {
   };
 
   const streamWithReply = async (userText) => {
-    const body = await chatApi.streamChat(userText);
+    const body = await chatApi.streamChat({ userText: userText });
     const reader = body.getReader();
 
     await streamAndPlayAudio(reader);
