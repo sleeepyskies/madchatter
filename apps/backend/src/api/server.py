@@ -149,6 +149,7 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
 
     port = find_server_port(settings.server_port)
     if port != settings.server_port:
+        settings.server_port = port
         logger.warning(f"Could not use the preferred port. OS chose port {port} to run on.")
 
 
