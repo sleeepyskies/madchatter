@@ -53,9 +53,16 @@ def build_frontend():
     shutil.copytree(src, dst)
 
 def cleanup():
-    pass
+    build_dir = ROOT / "build"
+    if build_dir.exists():
+        shutil.rmtree(build_dir)
 
-build_backend()
-build_frontend()
-cleanup()
-print("Build complete")
+if __name__ == "__main__":
+    try:
+        build_backend()
+        build_frontend()
+        cleanup()
+        print("Build complete")
+    except subprocess.CalledProcessError as e:
+        print(f"Build failed during: {e.cmd}")
+        sys.exit(1)
