@@ -43,10 +43,10 @@ class Settings(BaseSettings):
 		env_file="./../../.env",  # at monorepo root
 	)
 
-	env: Env = Env.DEV
+	env: Env
 	"""Application runtime environment."""
 
-	log_level: LogLevel = LogLevel.INFO
+	log_level: LogLevel = LogLevel.WARNING
 	"""Logging verbosity level."""
 
 	server_address: str
