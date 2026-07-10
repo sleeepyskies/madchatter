@@ -6,7 +6,6 @@
 *.db
 *.sqlite3
 *.log
-*.env
 *.egg-info/
 dist/
 build/
@@ -20,6 +19,3 @@ build/
 .DS_Store
 .vscode/
 /apps/backend/videos/
-/apps/frontend_viewer/node_modules
-/apps/frontend_viewer/dist
-node_modules/
