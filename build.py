@@ -45,7 +45,7 @@ def build_frontend():
 
     # then copy to backend so it can serve them
     src = FRONTEND_DIR / "out"
-    dst = DIST_PATH / "madchatter" / "frontend_dist"
+    dst = DIST_PATH / "madchatter" / "frontend"
 
     if dst.exists():
         shutil.rmtree(dst)

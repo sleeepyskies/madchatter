@@ -91,7 +91,7 @@ class Settings(BaseSettings):
 	@property
 	def frontend_dir(self) -> Path:
 		"""Directory reserved for storing the frontend build output."""
-		return (base_directory / "frontend_dist").absolute()
+		return (base_directory / "frontend").absolute()
 
 	@property
 	def files_dir(self) -> Path:
