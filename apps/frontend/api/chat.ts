@@ -1,4 +1,4 @@
-import { client, serverOrigin } from "./client";
+import { client } from "./client";
 import { VideoResponse } from "./videos";
 
 const api = client.extend((options) => ({

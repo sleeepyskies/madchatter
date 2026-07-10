@@ -6,6 +6,10 @@ import path from "path";
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const nextConfig: NextConfig = {
+  output: "export", // needed to serve static pages from backend
+  images: {
+    unoptimized: true,
+  },
   reactStrictMode: true,
   // create environment variable aliases such that they can be read from browser
   env: {

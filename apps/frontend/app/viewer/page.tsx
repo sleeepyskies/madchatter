@@ -1,6 +1,6 @@
-import Vad from "@/components/viewer/Vad";
+"use client";
 
-export const dynamic = "force-dynamic";
+import Vad from "@/components/viewer/Vad";
 
 export default function Page() {
   return <Vad />;

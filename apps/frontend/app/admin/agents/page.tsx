@@ -32,7 +32,7 @@ export default function AgentsAdminPage() {
       language: "en",
       voiceModel: ""
     });
-    router.push(`/admin/agents/${agent.id}`);
+    router.push(`/admin/agents/edit?=agentId${agent.id}`);
   };
 
   const handleDelete = async (id: number) => {
@@ -48,7 +48,7 @@ export default function AgentsAdminPage() {
   };
 
   const handleEdit = (agentId: number) => {
-    router.push(`/admin/agents/${agentId}`)
+    router.push(`/admin/agents/edit?=agentId${agentId}`);
   }
 
   return (

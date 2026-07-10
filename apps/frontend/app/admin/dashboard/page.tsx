@@ -93,7 +93,7 @@ export default function DashboardPage() {
 
   const createNewProject = async () => {
     const project = await projectsApi.createProject({ label: "New Project" });
-    router.push(`/admin/projects/${project.id}`);
+    router.push(`/admin/projects/edit?projectId=${project.id}`);
   };
 
   const createNewAgent = async () => {
@@ -103,14 +103,14 @@ export default function DashboardPage() {
       language: "en",
       voiceModel: "nothing",
     });
-    router.push(`/admin/agents/${agent.id}`);
+    router.push(`/admin/agents/edit?agentId=${agent.id}`);
   };
 
   const createNewKnowledgeBase = async () => {
     const knowledge = await knowledgeApi.createKnowledge({
       label: "New Knowledge Base",
     });
-    router.push(`/admin/knowledge-bases/${knowledge.id}`);
+    router.push(`/admin/knowledge-bases/edit?knowledgeId=${knowledge.id}`);
   };
 
   const actionCards = [

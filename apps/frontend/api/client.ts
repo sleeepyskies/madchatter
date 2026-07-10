@@ -7,9 +7,7 @@ if (!address || !port) {
   throw new Error("Could not read server port or address from environment.");
 }
 
-export const serverOrigin = `http://${address}:${port}`;
-
-const baseUrl = `${serverOrigin}/api`;
+const baseUrl = new URL(`http://${address}:${port}/api`);
 
 export const client = ky.create({
   prefix: baseUrl,
