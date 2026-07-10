@@ -16,14 +16,26 @@ from api.api_exception import APIException, ApiErrorResponse
 from api.routes import video_router, project_router, agent_router, knowledge_router, chat_router
 from settings import settings, Env
 
-# configure app and state
+# dont mount doc pages in prod builds
 app = FastAPI(
     title="MadChatter",
     summary="Backend server for the MadChatter application.",
+    **(
+        {
+            "openapi_url": None,
+            "docs_url": None,
+            "redoc_url": None,
+        }
+        if settings.env == Env.PROD
+        else {}
+    ),
 )
 
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 app.mount("/files", StaticFiles(directory=settings.files_dir), name="files")
+if settings.env == Env.PROD:
+    app.mount("/", StaticFiles(directory=settings.frontend_dir, html=True), name="frontend")
+
 
 app.state.SessionLocal = None
 app.state.engine = None
@@ -38,6 +50,8 @@ app.add_middleware(
 )
 
 router = APIRouter(prefix=settings.api_prefix)
+
+
 
 # link all sub routers
 router.include_router(video_router)
@@ -131,18 +145,22 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
     """
     app.state.engine = engine
     app.state.SessionLocal = SessionLocal
+    logger.info(settings.env)
 
     port = find_server_port(settings.server_port)
     if port != settings.server_port:
-        logger.warning(f"Could not use the preferred port. OS chose port ${port} to run on.")
+        logger.warning(f"Could not use the preferred port. OS chose port {port} to run on.")
+
+
+    if settings.env == Env.PROD:
+        import webbrowser
+        logger.info(f"Webapp can be viewed under {settings.webapp_url}")
+        webbrowser.open(settings.webapp_url)
 
     uvicorn.run(
-        "api.server:app",
+        app,
         host=settings.server_address,
         port=port,
         log_config=None,
     )
-
-    # import webbrowser
-    # webbrowser.open(settings.url_string)
 

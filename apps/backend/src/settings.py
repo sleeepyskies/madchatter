@@ -56,8 +56,8 @@ class Settings(BaseSettings):
 	"""Server port."""
 
 	@property
-	def url_string(self) -> str:
-		"""URL string of the server."""
+	def webapp_url(self) -> str:
+		"""The URL the web app can be viewed under."""
 		return f"http://{self.server_address}:{self.server_port}"
 
 	database_url: str
@@ -83,6 +83,11 @@ class Settings(BaseSettings):
 	def static_dir(self) -> Path:
 		"""Directory reserved for saving static files to serve."""
 		return (base_directory / "static").absolute()
+
+	@property
+	def frontend_dir(self) -> Path:
+		"""Directory reserved for storing the frontend build output."""
+		return (base_directory / "frontend_dist").absolute()
 
 	@property
 	def files_dir(self) -> Path:

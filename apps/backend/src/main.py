@@ -1,3 +1,4 @@
+import multiprocessing
 import sys
 from enum import IntEnum, unique
 
@@ -45,4 +46,5 @@ def main():
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support() # when building with pyinstaller, this solves the process recursively starting
     sys.exit(main())
