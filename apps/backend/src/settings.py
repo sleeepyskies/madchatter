@@ -2,14 +2,21 @@ from enum import StrEnum
 from pathlib import Path
 import sys
 
+from loguru import logger
+from dotenv import find_dotenv, load_dotenv
 from pydantic_settings import SettingsConfigDict, BaseSettings
 from sqlalchemy.orm import base
 
+# keep searching upwards until we find a .env file
+if not load_dotenv(find_dotenv()):
+	logger.error("Could not load environment, exiting the server.")
+	sys.exit(1)
 
 def get_base_directory() -> Path:
-	if getattr(sys, "frozen", False):
+	if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+		logger.debug("Running in a PyInstaller bundle")
 		return Path(sys.executable).resolve().parent
-	return Path(__file__).resolve().parent.parent
+	return Path(__file__).resolve().parent.parent.parent.parent
 
 
 base_directory = get_base_directory()
@@ -38,10 +45,7 @@ class Settings(BaseSettings):
 	Application configuration. Partially loaded from environment as well as default values.
 	"""
 
-	model_config = SettingsConfigDict(
-		env_prefix="MC_",
-		env_file="./../../.env",  # at monorepo root
-	)
+	model_config = SettingsConfigDict(env_prefix="MC_")
 
 	env: Env
 	"""Application runtime environment."""
@@ -93,7 +97,6 @@ class Settings(BaseSettings):
 	def files_dir(self) -> Path:
 		"""Directory reserved for saving files to disk. This includes videos and source knowledge file."""
 		return Path(self.run_dir / "files").absolute()
-
 
 settings = Settings()
 """Globally accessible application settings."""
