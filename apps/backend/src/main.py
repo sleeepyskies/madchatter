@@ -24,6 +24,16 @@ def setup_environment():
     settings.static_dir.mkdir(parents=True, exist_ok=True)
     settings.files_dir.mkdir(parents=True, exist_ok=True)
 
+def acquire_lock():
+    """
+    Ensures the binary has only a single instance running at a time.
+    If there is already an instance running, the existing instance will be opened in
+    the browser, and the current instance will then shut down.
+    """
+    # TODO(sky): implement this function. maybe it should go inside of start_server?
+    # what do we do if there is a bad shutdown and the file remains somehow?
+    # maybe write pid and check name and if running still in the lock file?
+    pass
 
 def main():
     """Entry point of the application."""
