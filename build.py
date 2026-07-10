@@ -4,8 +4,13 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).parent
+
 BACKEND_DIR = ROOT / "apps" / "backend"
 FRONTEND_DIR = ROOT / "apps" / "frontend"
+
+DIST_PATH = ROOT / "dist"
+WORK_PATH = ROOT / "build"
+
 
 def build_backend():
     # first use pyinstaller to create a binary
@@ -14,11 +19,22 @@ def build_backend():
             / ".venv"
             / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
     )
-    subprocess.check_call([str(python), "-m", "PyInstaller", "madchatter.spec"], cwd=BACKEND_DIR)
+    subprocess.check_call([
+        str(python),
+        "-m",
+        "PyInstaller",
+        "madchatter.spec",
+        "--distpath",
+        DIST_PATH,
+        "--workpath",
+        WORK_PATH,
+        "--clean",
+        "--noconfirm",
+    ], cwd=BACKEND_DIR)
 
     # then copy the prod.env to the dist dir
     source_env = ROOT / "prod.env"
-    dest_env = BACKEND_DIR / "dist" / "madchatter" / ".env"
+    dest_env = DIST_PATH / "madchatter" / ".env"
     if source_env.exists():
         shutil.copy(source_env, dest_env)
 
@@ -29,7 +45,7 @@ def build_frontend():
 
     # then copy to backend so it can serve them
     src = FRONTEND_DIR / "out"
-    dst = BACKEND_DIR / "dist" / "madchatter" / "frontend_dist"
+    dst = DIST_PATH / "madchatter" / "frontend_dist"
 
     if dst.exists():
         shutil.rmtree(dst)
