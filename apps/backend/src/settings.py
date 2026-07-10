@@ -4,6 +4,8 @@ import sys
 
 from loguru import logger
 from dotenv import find_dotenv, load_dotenv
+from numpy import __config__
+from pydantic import model_validator
 from pydantic_settings import SettingsConfigDict, BaseSettings
 from sqlalchemy.orm import base
 
@@ -12,21 +14,20 @@ if not load_dotenv(find_dotenv()):
 	logger.error("Could not load environment, exiting the server.")
 	sys.exit(1)
 
-def get_base_directory() -> Path:
-	if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+def _is_production_environment() -> bool:
+	return getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+
+
+def _get_base_directory() -> Path:
+	if _is_production_environment():
 		logger.debug("Running in a PyInstaller bundle")
-		return Path(sys.executable).resolve().parent
+		path = Path(sys.executable).resolve().parent
+		print(path)
+		return path
+	logger.debug("Running in a python script")
 	return Path(__file__).resolve().parent.parent.parent.parent
 
-
-base_directory = get_base_directory()
-
-
-class Env(StrEnum):
-	"""Describes the current runtime environment."""
-
-	DEV = "DEV"
-	PROD = "PROD"
+base_directory = _get_base_directory()
 
 
 class LogLevel(StrEnum):
@@ -47,9 +48,6 @@ class Settings(BaseSettings):
 
 	model_config = SettingsConfigDict(env_prefix="MC_")
 
-	env: Env
-	"""Application runtime environment."""
-
 	log_level: LogLevel = LogLevel.WARNING
 	"""Logging verbosity level."""
 
@@ -64,11 +62,9 @@ class Settings(BaseSettings):
 		"""The URL the web app can be viewed under."""
 		return f"http://{self.server_address}:{self.server_port}"
 
-	database_url: str
-	"""Database connection string."""
-
-	vector_db_url: str
-	"""Vector database connection string."""
+	@property
+	def is_production(self) -> bool:
+		return _is_production_environment()
 
 	api_prefix: str = "/api"
 	"""API prefix for all API endpoints."""
@@ -97,6 +93,22 @@ class Settings(BaseSettings):
 	def files_dir(self) -> Path:
 		"""Directory reserved for saving files to disk. This includes videos and source knowledge file."""
 		return Path(self.run_dir / "files").absolute()
+
+	database_url: str = ""
+	"""Database connection string."""
+
+	vector_db_url: str = ""
+	"""Vector database connection string."""
+
+	@model_validator(mode="after")
+	def __resolve_defaults(self) -> Settings:
+		if not self.database_url:
+			self.database_url = f"sqlite:///{(self.run_dir / 'database.sqlite').as_posix()}"
+		if not self.vector_db_url:
+			self.vector_db_url = f"chroma:///{(self.run_dir / 'chroma_db').as_posix()}"
+		return self
+
+
 
 settings = Settings()
 """Globally accessible application settings."""

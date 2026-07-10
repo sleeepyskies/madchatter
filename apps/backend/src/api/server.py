@@ -14,7 +14,7 @@ from starlette.responses import JSONResponse
 
 from api.api_exception import APIException, ApiErrorResponse
 from api.routes import video_router, project_router, agent_router, knowledge_router, chat_router
-from settings import settings, Env
+from settings import settings
 
 # dont mount doc pages in prod builds
 app = FastAPI(
@@ -26,14 +26,14 @@ app = FastAPI(
             "docs_url": None,
             "redoc_url": None,
         }
-        if settings.env == Env.PROD
+        if settings.is_production
         else {}
     ),
 )
 
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 app.mount("/files", StaticFiles(directory=settings.files_dir), name="files")
-if settings.env == Env.PROD:
+if settings.is_production:
     app.mount("/", StaticFiles(directory=settings.frontend_dir, html=True), name="frontend")
 
 
@@ -122,7 +122,7 @@ def find_server_port(preferred: int) -> int:
     Attempts to find a suitable server port.
     If the preferred port is taken, the OS will decide which port to run on.
     """
-    if settings.env == Env.DEV:
+    if not settings.is_production:
         return settings.server_port
 
     for port in (preferred, 0):
@@ -145,7 +145,6 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
     """
     app.state.engine = engine
     app.state.SessionLocal = SessionLocal
-    logger.info(settings.env)
 
     port = find_server_port(settings.server_port)
     if port != settings.server_port:
@@ -153,7 +152,7 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
         logger.warning(f"Could not use the preferred port. OS chose port {port} to run on.")
 
 
-    if settings.env == Env.PROD:
+    if settings.is_production:
         import webbrowser
         logger.info(f"Webapp can be viewed under {settings.webapp_url}")
         webbrowser.open(settings.webapp_url)
