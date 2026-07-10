@@ -2,6 +2,8 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useMicVAD, utils } from "@ricky0123/vad-react";
+import { CirclePause, CirclePlay, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import VideoPlayer from "./VideoPlayer.jsx";
 import ListeningAnimation from "./ListeningAnimation.jsx";
 import SubtitlePanel from "./SubtitlePanel.jsx";
@@ -17,6 +19,8 @@ export default function Vad() {
   const [currentVideoUrl, setCurrentVideoUrl] = useState("");
   const [isVideoLooping, setIsVideoLooping] = useState(true);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showControls, setShowControls] = useState(false);
 
   const audioCtxRef = useRef(null);
   const nextStartTimeRef = useRef(0);
@@ -29,6 +33,19 @@ export default function Vad() {
   const videoDoneRef = useRef(false);
   const lastReplyRef = useRef("");
   const sessionActiveRef = useRef(false);
+
+  const toggleListening = () => {
+    if (isPaused) {
+      setIsPaused(false);
+    } else {
+      if (vad) vad.pause();
+      setIsPaused(true);
+    }
+  };
+
+  const refreshPage = () => {
+    window.location.reload();
+  };
 
   const initAudioContext = () => {
     if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
@@ -187,7 +204,7 @@ export default function Vad() {
     onnxWASMBasePath: "/",
 
     onSpeechEnd: async (audioData) => {
-      if (state !== "LISTEN") return;
+      if (state !== "LISTEN" || isPaused) return;
 
       clearTimeout(inactivityTimerRef.current);
       initAudioContext();
@@ -271,22 +288,22 @@ export default function Vad() {
 
   useEffect(() => {
     if (!vad) return;
-    if (state === "LISTEN") {
+    if (state === "LISTEN" && !isPaused) {
       vad.start();
     } else {
       vad.pause();
     }
-  }, [state]);
+  }, [state, isPaused]);
 
   useEffect(() => {
-    if (vad && state === "LISTEN") {
+    if (vad && state === "LISTEN" && !isPaused) {
       initAudioContext();
       vad.start();
     }
-  }, [vad, state]);
+  }, [vad, state, isPaused]);
 
   useEffect(() => {
-    if (state === "LISTEN" && sessionActiveRef.current) {
+    if (state === "LISTEN" && !isPaused && sessionActiveRef.current) {
       inactivityTimerRef.current = setTimeout(
         handleInactivityTimeout,
         INACTIVITY_TIMEOUT,
@@ -295,16 +312,18 @@ export default function Vad() {
       clearTimeout(inactivityTimerRef.current);
     }
     return () => clearTimeout(inactivityTimerRef.current);
-  }, [state]);
+  }, [state, isPaused]);
 
   const statusLabel =
     state === "THINKING"
       ? "Thinking"
       : state === "SPEAKING"
         ? "Speaking"
-        : showWaveform
-          ? "Listening"
-          : "";
+        : isPaused
+          ? "Paused"
+          : showWaveform
+            ? "Listening"
+            : "";
 
   return (
     <div
@@ -330,6 +349,45 @@ export default function Vad() {
       <div
         style={{
           position: "absolute",
+          top: "0",
+          right: "0",
+          zIndex: 50,
+          pointerEvents: "auto",
+          padding: "24px",
+        }}
+        onMouseEnter={() => setShowControls(true)}
+        onMouseLeave={() => setShowControls(false)}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            opacity: showControls ? 1 : 0,
+            transition: "opacity 0.25s ease",
+          }}
+        >
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            onClick={toggleListening}
+            title={isPaused ? "Continue listening" : "Stop listening"}
+          >
+            {isPaused ? <CirclePlay className="size-4" /> : <CirclePause className="size-4" />}
+          </Button>
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            onClick={refreshPage}
+            title="Refresh page"
+          >
+            <RefreshCw className="size-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
           inset: 0,
           display: "flex",
           flexDirection: "column",
@@ -349,7 +407,7 @@ export default function Vad() {
             justifyContent: "flex-end",
           }}
         >
-          <ListeningAnimation isActive={showWaveform && state === "LISTEN"} />
+          <ListeningAnimation isActive={showWaveform && state === "LISTEN" && !isPaused} />
           {statusLabel ? (
             <span
               style={{
