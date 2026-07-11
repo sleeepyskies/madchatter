@@ -13,6 +13,7 @@ packages_to_collect = [
     "posthog",
     "onnxruntime",
     "tokenizers",
+    "faster_whisper",
 ]
 
 for package in packages_to_collect:
