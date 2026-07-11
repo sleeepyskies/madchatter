@@ -30,11 +30,11 @@ export interface UpdateKnowledgeRequest {
 
 export const knowledgeApi = {
   createKnowledge: async (request: CreateKnowledgeRequest): Promise<KnowledgeResponse> => {
-    return await api.post("", { json: request }).json();
+    return await api.post("/", { json: request }).json();
   },
 
   listKnowledge: async (): Promise<KnowledgeResponse[]> => {
-    return await api.get("").json();
+    return await api.get("/").json();
   },
 
   getKnowledge: async (knowledgeId: number): Promise<KnowledgeResponse> => {
