@@ -7,6 +7,7 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const nextConfig: NextConfig = {
   output: "export", // needed to serve static pages from backend
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },

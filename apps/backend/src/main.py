@@ -38,8 +38,8 @@ def acquire_lock():
 def main():
     """Entry point of the application."""
     try:
+        acquire_lock()
         configure_logging()
-
         setup_environment()
 
         engine, SessionLocal = load_database()

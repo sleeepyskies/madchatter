@@ -18,7 +18,8 @@
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks",
-    "providers": "@/providers"
+    "providers": "@/providers",
+    "assets": "@/assets"
   },
   "menuColor": "inverted",
   "menuAccent": "bold",

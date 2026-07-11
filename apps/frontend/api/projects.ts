@@ -85,7 +85,7 @@ export const projectsApi = {
     const formData = new FormData();
     formData.append("file", file);
 
-    return await api.post("import", {
+    return api.post("import", {
       body: formData,
     });
   },

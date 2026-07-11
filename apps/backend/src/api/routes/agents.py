@@ -17,7 +17,7 @@ def get_voice_models(
     return agent_service.get_voice_models()
 
 
-@router.post("", response_model=AgentResponse)
+@router.post("/", response_model=AgentResponse)
 def create_agent(
         request: CreateAgentRequest,
         agent_service: AgentService = Depends(get_agent_service),
@@ -25,7 +25,7 @@ def create_agent(
     return agent_service.create_agent(request)
 
 
-@router.get("", response_model=list[AgentResponse])
+@router.get("/", response_model=list[AgentResponse])
 def list_agents(agent_service: AgentService = Depends(get_agent_service)):
     return agent_service.list_agents()
 
