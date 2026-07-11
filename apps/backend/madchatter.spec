@@ -14,6 +14,7 @@ packages_to_collect = [
     "onnxruntime",
     "tokenizers",
     "faster_whisper",
+    "piper",
 ]
 
 for package in packages_to_collect:
