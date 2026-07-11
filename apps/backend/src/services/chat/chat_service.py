@@ -11,6 +11,9 @@ from services.chat.tts_module import TextToSpeech
 from services.chat.video_matcher_module import VideoMatcher
 from models.chat import ChatModeResponse, Mode
 from models.videos import VideoResponse
+from settings import settings
+from util.file_handler import FileHandler
+
 
 class ChatService:
     """
@@ -41,6 +44,7 @@ class ChatService:
         self.idle_video = idle_video
         self.enter_video = enter_video
         self.exit_video = exit_video
+        self.temp_dir = FileHandler(settings.tmp_dir)
 
     def analyze_mode(self, file: UploadFile) -> ChatModeResponse:
         """
@@ -143,13 +147,12 @@ class ChatService:
 
     def _save_input_audio(self, file: UploadFile) -> str:
         """Saves the user input audio file to a temporary location and returns the path"""
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        temp_input_path = os.path.join(current_dir, "temp_input.wav")
+        path = self.temp_dir.save_file(
+            file.file,
+            "temp_input.wav"
+        )
 
-        with open(temp_input_path, "wb") as f:
-            shutil.copyfileobj(file.file, f)
-
-        return temp_input_path
+        return path
 
     def _transcribe_audio(self, audio_path: str) -> str:
         """Transcribes the audio file to text using the STT service"""
