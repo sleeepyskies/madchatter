@@ -101,11 +101,11 @@ class Settings(BaseSettings):
 	"""Vector database connection string."""
 
 	@model_validator(mode="after")
-	def __resolve_defaults(self) -> Settings:
+	def __resolve_defaults(self) -> "Settings":
 		if not self.database_url:
-			self.database_url = f"sqlite:///{(self.run_dir / 'database.sqlite').as_posix()}"
+			self.database_url = f"sqlite:///{(self.run_dir / 'database.sqlite')}"
 		if not self.vector_db_url:
-			self.vector_db_url = f"chroma:///{(self.run_dir / 'chroma_db').as_posix()}"
+			self.vector_db_url = f"chroma:///{(self.run_dir / 'chroma_db')}"
 		return self
 
 
