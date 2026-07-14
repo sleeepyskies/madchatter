@@ -19,3 +19,5 @@ build/
 .DS_Store
 .vscode/
 /apps/backend/videos/
+run/
+static/

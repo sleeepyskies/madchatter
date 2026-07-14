@@ -1,6 +1,19 @@
+from enum import Enum
 from models.agent import AgentResponse
 from models.base import BaseSchema
 from models.videos import VideoResponse
+
+class STTModel(str, Enum):
+    BASE = "base"
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE_V2 = "large-v2"
+    LARGE_V3 = "large-v3"
+
+
+class STTDevice(str, Enum):
+    CPU = "cpu"
+    CUDA = "cuda"
 
 
 class ProjectResponse(BaseSchema):
@@ -12,7 +25,10 @@ class ProjectResponse(BaseSchema):
     idle_video: VideoResponse | None
     enter_video: VideoResponse | None
     exit_video: VideoResponse | None
-    terms: str | None
+    stt_terms: str | None
+    stt_model: STTModel | None
+    stt_device: STTDevice | None
+    llm_model: str | None
 
 
 class CreateProjectRequest(BaseSchema):
@@ -22,7 +38,10 @@ class CreateProjectRequest(BaseSchema):
     idle_video_id: int | None = None
     enter_video_id: int | None = None
     exit_video_id: int | None = None
-    terms: str | None = None
+    stt_terms: str | None = None
+    stt_model: STTModel | None = None
+    stt_device: STTDevice | None = None
+    llm_model: str | None = None
 
 
 class UpdateProjectRequest(BaseSchema):
@@ -32,8 +51,10 @@ class UpdateProjectRequest(BaseSchema):
     idle_video_id: int | None = None
     enter_video_id: int | None = None
     exit_video_id: int | None = None
-    terms: str | None = None
-
+    stt_terms: str | None = None
+    stt_model: STTModel | None = None
+    stt_device: STTDevice | None = None
+    llm_model: str | None = None
 
 
 class ExportProjectResponse(BaseSchema):

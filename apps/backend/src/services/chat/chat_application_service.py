@@ -36,7 +36,10 @@ class ChatApplicationService:
         idle_video = project.idle_video
         enter_video = project.enter_video
         exit_video = project.exit_video
-        terms = project.terms
+        stt_terms = project.stt_terms
+        stt_model = project.stt_model
+        stt_device = project.stt_device
+        llm_model = project.llm_model
 
 
         chroma_collection = self.knowledge_service.fetch_knowledge_base(project.knowledge_id)
@@ -50,7 +53,10 @@ class ChatApplicationService:
             "idle_video": idle_video,
             "enter_video": enter_video,
             "exit_video": exit_video,
-            "terms": terms
+            "stt_terms": stt_terms,
+            "stt_model": stt_model,
+            "stt_device": stt_device,
+            "llm_model": llm_model
         }
 
         self.chat_service = self.chat_factory.create(**config)

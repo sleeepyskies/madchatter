@@ -6,6 +6,10 @@ const api = client.extend((options) => ({
   prefix: `${options.prefix}/projects`,
 }));
 
+export type STTModel = "base" | "small" | "medium" | "large-v2" | "large-v3";
+
+export type STTDevice = "cpu" | "cuda";
+
 export interface ProjectResponse {
   id: number;
   label: string;
@@ -15,7 +19,10 @@ export interface ProjectResponse {
   idleVideo: VideoResponse | null;
   enterVideo: VideoResponse | null;
   exitVideo: VideoResponse | null;
-  terms: string | null;
+  sttTerms: string | null;
+  sttModel: STTModel | null;
+  sttDevice: STTDevice | null;
+  llmModel: string | null;
 }
 
 export interface CreateProjectRequest {
@@ -25,7 +32,10 @@ export interface CreateProjectRequest {
   idleVideoId?: number | null;
   enterVideoId?: number | null;
   exitVideoId?: number | null;
-  terms?: string | null;
+  sttTerms?: string | null;
+  sttModel?: STTModel | null;
+  sttDevice?: STTDevice | null;
+  llmModel?: string | null;
 }
 
 export interface UpdateProjectRequest {
@@ -35,7 +45,10 @@ export interface UpdateProjectRequest {
   idleVideoId?: number | null;
   enterVideoId?: number | null;
   exitVideoId?: number | null;
-  terms?: string | null;
+  sttTerms?: string | null;
+  sttModel?: STTModel | null;
+  sttDevice?: STTDevice | null;
+  llmModel?: string | null;
 }
 
 export const projectsApi = {

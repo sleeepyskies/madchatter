@@ -19,8 +19,8 @@ class RAG:
     to answer user questions based on retrieved context and chat history.
     """
 
-    def __init__(self, chroma_collection: str | None = None, system_prompt: str | None = None):
-        self.llm = ChatOllama(model="llama3.2")
+    def __init__(self, chroma_collection: str | None = None, system_prompt: str | None = None, llm_model: str | None = None):
+        self.llm = ChatOllama(model=llm_model or "llama3.2")
         self.repo = (
             KnowledgeBase(chroma_collection)
             if chroma_collection

@@ -71,7 +71,10 @@ class ProjectImportService:
         return self.project_repository.create(
             Project(
                 label=metadata.get("label"),
-                terms=metadata.get("terms")
+                stt_terms=metadata.get("stt_terms"),
+                stt_model=metadata.get("stt_model"),
+                stt_device=metadata.get("stt_device"),
+                llm_model=metadata.get("llm_model")
             )
         )
 
@@ -171,7 +174,10 @@ class ProjectImportService:
                 idle_video_id=project.idle_video_id,
                 enter_video_id=project.enter_video_id,
                 exit_video_id=project.exit_video_id,
-                terms=project.terms
+                stt_terms=project.stt_terms,
+                stt_model=project.stt_model,
+                stt_device=project.stt_device,
+                llm_model=project.llm_model
             ),
         )
 

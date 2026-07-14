@@ -51,5 +51,14 @@ class Project(Base):
     )
     """Optional video that can be set to play when the user exits interacting with the agent."""
 
-    terms: Mapped[str] = mapped_column(nullable=True)
+    stt_terms: Mapped[str] = mapped_column(nullable=True)
     """Optional speech recognition terms used to improve STT accuracy."""
+
+    stt_model: Mapped[str] = mapped_column(nullable=True)
+    """Optional STT model used for this project. If not set, the small model will be used."""
+
+    stt_device: Mapped[str] = mapped_column(nullable=True)
+    """Optional STT device used for this project. If not set, the default cpu will be used."""
+
+    llm_model: Mapped[str] = mapped_column(nullable=True)
+    """Optional LLM model used for this project. If not set, the default model will be used."""

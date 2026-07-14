@@ -4,7 +4,7 @@ class SpeechToText:
     """
     A class for performing speech-to-text transcription using the WhisperModel from the faster_whisper library.
     """
-    def __init__(self, model_size="base", device="cpu", language="en", compute_type="int8", terms=None):
+    def __init__(self, model_size="small", device="cpu", language="en", compute_type="int8", terms=None):
         """
         Initializes the SpeechToText class with the specified model size, device, and compute type.
         

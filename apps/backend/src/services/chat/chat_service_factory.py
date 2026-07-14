@@ -1,4 +1,5 @@
 from models.agent import Language
+from models.project import STTModel, STTDevice
 from services.chat.chat_service import ChatService
 from services.chat.rag_module import RAG
 from services.chat.stt_module import SpeechToText
@@ -18,23 +19,26 @@ class ChatServiceFactory:
                idle_video: VideoResponse | None,
                enter_video: VideoResponse | None,
                exit_video: VideoResponse | None,
-               terms: str | None) -> ChatService:
+               stt_terms: str | None,
+               stt_model: STTModel | None,
+               stt_device: STTDevice | None,
+               llm_model: str | None) -> ChatService:
 
         stt_terms = (
-            f"This audio may contain the following names and terms: {terms}"
-            if terms
+            f"This audio may contain the following names and terms: {stt_terms}"
+            if stt_terms
             else None
         )
 
         stt = SpeechToText(
-            model_size="medium",
+            model_size=stt_model.value,
             language=language.value,
-            device="cpu",
-            compute_type="int8",
+            device=stt_device.value,
+            compute_type="float16" if stt_device == "cuda" else "int8",
             terms=stt_terms
         )
 
-        rag = RAG(chroma_collection=chroma_collection, system_prompt=system_prompt)
+        rag = RAG(chroma_collection=chroma_collection, system_prompt=system_prompt, llm_model=llm_model)
 
         if voice_model is None:
             raise Exception("Must create ChatService with valid voice_model")
