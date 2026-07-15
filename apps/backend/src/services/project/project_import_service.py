@@ -49,7 +49,12 @@ class ProjectImportService:
             with zipfile.ZipFile(file.file) as z:
                 z.extractall(scratch_dir)
 
-            files_dir = scratch_dir / "files"
+            # why apple why
+            root_contents = [p for p in scratch_dir.iterdir() if p.is_dir() and p.name != "__MACOSX"]
+            base_dir = root_contents[0] if len(root_contents) == 1 else scratch_dir
+            files_dir = base_dir / "files"
+
+            logger.debug(f"Looking for files in: {files_dir}")
 
             self._load_agent(metadata, project)
             created_video_ids = self._load_videos(metadata, project, files_dir)
