@@ -31,16 +31,6 @@ class VideoMatcher:
 
         similarities = self.video_matrix @ query_norm
 
-        results = sorted(
-            zip(self.videos, similarities),
-            key=lambda x: x[1],
-            reverse=True
-        )
-
-        print("\nSimilarity ranking:")
-        for video, score in results:
-            print(f"{score:.4f}  {video.label}")
-
         best_index = np.argmax(similarities)
         best_score = similarities[best_index]
 

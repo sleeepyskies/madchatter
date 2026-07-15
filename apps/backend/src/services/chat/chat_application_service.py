@@ -41,8 +41,12 @@ class ChatApplicationService:
         stt_device = project.stt_device
         llm_model = project.llm_model
 
+        chroma_collection = None
 
-        chroma_collection = self.knowledge_service.fetch_knowledge_base(project.knowledge_id)
+        if project.knowledge_id:
+            chroma_collection = self.knowledge_service.fetch_knowledge_base(
+                project.knowledge_id
+            )
 
         config = {
             "language": agent.language,

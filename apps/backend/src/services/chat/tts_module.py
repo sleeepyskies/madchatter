@@ -12,7 +12,7 @@ class TextToSpeech:
     """
     A TextToSpeech class that uses the Piper TTS engine to convert text to speech. It loads a specified TTS model and provides a method to stream synthesized audio for given text input.
     """
-    def __init__(self, voice_model="eva.onnx", language: Language = Language.DE):
+    def __init__(self, voice_model="Alba.onnx", language: Language = Language.EN):
         self.voice_model_directory = settings.static_dir / "voice-models" / language.value
         self.model_path = str(self.voice_model_directory / voice_model)
         self.model_path = self.voice_model_directory / f"{voice_model}.onnx"
@@ -23,7 +23,6 @@ class TextToSpeech:
         self.voice = PiperVoice.load(self.model_path, config_path=config_path)
 
     def speak_stream(self, text_generator):
-        logger.debug("--- TTS STREAM START ---")
         try:
             for text_chunk in text_generator:
                 if not text_chunk.strip():

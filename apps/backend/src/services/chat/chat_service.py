@@ -157,7 +157,6 @@ class ChatService:
     def _transcribe_audio(self, audio_path: str) -> str:
         """Transcribes the audio file to text using the STT service"""
         user_text = self.stt_service.transcribe(audio_path)
-        logger.debug(f"\n[STT] Text: '{user_text}'")
         return user_text
 
     def _update_memory_user(self, user_text: str):
@@ -201,7 +200,6 @@ class ChatService:
         if buffer.strip():
             yield buffer
 
-        logger.debug(f"[LLM]: {full_reply}")
         self._update_memory_assistant(full_reply)
 
     def _fix_pcm_stream(self, audio_stream):
