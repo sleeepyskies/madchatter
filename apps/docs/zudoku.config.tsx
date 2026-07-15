@@ -25,6 +25,16 @@ const config: ZudokuConfig = {
           icon: "sparkles",
           items: ["/getting-start/system-requirments"],
         },
+        {
+          type: "category",
+          label: "Administrator Guide",
+          icon: "sparkles",
+          items: [
+            "/administrator-guide/agent-management",
+            "/administrator-guide/knowledge-management",
+            "/administrator-guide/project-management",
+          ],
+        },
       ],
     },
     {
