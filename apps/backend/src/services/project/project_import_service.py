@@ -49,12 +49,15 @@ class ProjectImportService:
             with zipfile.ZipFile(file.file) as z:
                 z.extractall(scratch_dir)
 
-            # why apple why
-            root_contents = [p for p in scratch_dir.iterdir() if p.is_dir() and p.name != "__MACOSX"]
-            base_dir = root_contents[0] if len(root_contents) == 1 else scratch_dir
-            files_dir = base_dir / "files"
+            potential_dirs = [p for p in scratch_dir.rglob("*") if p.is_dir() and p.name.lower() == "files"]
 
-            logger.debug(f"Looking for files in: {files_dir}")
+            if not potential_dirs:
+                all_items = [item.name for item in scratch_dir.rglob("*")]
+                logger.error(f"Files directory not found. Extracted items: {all_items}")
+                raise FileNotFoundError("Could not find a 'files/' directory in the ZIP.")
+
+            files_dir = potential_dirs[0]
+            logger.info(f"Located files directory at: {files_dir}")
 
             self._load_agent(metadata, project)
             created_video_ids = self._load_videos(metadata, project, files_dir)
