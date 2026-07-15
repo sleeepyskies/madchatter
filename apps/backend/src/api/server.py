@@ -11,13 +11,18 @@ from sqlalchemy.orm import sessionmaker
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse
+import mimetypes
 
 from api.api_exception import APIException, ApiErrorResponse
 from api.next_static_files import NextStaticFiles
 from api.routes import video_router, project_router, agent_router, knowledge_router, chat_router
 from settings import settings
 
+
 def create_app() -> FastAPI:
+    mimetypes.add_type("application/javascript", ".mjs")
+    mimetypes.add_type("application/wasm", ".wasm")
+
     # dont mount doc pages in prod builds
     return FastAPI(
         title="MadChatter",
@@ -33,6 +38,7 @@ def create_app() -> FastAPI:
         ),
     )
 
+
 def init_app_state(app: FastAPI, engine: Engine, SessionLocal: sessionmaker) -> None:
     app.add_middleware(
         CORSMiddleware,
@@ -44,6 +50,7 @@ def init_app_state(app: FastAPI, engine: Engine, SessionLocal: sessionmaker) -> 
     )
     app.state.SessionLocal = SessionLocal
     app.state.engine = engine
+
 
 def setup_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(APIException)
@@ -57,7 +64,6 @@ def setup_exception_handlers(app: FastAPI) -> None:
             message=exception.message,
             detail=exception.detail,
         )
-
 
     @app.exception_handler(IntegrityError)
     async def integrity_error_handler(request: Request, exception: IntegrityError):
@@ -80,7 +86,6 @@ def setup_exception_handlers(app: FastAPI) -> None:
             detail=detail,
         )
 
-
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled exception encountered during request processing")
@@ -95,6 +100,7 @@ def setup_exception_handlers(app: FastAPI) -> None:
             message=exception_message,
             detail=exception_message,
         )
+
 
 def attach_routers(app) -> None:
     router = APIRouter(prefix=settings.api_prefix)
@@ -116,6 +122,7 @@ def attach_static_files(app) -> None:
     if settings.is_production:
         app.mount("/", NextStaticFiles(directory=settings.frontend_dir, html=True), name="frontend")
 
+
 def find_server_port(preferred: int) -> int:
     """
     Attempts to find a suitable server port.
@@ -131,7 +138,6 @@ def find_server_port(preferred: int) -> int:
                 return s.getsockname()[1]
             except OSError:
                 pass
-
 
 
 def start_server(engine: Engine, SessionLocal: sessionmaker):
@@ -153,7 +159,6 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
         settings.server_port = port
         logger.warning(f"Could not use the preferred port. OS chose port {port} to run on.")
 
-
     if settings.is_production:
         import webbrowser
         logger.info(f"Webapp can be viewed under {settings.webapp_url}")
@@ -165,4 +170,3 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
         port=port,
         log_config=None,
     )
-
