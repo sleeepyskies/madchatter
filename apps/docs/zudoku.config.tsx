@@ -15,9 +15,15 @@ const config: ZudokuConfig = {
       items: [
         {
           type: "category",
-          label: "Getting Started",
+          label: "Introduction",
           icon: "sparkles",
-          items: ["/introduction"],
+          items: ["/overview", "/system-workflow"],
+        },
+        {
+          type: "category",
+          label: "Getting Start",
+          icon: "sparkles",
+          items: ["/system-requirments"],
         },
       ],
     },

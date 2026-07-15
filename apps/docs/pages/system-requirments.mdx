@@ -1,0 +1,63 @@
+---
+title: System Requirements
+---
+
+Mad Chatter runs entirely locally and requires sufficient hardware resources to execute the selected AI models. The actual requirements depend on the chosen language model (LLM), speech recognition model (STT), embedding model, and text-to-speech model (TTS).
+
+## Recommended Requirements
+
+- **Operating System**
+  - Windows, Linux, or macOS
+
+- **Memory**
+  - 16 GB RAM or more
+
+- **GPU**
+  - A CUDA-compatible NVIDIA GPU is recommended for accelerating AI model inference, especially for STT and LLM execution.
+
+- **Storage**
+  - Sufficient disk space is required for storing selected LLM and STT models, and knowledge base data.
+
+## Model Requirements
+
+### Large Language Model (LLM)
+
+Mad Chatter uses locally running language models through [Ollama](https://ollama.com/).
+
+Users can select and download different models depending on their hardware capabilities and performance requirements.
+
+Larger models generally require more memory and benefit from GPU acceleration.
+
+### Speech-to-Text Model (STT)
+
+Mad Chatter uses **Faster-Whisper** for local speech recognition.
+
+Supported model sizes include:
+
+- `base`
+- `small`
+- `medium`
+- `large-v2`
+- `large-v3`
+
+The required resources depend on the selected model:
+
+- CPU inference is supported for smaller models such as `base` and `small`.
+- CUDA acceleration is recommended for larger models such as `medium` and above to achieve better real-time performance.
+
+### Text-to-Speech Model (TTS)
+
+Mad Chatter uses **Piper** for local text-to-speech synthesis.
+
+- Users can download and configure different Piper voice models from the [Piper voice samples](https://rhasspy.github.io/piper-samples/).
+- Currently supported audio output sample rate: **22,050 Hz**.
+
+### Embedding Model
+
+The embedding model is used for indexing and retrieving relevant information from the local knowledge base.
+
+Mad Chatter uses the bilingual embedding model:
+
+`jina/jina-embeddings-v2-base-de`
+
+The model can be downloaded and managed through Ollama.
