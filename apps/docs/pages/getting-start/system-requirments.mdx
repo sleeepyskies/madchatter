@@ -44,6 +44,7 @@ The required resources depend on the selected model:
 
 - CPU inference is supported for smaller models such as `base` and `small`.
 - CUDA acceleration is recommended for larger models such as `medium` and above to achieve better real-time performance.
+- For German, models of size `medium` or larger are recommended for transcription accuracy.
 
 ### Text-to-Speech Model (TTS)
 
@@ -56,7 +57,7 @@ Mad Chatter uses **Piper** for local text-to-speech synthesis.
 
 The embedding model is used for indexing and retrieving relevant information from the local knowledge base.
 
-Mad Chatter uses the bilingual embedding model:
+Mad Chatter uses the bilingual (English, German) embedding model:
 
 `jina/jina-embeddings-v2-base-de`
 
