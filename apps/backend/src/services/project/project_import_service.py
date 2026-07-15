@@ -201,5 +201,14 @@ class ProjectImportService:
 
     def _read_metadata_from_zip(self, file: UploadFile) -> dict:
         with zipfile.ZipFile(file.file) as z:
-            with z.open("metadata.json") as f:
+            # sometimes the dir structure is weird, and we need to look deeper, for example on macOS
+
+            matches = [name for name in z.namelist() if name.endswith("metadata.json")]
+            if not matches:
+                raise FileNotFoundError("metadata.json not found in the archive.")
+
+            # take least nested one
+            matches.sort(key=lambda x: x.count('/'))
+
+            with z.open(matches[0]) as f:
                 return json.load(f)
