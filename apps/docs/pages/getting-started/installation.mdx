@@ -1,0 +1,80 @@
+---
+title: System Requirements
+---
+import {CodeTabs} from "zudoku/ui/CodeTabs";
+
+# Prerequisites
+The only prerequisite is that python is installed. This is for the optional seutp scripts.
+
+# Installation
+
+Mad Chatter is distributed as a standalone binary for Windows, macOS, and Linux. Download the correct release for your OS from the GitHub page.
+
+After downloading:
+
+1. Extract the ZIP archive.
+2. Move the extracted folder wherever you want.
+3. Start the application.
+
+---
+
+# Starting Mad Chatter
+
+## Recommended Way: Command Line
+
+The recommended way to start Mad Chatter is currently through the command line.
+
+Some reasons are:
+
+- Application logs
+- Better visibility into startup errors
+- Better control over application lifetime (closing the browser tab doesn’t shut down the application)
+
+In the future, we plan on using PyWebView to improve desktop integration and application lifetime handling.
+
+---
+
+<CodeTabs>
+    ```powershell
+    C:\Applications\madchatter\madchatter.exe
+    ```
+
+    ```bash
+    ~/Applications/madchatter/madchatter
+    ```
+
+    ```bash
+    ~/Applications/madchatter/madchatter
+    ```
+</CodeTabs>
+
+# Initial Setup
+
+Mad Chatter includes an optional setup script for preparing required runtime dependencies.
+
+The setup script will check the presence of any hard requirements, and optionally install any optional requirements.
+Running the setup script is recommended on a fresh installation.
+
+---
+
+# Setup Script
+
+The setup script is located at:
+```text
+scripts/setup.py
+```
+
+<CodeTabs>
+</CodeTabs>
+
+Run the setup:
+
+```bash
+python .\scripts\setup.py
+```
+
+To also download optional default models:
+
+```bash
+python .\scripts\setup.py --defaults
+```
