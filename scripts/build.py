@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import sys
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).parent.parent
 
 BACKEND_DIR = ROOT / "apps" / "backend"
 FRONTEND_DIR = ROOT / "apps" / "frontend"
