@@ -1,3 +1,67 @@
 ---
 title: Knowledge Base Management
 ---
+
+# Knowledge Base Management
+
+Knowledge bases allow agents in Mad Chatter to access additional custom inforamtion beyond the models base knowlegde.
+
+At its core, a knowledge base is just a collection of documents. When interacting with the agent, it can search and use these documents when generating responses.
+
+---
+
+## Creating a Knowledge Base
+
+To create a new knowledge base, simply open the management page for knowledge bases, and press the create button.
+
+---
+
+## Adding Sources
+
+Sources are the individual files stored inside a knowledge base.
+
+A source can be uploaded and will automatically be processed and indexed.
+
+Supported sources may include documents such as:
+
+- PDF files
+- Text files
+- Other supported document formats
+
+When a source is added:
+
+1. The file is stored locally (so a copy will exist within one of the applications managed directories).
+2. The document content is extracted.
+3. The content is converted into searchable embeddings.
+4. The indexed data is added to the knowledge base.
+
+---
+
+## Managing Sources
+
+Sources can be managed independently from their knowledge base.
+
+As the user, you can:
+
+- Add a new source
+- Download the source
+- Remove a source
+
+Removing a source will also remove its indexed content from the knowledge base.
+
+---
+
+## Deleting Knowledge Bases
+
+Deleting a knowledge base removes:
+
+- All associated source files
+- Stored document metadata
+
+---
+
+## Using Knowledge Bases
+
+After creating a knowledge base and adding sources, it can be assigned to a project.
+
+The agent of the project can then use the indexed information when answering, allowing it to provide responses with custom knowledge.
