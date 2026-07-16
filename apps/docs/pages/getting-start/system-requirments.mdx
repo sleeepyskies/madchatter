@@ -24,7 +24,13 @@ Mad Chatter runs entirely locally and requires sufficient hardware resources to 
 
 Mad Chatter uses locally running language models through [Ollama](https://ollama.com/).
 
-Users can select and download different models depending on their hardware capabilities and performance requirements.
+Users can select and download different models depending on their hardware capabilities and performance requirements. A lighter model is recommended for smooth interaction.
+
+For example:
+
+```bash
+ollama pull llama3.2
+```
 
 Larger models generally require more memory and benefit from GPU acceleration.
 
@@ -44,6 +50,7 @@ The required resources depend on the selected model:
 
 - CPU inference is supported for smaller models such as `base` and `small`.
 - CUDA acceleration is recommended for larger models such as `medium` and above to achieve better real-time performance.
+- For German, models of size `medium` or larger are recommended for transcription accuracy.
 
 ### Text-to-Speech Model (TTS)
 
@@ -56,7 +63,7 @@ Mad Chatter uses **Piper** for local text-to-speech synthesis.
 
 The embedding model is used for indexing and retrieving relevant information from the local knowledge base.
 
-Mad Chatter uses the bilingual embedding model:
+Mad Chatter uses the bilingual (English, German) embedding model:
 
 `jina/jina-embeddings-v2-base-de`
 

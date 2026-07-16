@@ -1,0 +1,55 @@
+---
+title: Interaction Workflow
+---
+
+The general interaction workflow of the viewer page consists of the following steps:
+
+## 1. Voice Detection and Input
+
+The microphone remains active while the assistant is running. However, the system does not continuously process all audio input.
+
+A local **Voice Activity Detection (VAD)** module detects human speech and only starts processing when a user's voice is detected.
+
+Users can disable the microphone or refresh the page using the controls located in the top-right corner of the viewer page.
+
+## 2. Session Start
+
+When a new interaction session begins, Mad Chatter plays the configured **Enter Video** if one has been assigned to the project.
+
+After the Enter Video finishes, the system starts the normal conversation session.
+
+## 3. Speech Processing
+
+The detected voice input is converted into text using a local STT model.
+
+The transcribed text is then analyzed by the conversational agent to determine the appropriate response.
+
+## 4. Response Generation
+
+Based on the user's request, Mad Chatter selects one of the following response modes:
+
+### Knowledge-Based Response
+
+For general questions, the system uses the configured knowledge base with **Retrieval-Augmented Generation (RAG)**.
+
+The workflow is:
+
+1. Retrieve relevant information from the local knowledge base.
+2. Generate a response using the configured LLM.
+3. Convert the generated text into speech using the TTS synthesis.
+
+The user receives both the generated voice response and the corresponding assistant interaction.
+
+### Interactive Video Response
+
+For requests that match predefined video descriptions, the system selects the most relevant video and starts playback.
+
+Videos are matched based on their configured descriptions. For example:
+
+```text
+How to get to HBKsaar
+```
+
+### Hybrid Response
+
+For videos without **Includes audio** enabled, Mad Chatter plays the muted video while generating and playing the LLM response through the TTS synthesis.

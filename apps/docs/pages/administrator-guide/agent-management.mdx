@@ -1,0 +1,28 @@
+---
+title: Agent Management
+---
+
+The **Agent Management** page allows administrators to configure the behavior of the AI assistant. Each agent defines how the assistant communicates with users, which language it uses.
+
+## System Prompt
+
+The system prompt defines the agent's role, personality, and response behavior. It provides the initial instructions that guide the language model throughout every conversation.
+
+A well-designed system prompt helps ensure that the assistant produces consistent and appropriate responses for the intended application.
+
+For example:
+
+> You are a friendly and helpful assistant for new students at HBKsaar.
+
+The following additional constraints are recommended to include, such as:
+
+- Always answer in English.
+- Keep each response within 10 words.
+
+These instructions are particularly useful when responses should be short, easy to understand.
+
+## Language
+
+The language setting specifies the language used in the conversation.
+
+Depending on the chosen language, system automatically loads the corresponding TTS synthesis options in the static/ directory.
