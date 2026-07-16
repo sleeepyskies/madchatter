@@ -24,7 +24,7 @@ const config: ZudokuConfig = {
           label: "Getting Started",
           icon: "rocket",
           items: [
-              "/getting-started/system-requirments",
+              "/getting-started/system-requirements",
               "/getting-started/installation",
               "/getting-started/building",
           ],

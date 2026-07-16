@@ -1,3 +1,58 @@
 ---
 title: Building
 ---
+
+# Building
+
+Mad Chatter can be built from source using the provided build script.
+
+The build process uses PyInstaller to bundle the application into a standalone executable. This includes CPython and all required Python dependencies, allowing the resulting application to run without a separate Python installation.
+
+---
+
+## Prerequisites
+
+Python and Git are required to build Mad Chatter.
+
+---
+
+## Clone the Repository
+
+```bash
+git clone https://github.com/sleeepyskies/madchatter.git
+cd madchatter
+```
+
+---
+
+## Run the Build Script
+
+The build script is located at:
+
+```text
+scripts/build.py
+```
+
+Run:
+
+```bash
+python scripts/build.py
+```
+
+The script should inform of any missing dependencies or issues.
+
+---
+
+## Build Output
+
+The finished application will be created at:
+
+```text
+dist/madchatter/
+```
+
+The generated application can be run directly.
+
+Follow the installation guide to complete runtime setup and download required models.
+
+---
