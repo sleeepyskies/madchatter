@@ -122,22 +122,6 @@ def mount_static_files(app) -> None:
         app.mount("/", NextStaticFiles(directory=settings.frontend_dir, html=True), name="frontend")
 
 
-def find_server_port(preferred: int) -> int:
-    """
-    Attempts to find a suitable server port.
-    If the preferred port is taken, the OS will decide which port to run on.
-    """
-    if not settings.is_production:
-        return settings.server_port
-
-    for port in (preferred, 0):
-        with socket.socket() as s:
-            try:
-                s.bind((settings.server_address, port))
-                return s.getsockname()[1]
-            except OSError:
-                pass
-
 
 def start_server(engine: Engine, SessionLocal: sessionmaker):
     """
@@ -153,19 +137,9 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
     attach_routers(app)
     mount_static_files(app)
 
-    port = find_server_port(settings.server_port)
-    if port != settings.server_port:
-        settings.server_port = port
-        logger.warning(f"Could not use the preferred port. OS chose port {port} to run on.")
-
-    if settings.is_production:
-        import webbrowser
-        logger.info(f"Webapp can be viewed under {settings.webapp_url}")
-        webbrowser.open(settings.webapp_url)
-
     uvicorn.run(
         app,
         host=settings.server_address,
-        port=port,
+        port=settings.server_port,
         log_config=None,
     )

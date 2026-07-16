@@ -34,8 +34,8 @@ def load_database() -> tuple[Engine, sessionmaker]:
         engine = create_engine(settings.database_url, echo=True)
         Base.metadata.create_all(engine)
 
-        SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
-        return engine, SessionLocal
+        session = sessionmaker(bind=engine, expire_on_commit=False)
+        return engine, session
 
     except Exception as e:
         logger.exception("Failed to connect to database")
