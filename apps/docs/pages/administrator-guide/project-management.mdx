@@ -1,3 +1,171 @@
 ---
 title: Project Management
 ---
+
+A project combines all components of Mad Chatter into a complete AI conversational assistant. Each project links together an AI agent, a knowledge base, video resources, and other configurations.
+
+Once a project is created and applied, these configurations are used throughout the entire conversation.
+
+## Step 1: Configure Videos
+
+Before configuring the AI agent, upload all videos required by the project.
+
+### Video Description
+
+Each uploaded video should include a clear and descriptive **Description**. The description is used by the system to match videos with user questions.
+
+For example:
+
+| Video       | Description             |
+| ----------- | ----------------------- |
+| Campus Tour | `How to get to HBKsaar` |
+| Library     | `Where is the library?` |
+
+When a user asks a related question, MadChatter compares the user's request with the video descriptions and selects the most appropriate video to play.
+
+For the best matching performance:
+
+- Use short, descriptive sentences.
+- Include important keywords that users are likely to say.
+
+### Include Audio
+
+Each video can optionally include its original audio.
+
+#### Include Audio Enabled
+
+When **Include Audio** is enabled:
+
+- The video is played with its original sound.
+- The language model does not generate a spoken response.
+- Users only hear the video's audio.
+
+This option is recommended for videos that already contain narration or explanations.
+
+#### Include Audio Disabled
+
+When **Include Audio** is disabled:
+
+- The video is muted.
+- The language model generates a response using the configured AI agent.
+- The generated response is played through the text-to-speech system while the video is displayed.
+
+This allows the AI to provide dynamic spoken explanations while showing visual content.
+
+### Special Video Assignment
+
+MadChatter supports three special videos that control the interaction flow.
+
+#### Idle Video
+
+The **Idle Video** is the default background video displayed whenever no other video is being played.
+
+If no matching video is found for a user's question, the Idle Video continues to play while the AI responds through speech.
+
+It is **highly recommended** to configure an Idle Video for every project.
+
+#### Enter Video
+
+The **Enter Video** is played when a new conversation session begins.
+
+This video is typically used to welcome users.
+
+#### Exit Video
+
+The **Exit Video** is played when the user has been inactive for more than **60 seconds**.
+
+It provides a natural way to end the current conversation and return the assistant to its idle state.
+
+---
+
+## Step 2: Configure the AI Agent
+
+Each project must be linked to an existing AI agent.
+
+The selected agent determines:
+
+- The system prompt
+- The conversation language
+- The language model
+
+For more information, see **Agent Management**.
+
+## Knowledge Base
+
+A project can optionally be connected to a knowledge base.
+
+For more information, see **Knowledge Base Management**.
+
+---
+
+## Step 3: Speech Recognition Settings
+
+### STT Model Size
+
+Select the Whisper model size according to the available hardware and the desired recognition accuracy.
+
+For English, **small** or **medium** models are enough for daily context.
+
+For German, using at least the **medium** model is recommended to achieve recognition accuracy.
+
+Larger models generally provide better transcription quality but require more computational resources.
+
+### STT Device
+
+Choose the device used for speech recognition.
+
+Available options include:
+
+- CPU
+- CUDA
+
+For larger Whisper models, running on **CUDA** is strongly recommended to improve performance.
+
+To use CUDA acceleration, ensure that your NVIDIA GPU, CUDA Toolkit, and all required CUDA runtime libraries are installed correctly before enabling the **CUDA** device.
+
+> **Note**
+>
+> If you encounter issues while running the Whisper model on CUDA, please refer to the official Faster-Whisper GitHub issue tracker:
+>
+> - [Faster-Whisper GitHub Issues](https://github.com/SYSTRAN/faster-whisper/issues?utm_source=chatgpt.com)
+>
+> One of the most common errors on Windows is:
+>
+> `RuntimeError: Library cublas64_12.dll is not found or cannot be loaded`
+>
+> For troubleshooting steps and possible solutions, see:
+>
+> - [Issue #1276 – RuntimeError: Library cublas64_12.dll is not found or cannot be loaded](https://github.com/SYSTRAN/faster-whisper/issues/1276?utm_source=chatgpt.com)
+>
+> Normally adding downloaded `cublas64_12.dll` or `cublasLt64_12.dll` to `System32` directory is enough.
+
+### STT Terms
+
+**STT Terms** allows administrators to define custom words that should be recognized more accurately by the speech recognition model.
+
+This is particularly useful for uncommon names, locations, abbreviations, or project-specific terminology.
+
+Examples:
+
+- HBK Saar
+- Saarbrücken
+- Hochschule der Bildenden Künste Saar
+- Professor names
+- Building names
+
+Adding these terms can significantly improve transcription accuracy when users mention them during conversations.
+
+---
+
+## Step 4: Language Model
+
+Input and specify the Ollama language model used by the project.
+
+For example:
+
+- llama3.2
+- qwen2.5:1.5b
+
+The specified model must already be downloaded and available in the local Ollama installation.
+
+---
