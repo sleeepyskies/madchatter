@@ -2,7 +2,7 @@
 
 ## Documentation
 
-Documentation can be found [here](https://madchatter.pages.dev/introduction) (site is still under
+Documentation can be found [here](https://madchatter.pages.dev) (site is still under
 construction).
 
 ## Requirements
