@@ -13,12 +13,16 @@ WORK_PATH = ROOT / "build"
 
 
 def build_backend():
-    # first use pyinstaller to create a binary
+    # first, create venv
+    subprocess.check_call(["uv", "sync"], cwd=BACKEND_DIR)
+
+    # then use pyinstaller to create a binary
     python = (
             BACKEND_DIR
             / ".venv"
             / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
     )
+
     subprocess.check_call([
         str(python),
         "-m",
