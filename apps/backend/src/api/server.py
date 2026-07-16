@@ -114,8 +114,7 @@ def attach_routers(app) -> None:
     app.include_router(router)
 
 
-def attach_static_files(app) -> None:
-    # app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
+def mount_static_files(app) -> None:
     app.mount("/files", StaticFiles(directory=settings.files_dir), name="files")
 
     # must be after other mounts to avoid consuming all requests
@@ -152,7 +151,7 @@ def start_server(engine: Engine, SessionLocal: sessionmaker):
     init_app_state(app, engine, SessionLocal)
     setup_exception_handlers(app)
     attach_routers(app)
-    attach_static_files(app)
+    mount_static_files(app)
 
     port = find_server_port(settings.server_port)
     if port != settings.server_port:
