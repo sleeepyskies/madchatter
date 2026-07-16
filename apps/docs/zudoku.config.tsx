@@ -21,9 +21,9 @@ const config: ZudokuConfig = {
         },
         {
           type: "category",
-          label: "Getting Start",
+          label: "Getting Started",
           icon: "rocket",
-          items: ["/getting-start/system-requirments"],
+          items: ["/getting-started/system-requirments"],
         },
         {
           type: "category",
