@@ -16,34 +16,35 @@ const config: ZudokuConfig = {
         {
           type: "category",
           label: "Introduction",
-          icon: "sparkles",
-          items: ["/introduction/overview", "/introduction/system-workflow"],
+          icon: "bot",
+          items: ["/introduction/overview"],
         },
         {
           type: "category",
           label: "Getting Start",
-          icon: "sparkles",
+          icon: "rocket",
           items: ["/getting-start/system-requirments"],
         },
         {
           type: "category",
           label: "Administrator Guide",
-          icon: "sparkles",
+          icon: "settings",
           items: [
             "/administrator-guide/agent-management",
             "/administrator-guide/knowledge-management",
             "/administrator-guide/project-management",
           ],
         },
+        {
+          type: "category",
+          label: "Viewer Guide",
+          icon: "eye",
+          items: ["/viewer-guide/interaction-workflow"],
+        },
       ],
     },
-    {
-      type: "link",
-      to: "/api",
-      label: "API Reference",
-    },
   ],
-  redirects: [{ from: "/", to: "/introduction" }],
+  redirects: [{ from: "/", to: "/introduction/overview" }],
   apis: [],
 };
 
