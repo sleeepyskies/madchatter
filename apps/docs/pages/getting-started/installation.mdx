@@ -1,80 +1,59 @@
 ---
-title: System Requirements
+title: Installation
 ---
 import {CodeTabs} from "zudoku/ui/CodeTabs";
 
-# Prerequisites
-The only prerequisite is that python is installed. This is for the optional seutp scripts.
+# Building
 
-# Installation
+Mad Chatter can be built from source using the provided build script.
 
-Mad Chatter is distributed as a standalone binary for Windows, macOS, and Linux. Download the correct release for your OS from the GitHub page.
-
-After downloading:
-
-1. Extract the ZIP archive.
-2. Move the extracted folder wherever you want.
-3. Start the application.
+The build process uses PyInstaller to bundle the application into a standalone executable. This includes CPython and all required Python dependencies, allowing the resulting application to run without a separate Python installation.
 
 ---
 
-# Starting Mad Chatter
+## Prerequisites
 
-## Recommended Way: Command Line
-
-The recommended way to start Mad Chatter is currently through the command line.
-
-Some reasons are:
-
-- Application logs
-- Better visibility into startup errors
-- Better control over application lifetime (closing the browser tab doesn’t shut down the application)
-
-In the future, we plan on using PyWebView to improve desktop integration and application lifetime handling.
+Python and Git are required to build Mad Chatter.
 
 ---
 
-<CodeTabs>
-    ```powershell
-    C:\Applications\madchatter\madchatter.exe
-    ```
+## Clone the Repository
 
-    ```bash
-    ~/Applications/madchatter/madchatter
-    ```
-
-    ```bash
-    ~/Applications/madchatter/madchatter
-    ```
-</CodeTabs>
-
-# Initial Setup
-
-Mad Chatter includes an optional setup script for preparing required runtime dependencies.
-
-The setup script will check the presence of any hard requirements, and optionally install any optional requirements.
-Running the setup script is recommended on a fresh installation.
+```bash
+git clone https://github.com/sleeepyskies/madchatter.git
+cd madchatter
+```
 
 ---
 
-# Setup Script
+## Run the Build Script
 
-The setup script is located at:
+The build script is located at:
+
 ```text
-scripts/setup.py
+scripts/build.py
 ```
 
-<CodeTabs>
-</CodeTabs>
-
-Run the setup:
+Run:
 
 ```bash
-python .\scripts\setup.py
+python scripts/build.py
 ```
 
-To also download optional default models:
+The script should inform of any missing dependencies or issues.
 
-```bash
-python .\scripts\setup.py --defaults
+---
+
+## Build Output
+
+The finished application will be created at:
+
+```text
+dist/madchatter/
 ```
+
+The generated application can be run directly.
+
+Follow the installation guide to complete runtime setup and download required models.
+
+---
