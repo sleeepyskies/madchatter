@@ -115,7 +115,7 @@ def attach_routers(app) -> None:
 
 
 def attach_static_files(app) -> None:
-    app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
+    # app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
     app.mount("/files", StaticFiles(directory=settings.files_dir), name="files")
 
     # must be after other mounts to avoid consuming all requests

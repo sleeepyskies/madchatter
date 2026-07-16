@@ -13,7 +13,7 @@ class AgentService:
 
     def __init__(self, agent_repository: AgentRepository):
         self.agent_repository = agent_repository
-        self.voice_model_directory = settings.static_dir / "voice-models"
+        self.voice_model_directory = settings.voice_model_dir
 
     def create_agent(self, request: CreateAgentRequest) -> AgentResponse:
         agent = self.agent_repository.create(

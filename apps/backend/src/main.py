@@ -21,7 +21,7 @@ def setup_environment():
     logger.debug("Setting up environment.")
     settings.run_dir.mkdir(parents=True, exist_ok=True)
     settings.tmp_dir.mkdir(parents=True, exist_ok=True)
-    settings.static_dir.mkdir(parents=True, exist_ok=True)
+    settings.voice_model_dir.mkdir(parents=True, exist_ok=True)
     settings.files_dir.mkdir(parents=True, exist_ok=True)
 
 def acquire_lock():

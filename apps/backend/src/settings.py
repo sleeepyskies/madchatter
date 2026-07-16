@@ -80,14 +80,14 @@ class Settings(BaseSettings):
 		return Path(self.run_dir / "tmp").absolute()
 
 	@property
-	def static_dir(self) -> Path:
+	def voice_model_dir(self) -> Path:
 		"""Directory reserved for saving static files to serve."""
-		return (base_directory / "static").absolute()
+		return Path(self.run_dir / "voice-models").absolute()
 
 	@property
 	def frontend_dir(self) -> Path:
 		"""Directory reserved for storing the frontend build output."""
-		return (base_directory / "frontend").absolute()
+		return Path(base_directory / "frontend").absolute()
 
 	@property
 	def files_dir(self) -> Path:
