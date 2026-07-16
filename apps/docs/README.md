@@ -1,3 +1,3 @@
-# MadChatter Docs
+# madchatter - docs
 
-TODO
+Official documentation pages for Mad Chatter. 
