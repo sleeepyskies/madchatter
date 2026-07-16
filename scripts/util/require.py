@@ -6,9 +6,14 @@ import shutil
 from pathlib import Path
 
 
+def has_tool(name: str) -> bool:
+    """Checks the existence of a tool providing a hint on failure."""
+    return shutil.which(name) is not None
+
+
 def require_tool(name: str, hint: str) -> None:
-    """Verifies the existence of a tool providing a hint on failure."""
-    if shutil.which(name) is None:
+    """Requires the existence of a tool providing a hint on failure."""
+    if not has_tool(name):
         raise RuntimeError(f"required tool '{name}' not found on PATH. {hint}")
 
 

@@ -20,6 +20,9 @@ DIST_PATH = ROOT / "dist"
 WORK_PATH = ROOT / "build"
 DIST_APP_DIR = DIST_PATH / "madchatter"
 
+UTIL_DIR = ROOT / "scripts" / "util"
+SETUP_SCRIPT = ROOT / "scripts" / "setup.py"
+
 PYTHON_VENV = (
     BACKEND_DIR
     / ".venv"
@@ -99,9 +102,7 @@ def build_frontend() -> None:
     cli.run(["npm", "install"], cwd=FRONTEND_DIR, description="npm install")
 
     cli.info("Running frontend build")
-    cli.run(
-        ["npm", "run", "build"], cwd=FRONTEND_DIR, description="npm run build"
-    )
+    cli.run(["npm", "run", "build"], cwd=FRONTEND_DIR, description="npm run build")
 
     src = FRONTEND_DIR / "out"
     if not src.is_dir():
@@ -115,6 +116,28 @@ def build_frontend() -> None:
         shutil.rmtree(dst)
     shutil.copytree(src, dst)
     cli.ok(f"Copied frontend build -> {dst}")
+
+
+def copy_scripts() -> None:
+    """Copy setup scripts and utilities into dist directory."""
+    cli.step("Copying setup utilities")
+
+    dst_scripts = DIST_APP_DIR / "scripts"
+    dst_util = dst_scripts / "util"
+
+    if dst_scripts.exists():
+        shutil.rmtree(dst_scripts)
+
+    dst_scripts.mkdir(parents=True)
+
+    shutil.copytree(UTIL_DIR, dst_util)
+
+    shutil.copy(
+        SETUP_SCRIPT,
+        dst_scripts / "setup.py",
+    )
+
+    cli.ok("Copied setup.py and util directory")
 
 
 def cleanup() -> None:
@@ -133,6 +156,7 @@ def main() -> int:
 
         build_backend()
         build_frontend()
+        copy_scripts()
 
         cleanup()
         cli.step("Build complete")
