@@ -27,8 +27,8 @@ PIPER_MODELS = {
         "de_DE-thorsten-high.onnx.json",
     ],
     "en": [
-        "en_US-lessac-high.onnx",
-        "en_US-lessac-high.onnx.json",
+        "en_GB-alba-medium.onnx",
+        "en_GB-alba-medium.onnx.json",
     ],
 }
 
