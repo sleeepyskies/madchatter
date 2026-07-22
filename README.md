@@ -50,5 +50,5 @@ Mad Chatter local AI models that fit the following:
 
 - **LLM:** Ollama compatible models
 - **STT:** Only faster-whisper is currently supported
-- **TTS:** Only Piper is supported (but any piper compatible models can be used)
+- **TTS:** Only Piper is supported (but any Piper compatible models with a sample rate of 22,050 Hz can be used)
 - **Embeddings:** Only `jina/jina-embeddings-v2-base-de` is supported for english and german usage
