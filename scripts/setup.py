@@ -21,16 +21,24 @@ ROOT = Path(__file__).parent.parent
 EMBEDDINGS_MODEL = "jina/jina-embeddings-v2-base-de"
 LLAMA3_2_MODEL = "llama3.2"
 
-PIPER_MODELS = {
-    "de": [
-        "de_DE-thorsten-high.onnx",
-        "de_DE-thorsten-high.onnx.json",
-    ],
-    "en": [
-        "en_GB-alba-medium.onnx",
-        "en_GB-alba-medium.onnx.json",
-    ],
-}
+PIPER_MODELS = [
+    (
+        "de",
+        "de/de_DE/thorsten/medium",
+        [
+            "de_DE-thorsten-medium.onnx",
+            "de_DE-thorsten-medium.onnx.json",
+        ],
+    ),
+    (
+        "en",
+        "en/en_GB/alba/medium",
+        [
+            "en_GB-alba-medium.onnx",
+            "en_GB-alba-medium.onnx.json",
+        ],
+    ),
+]
 
 PIPER_VOICE_DIR = ROOT / "run" / "voice-models"
 
@@ -109,13 +117,14 @@ def download_piper_models() -> None:
     """Download required Piper TTS models."""
     cli.step("Fetching Piper voices")
 
-    for language, files in PIPER_MODELS.items():
+    for language, model_path, files in PIPER_MODELS:
         voice_dir = PIPER_VOICE_DIR / language
 
         for filename in files:
             url = (
                 f"{PIPER_BASE_URL}/"
-                f"{language}/{filename}"
+                f"{model_path}/"
+                f"{filename}"
             )
 
             destination = voice_dir / filename
