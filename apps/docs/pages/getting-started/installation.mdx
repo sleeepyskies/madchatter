@@ -3,9 +3,11 @@ title: Installation
 ---
 import {CodeTabs} from "zudoku/ui/CodeTabs";
 
-The only prerequisite is that python is installed. This is for the optional seutp scripts.
+The only prerequisite is that python is installed. This is for the optional
+setup scripts.
 
-Mad Chatter is distributed as a standalone binary for Windows, macOS, and Linux. Download the correct release for your OS from the GitHub page.
+Mad Chatter is distributed as a standalone binary for Windows, macOS, and Linux.
+Download the correct release for your OS from the GitHub page.
 
 After downloading:
 
@@ -15,9 +17,7 @@ After downloading:
 
 ---
 
-# Starting Mad Chatter
-
-## Recommended Way: Command Line
+## Starting MadChatter
 
 The recommended way to start Mad Chatter is currently through the command line.
 
@@ -25,52 +25,64 @@ Some reasons are:
 
 - Application logs
 - Better visibility into startup errors
-- Better control over application lifetime (closing the browser tab doesn’t shut down the application)
+- Better control over application lifetime (closing the browser tab doesn’t
+shut down the application)
 
-In the future, we plan on using PyWebView to improve desktop integration and application lifetime handling.
-
----
+To run MadChatter, simply run the following command in a console.
 
 <CodeTabs>
     ```powershell
-    C:\Applications\madchatter\madchatter.exe
+    [install-directory]\madchatter\madchatter.exe
     ```
 
     ```bash
-    ~/Applications/madchatter/madchatter
-    ```
-
-    ```bash
-    ~/Applications/madchatter/madchatter
+    [intall-directory]/madchatter/madchatter
     ```
 </CodeTabs>
 
-# Initial Setup
+---
+
+## Initial Setup
 
 Mad Chatter includes an optional setup script for preparing required runtime dependencies.
 
-The setup script will check the presence of any hard requirements, and optionally install any optional requirements.
+The setup script will check the presence of any hard requirements, and
+optionally install any optional requirements.
 Running the setup script is recommended on a fresh installation.
 
+The setup script can be run by running the following command:
+
+<CodeTabs>
+    ```powershell
+    python [install-directory]\scripts\setup.py
+    ```
+
+    ```bash
+    python [install-directory]/scripts/setup.py
+    ```
+</CodeTabs>
+
+The flag `--defaults` can be passed in when running the script to also
+fetch some default models:
+
+<CodeTabs>
+    ```powershell
+    python [install-directory]\scripts\setup.py --defaults
+    ```
+
+    ```bash
+    python [install-directory]/scripts/setup.py --defaults
+
+    ```
+</CodeTabs>
+
 ---
 
-# Setup Script
+## Adding new Piper voice models
 
-The setup script is located at:
-```text
-scripts/setup.py
-```
+In order to add new voice models, you must provide the files yourself. This can
+be done by:
 
-Run the setup:
-
-```powershell
-python .\scripts\setup.py
-```
-
-To also download optional default models:
-
-```powershell
-python .\scripts\setup.py --defaults
-```
-
----
+- Downloading the `voice-model.onnx` and `voice-model.onnx.json` files (some
+can be found under [piper-samples](https://rhasspy.github.io/piper-samples/)).
+- Placing both the files in either the `de` or `en` directory at `madchatter/run/voice-models`.
