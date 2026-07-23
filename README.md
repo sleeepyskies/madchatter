@@ -44,6 +44,10 @@ Recommended:
 
 Performance depends on the selected language model, speech recognition model, and available hardware.
 
+## Architecture
+
+For more information on the architecture of Mad Chatter, see [the docs](https://madchatter.pages.dev/developer-info/architecture).
+
 ## Supported Models
 
 Mad Chatter local AI models that fit the following:
