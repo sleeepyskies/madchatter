@@ -1,0 +1,66 @@
+---
+title: Architecture
+---
+
+## Tech Stack
+
+The tech stack used for MadChatter is:
+
+### Frontend
+
+- React & Next.js
+- shadcn component library
+
+### Backend
+
+- Python
+- FastAPI based webserver
+- SqlAlchemy ORM
+- SqLite database
+- ChromaDB for vectorized knowledge storage and retrieval
+- Piper TTS
+- faster-whisper STT
+- Ollama for LLM interfacing
+
+---
+
+## Components
+
+The structure of MadChatter is relatively simple and consists of two main components.
+
+### Frontend
+
+The frontend is a React/Next.js application that provides the user interface.
+It is responsible for:
+
+- Rendering the chat and admin pages
+- Communicating with the backend through a REST API
+
+### Backend
+
+The backend is a FastAPI application responsible for all application logic. It
+consists of a Api Handler layer, a Service layer and a Repository layer.
+
+The Api Handler layer mainly forwards all requests to the Service layer.
+
+The Service layer contains the main business logic. This involves validating
+validation of requests, triggering the AI pipeline for certain tasks, writing
+files to disk requesting the Repository layer to write to the database.
+
+The Repository layer handles persistence of data.
+
+---
+
+## Build & Deployment
+
+MadChatter is distributed as a single executable.
+
+During the build process:
+
+1. The Next.js frontend is exported as static files.
+2. The FastAPI backend is configured to serve these static assets.
+3. PyInstaller bundles the Python application, the CPython interpreter,
+and all required dependencies into a single executable.
+
+This architecture avoids the need for separate frontend and backend
+deployments while keeping the application self contained and able to run locally.
